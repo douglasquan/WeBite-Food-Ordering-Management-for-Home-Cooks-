@@ -27,12 +27,9 @@
     padding: 10px;
 }
 
-.dish-name{
-    float: left;
-}
-
-.dish-price{
-    right:100%;
+.dish-link {
+    display: flex;
+    justify-content: space-between;
 }
 
 body {
