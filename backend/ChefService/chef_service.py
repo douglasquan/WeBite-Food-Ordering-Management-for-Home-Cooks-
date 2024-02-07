@@ -53,8 +53,9 @@ def post_handler():
             return jsonify({"error": "Database error"}), 500
 
 
-@app.route("/chef/<int:id>", methods=["GET"])
-def handler_get(id):
+@app.route("/chef", methods=["GET"])
+def handler_get():
+    id = request.args.get('id', default=None, type=int)  
     conn = db_connection()
     cursor = conn.cursor()
     if request.method == "GET":
@@ -74,8 +75,9 @@ def handler_get(id):
             return jsonify({"error": "chef id not found"}), 404
 
 
-@app.route("/chef/<int:id>", methods=["PUT"])
-def handler_put(id):
+@app.route("/chef", methods=["PUT"])
+def handler_put():
+    id = request.args.get('id', default=None, type=int)  
     conn = db_connection()
     cursor = conn.cursor()
     
@@ -112,8 +114,9 @@ def handler_put(id):
     return jsonify({"error": "Invalid request method"}), 405
 
 
-@app.route("/chef/<int:id>", methods=["DELETE"])
-def handler_delete(id):
+@app.route("/chef", methods=["DELETE"])
+def handler_delete():
+    id = request.args.get('id', default=None, type=int)  
     conn = db_connection()
     cursor = conn.cursor()
     
