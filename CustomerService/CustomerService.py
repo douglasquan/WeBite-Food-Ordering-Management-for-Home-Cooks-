@@ -3,17 +3,19 @@ import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 import json
 import sys
+import os
 
 app = Flask(__name__)
 
 DATABASE = 'customers.db'
-meal_DATABASE = 'meals.db'
+#meal_DATABASE = 'meals.db'
 
 
 def create_tables():
     tables = [
         """CREATE TABLE IF NOT EXISTS customers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            command TEXT NOT NULL,
             name TEXT NOT NULL,
             email TEXT NOT NULL UNIQUE,
             password_hash TEXT NOT NULL
@@ -27,16 +29,16 @@ def create_tables():
 
     conn_cus = get_db_connection('customers.db')
     cursor_cus = conn_cus.cursor()
-    conn_meal = get_db_connection('meals.db')
-    cursor_meal = conn_meal.cursor()
+    #conn_meal = get_db_connection('meals.db')
+    #cursor_meal = conn_meal.cursor()
 
     cursor_cus.execute(tables[0])
-    cursor_meal.execute(tables[1])
+    #cursor_meal.execute(tables[1])
 
     conn_cus.commit()
     conn_cus.close()
-    conn_meal.commit()
-    conn_meal.close()
+    #conn_meal.commit()
+    #conn_meal.close()
 
 
 @app.cli.command('init_db')
@@ -50,7 +52,17 @@ def get_db_connection(db_name):
     return conn
 
 
-@app.route('/customer/create', methods=['POST'])
+@app.route('/customer', methods=['POST'])
+def post_handler():
+    data = request.json
+    command = data.get('command')
+    if command == 'create':
+        create_customer()
+    elif command == 'login':
+        login_customer()
+    else:
+        return jsonify({"message": "Command's wrong"}), 409
+
 def create_customer():
     customer_data = request.json
     name = customer_data.get('name')
@@ -74,8 +86,9 @@ def create_customer():
     return jsonify({"message": "User created successfully"}), 201
 
 
-@app.route('/customer/<int:customet_id>', methods=['GET'])
-def get_customer(customer_id):
+@app.route('/customer', methods=['GET'])
+def get_customer():
+    customer_id = request.args.get('id')
     conn = get_db_connection('customers.db')
     customer = conn.execute('SELECT * FROM customers WHERE id = ?',
                             (customer_id,)).fetchone()
@@ -85,8 +98,9 @@ def get_customer(customer_id):
     return jsonify(dict(customer)), 200
 
 
-@app.route('/customer/<int:customer_id>', methods=['DELETE'])
-def delete_customer(customer_id):
+@app.route('/customer>', methods=['DELETE'])
+def delete_customer():
+    customer_id = request.args.get('id')
     conn = get_db_connection('customers.db')
     customer = conn.execute('SELECT * FROM customers WHERE id = ?', (customer_id,)).fetchone()
     if customer is None:
@@ -99,53 +113,60 @@ def delete_customer(customer_id):
     return jsonify({"message": "Customer deleted successfully"}), 200
 
 
-@app.route('/meal/create', methods=['POST'])
-def create_meal():
-    meal_data = request.json
-    name = meal_data.get('name')
-    cost = meal_data.get('cost')
-
-    if not name or cost is None:
-        return jsonify({"message": "Name and cost are required"}), 400
-
-    conn = get_db_connection('meals.db')
-    conn.execute('INSERT INTO meals (name, cost) VALUES (?, ?)', (name, cost))
-    conn.commit()
-    conn.close()
-
-    return jsonify({"message": "Meal added successfully"}), 201
-
-
-@app.route('/meal/<meal_name>', methods=['GET'])
-def get_meal_cost(meal_name):
-    conn = get_db_connection('customers.db')
-    meal = conn.execute('SELECT * FROM meals WHERE name = ?',
-                        (meal_name,)).fetchone()
-    conn.close()
-    if meal is None:
-        return jsonify({"message": "Meal not found"}), 404
-    return jsonify({"name": meal["name"], "cost": meal["cost"]}), 200
+# @app.route('/meal/create', methods=['POST'])
+# def create_meal():
+#     meal_data = request.json
+#     name = meal_data.get('name')
+#     cost = meal_data.get('cost')
+#
+#     if not name or cost is None:
+#         return jsonify({"message": "Name and cost are required"}), 400
+#
+#     conn = get_db_connection('meals.db')
+#     conn.execute('INSERT INTO meals (name, cost) VALUES (?, ?)', (name, cost))
+#     conn.commit()
+#     conn.close()
+#
+#     return jsonify({"message": "Meal added successfully"}), 201
 
 
-@app.route('/meal/<int:meal_id>', methods=['DELETE'])
-def delete_meal(meal_id):
-    conn = get_db_connection('meals.db')
-    meal = conn.execute('SELECT * FROM meals WHERE id = ?', (meal_id,)).fetchone()
-    if meal is None:
-        conn.close()
-        return jsonify({"message": "Meal not found"}), 404
-
-    conn.execute('DELETE FROM meals WHERE id = ?', (meal_id,))
-    conn.commit()
-    conn.close()
-    return jsonify({"message": "Meal deleted successfully"}), 200
+# @app.route('/meal/<meal_name>', methods=['GET'])
+# def get_meal_cost(meal_name):
+#     conn = get_db_connection('customers.db')
+#     meal = conn.execute('SELECT * FROM meals WHERE name = ?',
+#                         (meal_name,)).fetchone()
+#     conn.close()
+#     if meal is None:
+#         return jsonify({"message": "Meal not found"}), 404
+#     return jsonify({"name": meal["name"], "cost": meal["cost"]}), 200
 
 
-@app.route('/customer/login', methods=['POST'])
+# @app.route('/meal/<int:meal_id>', methods=['DELETE'])
+# def delete_meal(meal_id):
+#     conn = get_db_connection('meals.db')
+#     meal = conn.execute('SELECT * FROM meals WHERE id = ?', (meal_id,)).fetchone()
+#     if meal is None:
+#         conn.close()
+#         return jsonify({"message": "Meal not found"}), 404
+#
+#     conn.execute('DELETE FROM meals WHERE id = ?', (meal_id,))
+#     conn.commit()
+#     conn.close()
+#     return jsonify({"message": "Meal deleted successfully"}), 200
+
+
+#@app.route('/customer/login', methods=['POST'])
 def login_customer():
-    credentials = request.json
-    email = credentials.get('email')
-    password = credentials.get('password')
+    #credentials = request.json
+    try:
+        email = request.args.get('email')
+    except KeyError:
+        try:
+            password = request.args.get('password')
+        except KeyError:
+            return "bad request", 400
+    # email = credentials.get('email')
+    # password = credentials.get('password')
 
     if not email or not password:
         return jsonify({"message": "Email and password are required"}), 400
@@ -173,5 +194,17 @@ if __name__ == '__main__':
     # with open(file_path, 'r') as configjson:
     #     config = json.load(configjson)
     # port = config['CustomerSerive']['port']
-    port = 8001
-    app.run(debug=True, port=port)
+    # port = 8001
+    # app.run(debug=True, port=port)
+    current_dir = os.getcwd()
+    config_path = os.path.abspath(os.path.join(os.path.join(os.path.join(current_dir, os.pardir), os.pardir), "config.json"))
+    with open(config_path, 'r') as config_file:
+        config_data = json.load(config_file)
+    # getting ip for everything
+    try:
+        customer_ip = config_data['CustomerService']['ip']
+        customer_port = config_data['CustomerService']['port']
+    except KeyError:
+        print("Order config missing")
+        exit(1)
+    app.run(host=customer_ip, port=customer_port, debug=True)
