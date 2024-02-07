@@ -36,7 +36,7 @@ def test_populate_chef_db(chef_list):
             print("Request failed with status code:", response.status_code)
 
 def test_get_chef_by_id(id_to_get):
-    response = requests.get(BASE + f"chef/{id_to_get}")
+    response = requests.get(BASE + f"chef?id={id_to_get}")
     if response.status_code == 200:
         try:
             data = response.json()
@@ -49,7 +49,7 @@ def test_get_chef_by_id(id_to_get):
         print("Request failed with status code:", response.status_code)
 
 def test_update_chef(id_to_update, update_data):
-    response = requests.put(BASE + f"chef/{id_to_update}", json=update_data)
+    response = requests.put(BASE + f"chef?id={id_to_update}", json=update_data)
     if response.status_code == 200:
         try:
             data = response.json()
@@ -60,7 +60,7 @@ def test_update_chef(id_to_update, update_data):
         print("Request failed with status code:", response.status_code)
 
 def test_delete_chef(id_to_delete, chef_data):
-    response = requests.delete(BASE + f"chef/{id_to_delete}", json=chef_data)
+    response = requests.delete(BASE + f"chef?id={id_to_delete}", json=chef_data)
     if response.status_code == 200:
         try:
             data = response.json()
@@ -73,24 +73,24 @@ def test_delete_chef(id_to_delete, chef_data):
 
 
 # Populate the database with chefs
-test_populate_chef_db(chef_list)
+# test_populate_chef_db(chef_list)
 
 # Get a chef by ID
 test_get_chef_by_id('2575607672')
 
-# Update a chef's information
-update_data = {
-    "name": "douglas_updated2",  
-    "email": "douglas_updated_email@example.com",  
-}
-test_update_chef(2575607672, update_data)
+# # Update a chef's information
+# update_data = {
+#     "name": "douglas_updated2",  
+#     "email": "douglas_updated_email@example.com",  
+# }
+# test_update_chef(2575607672, update_data)
 
-# Delete a chef
-chef_to_delete = {
-    "id": 735570578,
-    "name": "tom",
-    "phone_num":  3453453455,  
-    "email": "tom@gmail.com",
-    "password": "tom123"
-}
-test_delete_chef(chef_to_delete["id"], chef_to_delete)
+# # Delete a chef
+# chef_to_delete = {
+#     "id": 735570578,
+#     "name": "tom",
+#     "phone_num":  3453453455,  
+#     "email": "tom@gmail.com",
+#     "password": "tom123"
+# }
+# test_delete_chef(chef_to_delete["id"], chef_to_delete)
