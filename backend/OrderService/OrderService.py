@@ -10,37 +10,29 @@ app = Flask(__name__)
 @app.route('/order', methods=['POST'])
 def handle_post():
     data = request.get_json()
-    try:
-        command = data["command"]
-    except ValueError:
-        return "Invalid Command", 400
     # rudimentary does not contain duplicate checking
-    if command == 'create':
-        unique_id = uuid.uuid4().int
-        print(unique_id)
-        databasep = sqlite3.connect("order.db")
-        cursorp = databasep.cursor()
-        try:
-            print(data)
-            cursorp.execute(f'''
-                INSERT INTO orders
-                VALUES ({unique_id}, {data["customer_id"]}, {data["chef_id"]}, {data["quantity"]}, {data["price"]}, 'In progress');
-            ''')
-            databasep.commit()
-            databasep.close()
-            response = {
-                "order_id": unique_id,
-                "quantity": data["quantity"],
-                "status": "In progress"
-            }
-            return response, 200
-        except KeyError:
-            return "Missing values", 400
-        except sqlite3.OperationalError:
-            return "Bad token", 400
-    elif command == 'update':
-        # not yet implemented for Sprint 1
-        return "Not yet implemented", 404
+    unique_id = uuid.uuid4().int
+    print(unique_id)
+    databasep = sqlite3.connect("order.db")
+    cursorp = databasep.cursor()
+    try:
+        print(data)
+        cursorp.execute(f'''
+            INSERT INTO orders
+            VALUES ({unique_id}, {data["customer_id"]}, {data["chef_id"]}, {data["quantity"]}, {data["price"]}, 'In progress');
+        ''')
+        databasep.commit()
+        databasep.close()
+        response = {
+            "order_id": unique_id,
+            "quantity": data["quantity"],
+            "status": "In progress"
+        }
+        return response, 200
+    except KeyError:
+        return "Missing values", 400
+    except sqlite3.OperationalError:
+        return "Bad token", 400
 
 
 @app.route('/order', methods=['GET'])
@@ -69,8 +61,12 @@ def handle_get():
         return response, 200
 
 
-
 @app.route('/order', methods=['DELETE'])
+def handle_delete():
+    return "Not yet implemented", 404
+
+
+@app.route('/order', methods=['PUT'])
 def handle_delete():
     return "Not yet implemented", 404
 
@@ -92,7 +88,8 @@ if __name__ == "__main__":
     database.close()
     # getting config
     current_dir = os.getcwd()
-    config_path = os.path.abspath(os.path.join(os.path.join(os.path.join(current_dir, os.pardir), os.pardir), "config.json"))
+    config_path = os.path.abspath(
+        os.path.join(os.path.join(os.path.join(current_dir, os.pardir), os.pardir), "config.json"))
     with open(config_path, 'r') as config_file:
         config_data = json.load(config_file)
     # getting ip for everything
