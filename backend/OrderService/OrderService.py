@@ -92,7 +92,7 @@ if __name__ == "__main__":
     database.close()
     # getting config
     current_dir = os.getcwd()
-    config_path = os.path.abspath(os.path.join(os.path.join(current_dir, os.pardir), "config.json"))
+    config_path = os.path.abspath(os.path.join(os.path.join(os.path.join(current_dir, os.pardir), os.pardir), "config.json"))
     with open(config_path, 'r') as config_file:
         config_data = json.load(config_file)
     # getting ip for everything

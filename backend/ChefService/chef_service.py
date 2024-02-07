@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import json
 import sqlite3
 import uuid
+import os
 
 app = Flask(__name__)
 
@@ -150,4 +151,15 @@ def handler_delete(id):
     return jsonify({"error": "Invalid request method"}), 405
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    current_dir = os.getcwd()
+    config_path = os.path.abspath(os.path.join(os.path.join(os.path.join(current_dir, os.pardir), os.pardir), "config.json"))
+    with open(config_path, 'r') as config_file:
+        config_data = json.load(config_file)
+    # getting ip for everything
+    try:
+        chef_ip = config_data['CustomerService']['ip']
+        chef_port = config_data['CustomerService']['port']
+    except KeyError:
+        print("Order config missing")
+        exit(1)
+    app.run(host=chef_ip, port=chef_port, debug=True)

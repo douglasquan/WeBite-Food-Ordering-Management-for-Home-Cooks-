@@ -20,7 +20,7 @@ def chef():
         response = requests.delete(routes['chef'], json=r)
         return response.status_code, response.json()
     else:
-        return 400,"Bad Request"
+        return 400, "Bad Request"
 
 
 @app.route('/order', methods=['POST', 'GET', 'DELETE'])
@@ -72,8 +72,8 @@ if __name__ == "__main__":
         orders_ip = config_data['OrderService']['ip']
         orders_port = config_data['OrderService']['port']
 
-        user_ip = config_data['UserService']['ip']
-        user_port = config_data['UserService']['port']
+        customer_ip = config_data['CustomerService']['ip']
+        customer_port = config_data['CustomerService']['port']
 
         chef_ip = config_data['ChefService']['ip']
         chef_port = config_data['ChefService']['port']
@@ -81,7 +81,7 @@ if __name__ == "__main__":
         print("Config file missing services")
         exit(1)
     routes = {
-        "user": f"http://{user_ip}:{user_port}/user",
+        "user": f"http://{customer_ip}:{customer_port}/customer",
         "chef": f"http://{chef_port}:{chef_ip}/chef",
         "orders": f"http://{orders_port}:{orders_ip}/orders"
     }

@@ -3,6 +3,7 @@ import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 import json
 import sys
+import os
 
 app = Flask(__name__)
 
@@ -173,5 +174,17 @@ if __name__ == '__main__':
     # with open(file_path, 'r') as configjson:
     #     config = json.load(configjson)
     # port = config['CustomerSerive']['port']
-    port = 8001
-    app.run(debug=True, port=port)
+    # port = 8001
+    # app.run(debug=True, port=port)
+    current_dir = os.getcwd()
+    config_path = os.path.abspath(os.path.join(os.path.join(os.path.join(current_dir, os.pardir), os.pardir), "config.json"))
+    with open(config_path, 'r') as config_file:
+        config_data = json.load(config_file)
+    # getting ip for everything
+    try:
+        customer_ip = config_data['CustomerService']['ip']
+        customer_port = config_data['CustomerService']['port']
+    except KeyError:
+        print("Order config missing")
+        exit(1)
+    app.run(host=customer_ip, port=customer_port, debug=True)
