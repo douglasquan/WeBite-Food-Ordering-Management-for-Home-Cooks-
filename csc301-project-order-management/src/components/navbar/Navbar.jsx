@@ -13,12 +13,6 @@ const Navbar = () => {
             <a id="link" class="active" href="Home">Home</a>
           </li>
           <li className='nav-element'>
-            <a id="link" href="Chef">Chef</a>
-          </li>
-          <li className='nav-element'>
-            <a id="link" href="Customer">Customer</a>
-          </li>
-          <li className='nav-element'>
             <a id="link" href="Login">Login</a>
           </li>
         </ul>
