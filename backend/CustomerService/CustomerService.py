@@ -15,7 +15,6 @@ def create_tables():
     tables = [
         """CREATE TABLE IF NOT EXISTS customers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            command TEXT NOT NULL,
             name TEXT NOT NULL,
             email TEXT NOT NULL UNIQUE,
             password_hash TEXT NOT NULL
@@ -65,6 +64,7 @@ def post_handler():
 
 def create_customer():
     customer_data = request.json
+    #id = customer_data.get('id')
     name = customer_data.get('name')
     email = customer_data.get('email')
     password = customer_data.get('password')
@@ -75,15 +75,20 @@ def create_customer():
 
     try:
         conn = get_db_connection()
-        conn.execute('INSERT INTO customers (name, email, password_hash) VALUES (?, ?, ?)',
+        cur = conn.cursor()
+        cur.execute('INSERT INTO customers (name, email, password_hash) VALUES (?, ?, ?)',
                      (name, email, password_hash))
         conn.commit()
+        id = cur.lastrowid
     except sqlite3.IntegrityError:
         return jsonify({"message": "Email already exists"}), 409
     finally:
         conn.close()
-
-    return jsonify({"message": "User created successfully"}), 201
+    response = {"id": id,
+                "name": name,
+                "email": email,
+                "password_hash": password_hash}
+    return response, 201
 
 
 @app.route('/customer', methods=['GET'])
