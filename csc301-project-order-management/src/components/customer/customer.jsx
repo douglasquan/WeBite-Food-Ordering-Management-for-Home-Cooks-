@@ -1,13 +1,26 @@
 import React from "react"
-import Badge from 'react-bootstrap/Badge';
-import Carousel from 'react-bootstrap/Carousel';
-import Button from 'react-bootstrap/Button';
-import ListGroup from 'react-bootstrap/ListGroup';
+
+import { useEffect, useState } from "react";
+import { fetchMenu } from "../view_control.js";
 
 import './customer.css';
 import Navbar from "../navbar/Navbar.jsx"
 
 function Customer() {
+
+
+  const [menuItem, setMenuItems] = useState([]);
+  useEffect(() => {
+    // Pass variables into fetchMenu
+    fetchMenu('1')
+      .then(data => {
+        setMenuItems(data);
+      })
+      .catch(error => {
+        console.error('Error fetching menu:', error);
+      });
+  }, []);
+
   const menuItems = [
     { id: 1, name: 'Dish 1', price: '$10.99' },
     { id: 2, name: 'Dish 2', price: '$8.99' },
