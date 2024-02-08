@@ -1,8 +1,4 @@
 import React from "react"
-import Badge from 'react-bootstrap/Badge';
-import Carousel from 'react-bootstrap/Carousel';
-import Button from 'react-bootstrap/Button';
-import ListGroup from 'react-bootstrap/ListGroup';
 
 import './customer.css';
 import Navbar from "../navbar/Navbar.jsx"

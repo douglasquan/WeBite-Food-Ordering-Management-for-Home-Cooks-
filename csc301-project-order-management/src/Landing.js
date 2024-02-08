@@ -23,12 +23,12 @@ function Landing() {
                         element={<Home />}
                     />
                     <Route
-                        path="/customer"
+                        path="/customer/:resturantID"
                         element={<Customer />}
                     />
-                    <Route
-                        path="/chef"
-                        element={<Chef />}
+                    <Route 
+                        path="/chef/:buisnessID" 
+                        element={<Chef />} 
                     />
                     <Route
                         path="/login"

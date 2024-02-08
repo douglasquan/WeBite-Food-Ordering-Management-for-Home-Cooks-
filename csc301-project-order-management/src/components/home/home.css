@@ -29,6 +29,7 @@
 
 .chef-link{
     text-decoration: none;
+    color: black;
 }
 
 .customer-container{
@@ -61,4 +62,5 @@
 
 .customer-link{
     text-decoration: none;
+    color: black;
 }
