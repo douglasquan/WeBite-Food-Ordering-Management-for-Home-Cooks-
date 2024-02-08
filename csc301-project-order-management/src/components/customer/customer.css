@@ -14,12 +14,12 @@
     flex-wrap: wrap;
     flex-direction: column;
     align-content: center;
+    width: 50%; 
 }
 
 .menu-column {
     display: flex;
     width: 100%;
-    left: 50%;
     flex-direction: column;
     gap: 10px;
 }
