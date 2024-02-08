@@ -67,8 +67,38 @@ def handle_delete():
 
 
 @app.route('/order', methods=['PUT'])
-def handle_delete():
-    return "Not yet implemented", 404
+def handle_update():
+    id = request.args.get('id')
+    conn = sqlite3.connect("order.db")
+    cursor = conn.cursor()
+    data = request.get_json()
+
+    # Check if 'id' is present in the JSON data
+    if 'id' not in data:
+        return jsonify({"error": "Missing 'id' field in JSON data"}), 404
+
+    # Check if the provided 'id' matches the route parameter 'id'
+    if id != data['id']:
+        return jsonify({"error": "Mismatched 'id' in URL and JSON data"}), 404
+
+    # Remove 'id' from the data to prevent updating it
+    del data['id']
+
+    # Generate the SET clause dynamically based on provided fields
+    set_clause = ", ".join([f"{key} = ?" for key in data.keys()])
+    values = tuple(data.values())
+
+    # Update the chef's information in the database
+    if set_clause:
+        sql = f"UPDATE orders SET {set_clause} WHERE id = ?"
+        values += (id,)  # Append 'id' to the values tuple
+        cursor.execute(sql, values)
+        conn.commit()
+        conn.close()
+        return jsonify({"message": "Chef information updated successfully"}), 200
+
+    # If no fields other than 'id' were provided, consider it a success
+    return jsonify({"message": "Chef information unchanged"}), 200
 
 
 if __name__ == "__main__":
@@ -77,11 +107,11 @@ if __name__ == "__main__":
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS orders (
             order_id BIGINT PRIMARY KEY,
-            customer_id BIGINT,
-            chef_id BIGINT,
-            quantity INTEGER,
-            price REAL,
-            status TEXT
+            customer_id BIGINT NOT NULL,
+            chef_id BIGINT NOT NULL,
+            quantity INTEGER NOT NULL,
+            price REAL NOT NULL,
+            status TEXT NOT NULL
         );
     ''')
     database.commit()
