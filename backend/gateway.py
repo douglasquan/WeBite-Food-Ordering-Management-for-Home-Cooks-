@@ -1,6 +1,7 @@
 from flask import *
 import requests
 import os
+
 app = Flask(__name__)
 
 
@@ -75,6 +76,31 @@ def user():
         return "Bad Request", 400
 
 
+@app.route('/meal', methods=['POST', 'GET', 'DELETE', 'PUT'])
+def meal():
+    if request.method == 'GET':
+        r = request.query_string.decode()
+        new_url = routes['meal'] + f'?{r}'
+        response = requests.get(new_url)
+        return response.json(), response.status_code
+    elif request.method == 'POST':
+        r = request.get_json()
+        print(request.endpoint)
+        print(request.url)
+        response = requests.post(routes['meal'], json=r)
+        return response.json(), response.status_code
+    elif request.method == 'DELETE':
+        r = request.get_json()
+        response = requests.delete(routes['meal'], json=r)
+        return response.json(), response.status_code
+    elif request.method == 'PUT':
+        r = request.get_json()
+        response = requests.put(routes['meal'], json=r)
+        return response.json(), response.status_code
+    else:
+        return "Bad Request", 400
+
+
 if __name__ == "__main__":
     # getting config
     current_dir = os.getcwd()
@@ -91,12 +117,16 @@ if __name__ == "__main__":
 
         chef_ip = config_data['ChefService']['ip']
         chef_port = config_data['ChefService']['port']
+
+        meal_ip = config_data['MealService']['ip']
+        meal_port = config_data['MealService']['port']
     except KeyError:
         print("Config file missing services")
-        exit(1)
+
     routes = {
         "customer": f"http://{customer_ip}:{customer_port}/customer",
         "chef": f"http://{chef_ip}:{chef_port}/chef",
-        "orders": f"http://{orders_ip}:{orders_port}/order"
+        "orders": f"http://{orders_ip}:{orders_port}/order",
+        "meal": f"http://{meal_ip}:{meal_port}/meal"
     }
     app.run(port=config_data['Gateway']['port'], host=config_data['Gateway']['ip'], debug=True)
