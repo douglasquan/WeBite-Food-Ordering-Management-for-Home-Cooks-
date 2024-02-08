@@ -47,7 +47,7 @@ def get_db_connection(db_name):
     return conn
 
 
-@app.route('/meal/create', methods=['POST'])
+@app.route('/meal', methods=['POST'])
 def create_meal():
     meal_data = request.json
     name = meal_data.get('name')
@@ -57,11 +57,15 @@ def create_meal():
         return jsonify({"message": "Name and cost are required"}), 400
 
     conn = get_db_connection('meals.db')
-    conn.execute('INSERT INTO meals (name, cost) VALUES (?, ?)', (name, cost))
+    cur = conn.cursor()
+    cur.execute('INSERT INTO meals (name, cost) VALUES (?, ?)', (name, cost))
     conn.commit()
+    id = cur.lastrowid
     conn.close()
-
-    return jsonify({"message": "Meal added successfully"}), 201
+    response = {"id": id,
+                "name": name,
+                "cost": cost,}
+    return response, 201
 
 
 @app.route('/meal', methods=['GET'])
