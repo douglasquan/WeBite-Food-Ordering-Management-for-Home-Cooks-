@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button';
 import ListGroup from 'react-bootstrap/ListGroup';
 
 import './chef.css';
+import Navbar from "../navbar/Navbar.jsx"
 
 function Chef() {
   const menuItems = [
@@ -16,30 +17,36 @@ function Chef() {
 
 
   return (
-    <div>
-      <header>
-        <h1 class="main-header">weBite | Chef View Page</h1>
-      </header>
+    <div> 
+      <Navbar />
 
       <main>
         <h2 class="menu">Menu</h2>
         <div class="menu-container">
           <div class="column">
+            <ul>
               {menuItems.map((item, index) => (
+                <ul key={index} className="order-item">
                   <a class = "order" href={`/order/${item.id}`} className="order">
                     <span className="order-name">{item.name}</span>
                     <span className="order-price">{item.price}</span>
                   </a>
+                </ul>
               ))}
+            </ul>
           </div>
 
           <div class="column">
+            <ul>
               {menuItems.map((item, index) => (
-                  <a href={`/order/${item.id}`} className="order">
+                <ul key={index} className="order-item">
+                  <a class = "order" href={`/order/${item.id}`} className="order">
                     <span className="order-name">{item.name}</span>
                     <span className="order-price">{item.price}</span>
                   </a>
+                </ul>
               ))}
+            </ul>
           </div>
         </div>
       </main>

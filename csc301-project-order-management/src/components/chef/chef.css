@@ -8,8 +8,10 @@ body {
 
 .column {
     display: flex;
-    flex-direction: column;
+    width: 100%;
     gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 header {
@@ -48,14 +50,23 @@ footer {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    height: 100vh
+    height: 100vh;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-content: center;
 }
 
 .menu {
 text-align: center;
 }
+
 .footer-title {
 color: white;
+}
+
+.order-item {
+    border: 1px solid #ddd;
+    padding: 10px;
 }
 
 .order {
