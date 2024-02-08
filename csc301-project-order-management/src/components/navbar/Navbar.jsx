@@ -9,17 +9,17 @@ const Navbar = () => {
       </div>
       <div className='nav-links'>
         <ul>
-          <li>
-            <a class="active" href="Home">Home</a>
+          <li className='nav-element'>
+            <a id="link" class="active" href="Home">Home</a>
           </li>
-          <li>
-            <a href="Chef">Chef</a>
+          <li className='nav-element'>
+            <a id="link" href="Chef">Chef</a>
           </li>
-          <li>
-            <a href="Customer">Customer</a>
+          <li className='nav-element'>
+            <a id="link" href="Customer">Customer</a>
           </li>
-          <li>
-            <a href="Login">Login</a>
+          <li className='nav-element'>
+            <a id="link" href="Login">Login</a>
           </li>
         </ul>
       </div>

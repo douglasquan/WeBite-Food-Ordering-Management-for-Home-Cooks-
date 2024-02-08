@@ -29,14 +29,14 @@
 }
 
 
-li{
+.nav-element{
     list-style: none;
     display: inline-block;
     padding: 1ex;
     margin-left: 1.5ex;
 }
 
-a{  
+#link{  
     color: gray;
     font-size: 2.5ex;
     background-color: white;
@@ -45,7 +45,7 @@ a{
     border-radius: 5%;
 }
 
-a:hover {
+#link:hover {
     background-color: whitesmoke;
     color: black;
 }

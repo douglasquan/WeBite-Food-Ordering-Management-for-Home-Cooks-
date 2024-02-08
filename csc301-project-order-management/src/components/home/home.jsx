@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
- 
+import './home.css';
 import Navbar from "../navbar/Navbar.jsx"
 
 function Home() {
@@ -7,11 +7,11 @@ function Home() {
     <div className="App">
         <Navbar />
         <div className='chef-container'>
-          <h1>chef container</h1>
+          <h1>CHEF CONTAINER</h1>
           <div className='chef-info'>
             <ul className='chef-list'>
               <li>
-                <Link to="/customer">customer</Link>
+                <Link className="chef-link" to="/chef">chef</Link>
               </li>
               <li>2</li>
               <li>3</li>
@@ -20,11 +20,11 @@ function Home() {
           </div>
         </div>
         <div className='customer-container'>
-          <h1>customer container</h1>
+          <h1>CUTSOMER CONTAINER</h1>
           <div className='customer-info'>
             <ul className='customer-list'>
                 <li>
-                    <Link to="/chef">chef</Link>
+                    <Link className="customer-link" to="/customer">customer</Link>
                 </li>
                 <li>2</li>
                 <li>3</li>
