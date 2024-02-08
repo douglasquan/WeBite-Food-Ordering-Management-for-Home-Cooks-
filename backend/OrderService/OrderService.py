@@ -11,7 +11,7 @@ app = Flask(__name__)
 def handle_post():
     data = request.get_json()
     # rudimentary does not contain duplicate checking
-    unique_id = uuid.uuid4().int
+    unique_id = abs(uuid.uuid4().int) % (10 ** 10)
     print(unique_id)
     databasep = sqlite3.connect("order.db")
     cursorp = databasep.cursor()
@@ -73,16 +73,16 @@ def handle_update():
     cursor = conn.cursor()
     data = request.get_json()
 
-    # Check if 'id' is present in the JSON data
-    if 'id' not in data:
-        return jsonify({"error": "Missing 'id' field in JSON data"}), 404
+    # # Check if 'id' is present in the JSON data
+    # if 'id' not in data:
+    #     return jsonify({"error": "Missing 'id' field in JSON data"}), 404
 
-    # Check if the provided 'id' matches the route parameter 'id'
-    if id != data['id']:
-        return jsonify({"error": "Mismatched 'id' in URL and JSON data"}), 404
+    # # Check if the provided 'id' matches the route parameter 'id'
+    # if id != data['id']:
+    #     return jsonify({"error": "Mismatched 'id' in URL and JSON data"}), 404
 
-    # Remove 'id' from the data to prevent updating it
-    del data['id']
+    # # Remove 'id' from the data to prevent updating it
+    # del data['id']
 
     # Generate the SET clause dynamically based on provided fields
     set_clause = ", ".join([f"{key} = ?" for key in data.keys()])
@@ -90,7 +90,7 @@ def handle_update():
 
     # Update the chef's information in the database
     if set_clause:
-        sql = f"UPDATE orders SET {set_clause} WHERE id = ?"
+        sql = f"UPDATE orders SET {set_clause} WHERE order_id = ?"
         values += (id,)  # Append 'id' to the values tuple
         cursor.execute(sql, values)
         conn.commit()

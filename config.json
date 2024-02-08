@@ -1,0 +1,19 @@
+{
+    "ChefService": {
+          "port": 14001,
+          "ip": "127.0.0.1"
+      }   ,
+      "OrderService": {
+          "port": 14002,
+          "ip": "127.0.0.1"
+      }   ,
+      "CustomerService": {
+          "port": 15000,
+          "ip": "127.0.0.1"
+      }   ,
+      "Gateway": {
+          "port": 14000,
+          "ip": "127.0.0.1"
+      }   
+  }
+  
