@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button';
 import ListGroup from 'react-bootstrap/ListGroup';
 
 import './customer.css';
+import Navbar from "../navbar/Navbar.jsx"
 
 function Customer() {
   const menuItems = [
@@ -24,9 +25,7 @@ function Customer() {
 
   return (
     <div>
-      <header>
-        <h1 class="main-header">weBite | Customer View Page</h1>
-      </header>
+      <Navbar />
 
       <main>
         <h2 class="menu">Menu</h2>

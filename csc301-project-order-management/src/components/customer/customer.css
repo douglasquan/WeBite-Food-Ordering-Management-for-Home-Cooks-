@@ -7,11 +7,13 @@
 }
 
 .menu-container {
-    padding-right: 2.47em;
     display: flex;
     justify-content: space-around;
     align-items: center;
-    height: 100vh
+    height: 100vh;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-content: center;
 }
 
 .menu-column {
