@@ -12,10 +12,10 @@
 }
 
 .chef-list li{
-    width: 100px;
-    height: 100px;
+    width: 10ex;
+    height: 10ex;
     text-align: center;
-    line-height: 100px;
+    line-height: 10ex;
     border-radius: 1ex;
     background-color: lightblue;
     margin:3ex;
@@ -43,10 +43,10 @@
 }
 
 .customer-list li{
-    width: 100px;
-    height: 100px;
+    width: 10ex;
+    height: 10ex;
     text-align: center;
-    line-height: 100px;
+    line-height: 10ex;
     border-radius: 1ex;
     background-color: lightblue;
     margin:3ex;
