@@ -1,17 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import './style.css'; // Ensure this is the correct path to your CSS file
+import Navbar from "../navbar/Navbar.jsx"
+
 
 function Login() {
   let navigate = useNavigate();
-
-  const handleCreateAccount = () => {
-    navigate('/create-account');
-  };
-
-  const handleForgotPassword = () => {
-    navigate('/forgot-password');
-  };
 
   const handleLogin = (event) => {
     navigate('/Login');
@@ -19,17 +14,7 @@ function Login() {
 
   return (
     <div className="wrapper"> 
-      <header>
-        <nav>
-          <ul className="nav-links">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Food Group</a></li>
-            <li><a href="#">Finance</a></li>    
-          </ul>
-          <button className="login-btn" onClick={() => navigate('/login')}>Login</button>
-        </nav>
-      </header>
+      <Navbar />
       <main>
         <div className="form-container">
           <form id="loginForm" onSubmit={handleLogin}>
@@ -44,8 +29,10 @@ function Login() {
             </div>
             <button type="submit">Login</button>
             <div className="helper-links">
-              <a onClick={handleForgotPassword} className="forgot-password">Forgot Password?</a>
-              <button type="button" className="create-account-btn" onClick={handleCreateAccount}>Create Account</button>
+              <a href = "forgot-password" className="forgot-password">Forgot Password?</a>
+              <button type="button" className="create-account-btn">
+                <a href = "/create-account"className= "create-account-btn"> Create Account </a>
+              </button>
             </div>
           </form>
         </div>

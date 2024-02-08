@@ -1,27 +1,12 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import './style.css'; // Assuming a single CSS file for all components
+import Navbar from "../navbar/Navbar.jsx"
 
 function CreateAccount() {
-  let navigate = useNavigate();
-
-  const handleLogin = (event) => {
-    navigate('/Login');
-  };
-
   return (
     <div className="wrapper"> 
-      <header>
-        <nav>
-          <ul className="nav-links">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Food Group</a></li>
-            <li><a href="#">Finance</a></li>    
-          </ul>
-          <button className="login-btn" onClick={handleLogin}>Login</button>
-        </nav>
-      </header>
+    <Navbar />
       <main>
         <div className="form-container">
           <form id="createAccountForm">

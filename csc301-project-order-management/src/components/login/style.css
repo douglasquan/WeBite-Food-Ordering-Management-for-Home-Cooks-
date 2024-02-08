@@ -164,6 +164,8 @@ h2 {
   color: #b2f5ea; /* Hover color for link */
 }
 
+
+
 .create-account-btn {
   background-color: #00b8d4; /* Same as link color for consistency */
   color: white;
@@ -190,6 +192,8 @@ body, .wrapper {
 }
 
 footer {
+  position: relative;
+  margin-top: 15px;
   height: 3rem; /* Set the height of the footer */
   padding: 1.5rem;
   display: flex;
