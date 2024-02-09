@@ -103,7 +103,11 @@ customer_to_delete = {
     "quantity": 2,
     "price": 20.0,
 }
-
+# customer_to_delete = {
+# "name": "John Doe",
+#         "email": "john@example.com",
+#         "password_hash": "hash1"
+# }
 
 def test_customer_login(email_to_login, password_to_login, login_data):
     login_data["command"] = "login"

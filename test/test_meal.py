@@ -91,12 +91,16 @@ update_data = {
     "price": "15.99",
 }
 
-customer_to_delete = {
+meal_to_delete = {
     "customer_id": 1005,
     "chef_id": 2005,
     "quantity": 2,
     "price": 20.0,
 }
+# meal_to_delete = {
+#     "name": "pasta",
+#     "cost": 3
+# }
 
 
 if __name__ == '__main__':
@@ -110,5 +114,5 @@ if __name__ == '__main__':
     # test_customer_order(1964905803, update_data)
 
     # Delete a customer
-    test_delete_customer(1, customer_to_delete)
+    test_delete_customer(1, meal_to_delete)
     test_get_customer_by_id(1)
