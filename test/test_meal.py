@@ -31,7 +31,7 @@ meal_list = [
 ]
 
 
-def test_create_customer_db(meal_list):
+def test_create_meal_db(meal_list):
     for meal_data in meal_list:
         response = requests.post(GATEWAY_URI + "meal", json=meal_data)
         if response.status_code == 200:
@@ -45,7 +45,7 @@ def test_create_customer_db(meal_list):
             print("Request failed with response:", response)
 
 
-def test_get_customer_by_id(id_to_get):
+def test_get_meal_by_id(id_to_get):
     response = requests.get(GATEWAY_URI + f"meal?id={id_to_get}")
     if response.status_code == 200:
         try:
@@ -54,13 +54,13 @@ def test_get_customer_by_id(id_to_get):
         except ValueError:
             print("Response is not in JSON format")
     elif response.status_code == 404:
-        print("customer id not found.")
+        print("meal id not found.")
     else:
         print("Request failed with status code:", response.status_code)
         print("Request failed with response:", response.json())
 
 
-def test_update_customer(id_to_update, update_data):
+def test_update_meal(id_to_update, update_data):
     response = requests.put(GATEWAY_URI + f"meal?id={id_to_update}", json=update_data)
     if response.status_code == 200:
         try:
@@ -73,7 +73,7 @@ def test_update_customer(id_to_update, update_data):
         print("Request failed with response:", response.json())
 
 
-def test_delete_customer(id_to_delete, order_data):
+def test_delete_meal(id_to_delete, order_data):
     response = requests.delete(GATEWAY_URI + f"meal?id={id_to_delete}", json=order_data)
     if response.status_code == 200:
         try:
@@ -87,12 +87,12 @@ def test_delete_customer(id_to_delete, order_data):
 
 
 update_data = {
-    "customer_id": "1007",
+    "meal_id": "1007",
     "price": "15.99",
 }
 
-customer_to_delete = {
-    "customer_id": 1005,
+meal_to_delete = {
+    "meal_id": 1005,
     "chef_id": 2005,
     "quantity": 2,
     "price": 20.0,
@@ -101,14 +101,14 @@ customer_to_delete = {
 
 if __name__ == '__main__':
     # Populate the customers.db with customers
-    test_create_customer_db(meal_list)
+    test_create_meal_db(meal_list)
 
     # Get a customer by ID
-    test_get_customer_by_id(1)
+    test_get_meal_by_id(1)
 
     # Update a customer's information
     # test_customer_order(1964905803, update_data)
 
     # Delete a customer
-    test_delete_customer(1, customer_to_delete)
-    test_get_customer_by_id(1)
+    test_delete_meal(1, meal_to_delete)
+    test_get_meal_by_id(1)
