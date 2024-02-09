@@ -4,12 +4,6 @@ import json
 import sys
 import os
 
-from flask import Flask, request, jsonify
-import sqlite3
-import json
-import sys
-import os
-
 app = Flask(__name__)
 meal_DATABASE = 'meals.db'
 
