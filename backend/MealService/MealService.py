@@ -83,12 +83,17 @@ def get_meal_cost():
 @app.route('/meal', methods=['DELETE'])
 def delete_meal():
     meal_id = request.args.get('id')
+    meal_data = request.json
+    name = meal_data.get('name')
+    cost = meal_data.get('cost')
     conn = get_db_connection('meals.db')
     meal = conn.execute('SELECT * FROM meals WHERE id = ?', (meal_id,)).fetchone()
     if meal is None:
         conn.close()
         return jsonify({"message": "Meal not found"}), 404
-
+    if name != meal['name'] or cost != meal['cost']:
+        conn.close()
+        return jsonify({"message": "Authentication failed"}), 409
     conn.execute('DELETE FROM meals WHERE id = ?', (meal_id,))
     conn.commit()
     conn.close()
