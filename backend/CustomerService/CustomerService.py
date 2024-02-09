@@ -5,6 +5,13 @@ import json
 import sys
 import os
 
+from flask import Flask, request, jsonify
+import sqlite3
+from werkzeug.security import generate_password_hash, check_password_hash
+import json
+import sys
+import os
+
 app = Flask(__name__)
 
 DATABASE = 'customers.db'
@@ -25,12 +32,11 @@ def create_tables():
             cost DECIMAL NOT NULL
         )"""
     ]
-
     conn_cus = get_db_connection('customers.db')
     cursor_cus = conn_cus.cursor()
+    cursor_cus.execute('''DROP TABLE IF EXISTS customers;''')
     #conn_meal = get_db_connection('meals.db')
     #cursor_meal = conn_meal.cursor()
-
     cursor_cus.execute(tables[0])
     #cursor_meal.execute(tables[1])
 
@@ -40,7 +46,7 @@ def create_tables():
     #conn_meal.close()
 
 
-@app.cli.command('init_db')
+#@app.cli.command('init_db')
 def initialize_database():
     create_tables()
 
@@ -56,30 +62,41 @@ def post_handler():
     data = request.json
     command = data.get('command')
     if command == 'create':
-        create_customer()
+        response = create_customer()
+        return response
     elif command == 'login':
-        login_customer()
+        response = login_customer()
+        return response
     else:
         return jsonify({"message": "Command's wrong"}), 409
 
 def create_customer():
     customer_data = request.json
+    #print(request.json)
     #id = customer_data.get('id')
     name = customer_data.get('name')
     email = customer_data.get('email')
-    password = customer_data.get('password')
+    password = customer_data.get('password_hash')
+    #print(name, email, password)
 
     if not (name and email and password):
+        #print("no")
         return jsonify({"message": "Missing fields"}), 400
     password_hash = generate_password_hash(password)
-
+    #print("password_hash")
     try:
-        conn = get_db_connection()
+        #print("3")
+        conn = get_db_connection('customers.db')
         cur = conn.cursor()
+        #print("4")
+        # sql = """INSERT INTO customers (name, email, password_hash) VALUES (?, ?, ?)"""
+        # cur = cur.execute(sql, (name, email, password_hash))
         cur.execute('INSERT INTO customers (name, email, password_hash) VALUES (?, ?, ?)',
                      (name, email, password_hash))
+        #print("5")
         conn.commit()
         id = cur.lastrowid
+        #print("id", id)
     except sqlite3.IntegrityError:
         return jsonify({"message": "Email already exists"}), 409
     finally:
@@ -88,7 +105,8 @@ def create_customer():
                 "name": name,
                 "email": email,
                 "password_hash": password_hash}
-    return response, 201
+    #print(response)
+    return response, 200
 
 
 @app.route('/customer', methods=['GET'])
@@ -103,7 +121,7 @@ def get_customer():
     return jsonify(dict(customer)), 200
 
 
-@app.route('/customer>', methods=['DELETE'])
+@app.route('/customer', methods=['DELETE'])
 def delete_customer():
     customer_id = request.args.get('id')
     conn = get_db_connection('customers.db')
@@ -164,12 +182,13 @@ def delete_customer():
 def login_customer():
     #credentials = request.json
     try:
+        #print(request.json)
         email = request.args.get('email')
+        print(email)
+        password = request.args.get('password_hash')
+        #print(password)
     except KeyError:
-        try:
-            password = request.args.get('password')
-        except KeyError:
-            return "bad request", 400
+        return "bad request", 400
     # email = credentials.get('email')
     # password = credentials.get('password')
 
@@ -178,6 +197,7 @@ def login_customer():
 
     conn = get_db_connection("customers.db")
     customer = conn.execute('SELECT * FROM customers WHERE email = ?', (email,)).fetchone()
+    conn.commit()
     conn.close()
 
     if customer and check_password_hash(customer['password_hash'], password):
@@ -201,6 +221,7 @@ if __name__ == '__main__':
     # port = config['CustomerSerive']['port']
     # port = 8001
     # app.run(debug=True, port=port)
+    initialize_database()
     current_dir = os.getcwd()
     config_path = os.path.abspath(os.path.join(os.path.join(os.path.join(current_dir, os.pardir), os.pardir), "config.json"))
     with open(config_path, 'r') as config_file:
@@ -210,6 +231,6 @@ if __name__ == '__main__':
         customer_ip = config_data['CustomerService']['ip']
         customer_port = config_data['CustomerService']['port']
     except KeyError:
-        print("Order config missing")
+        print("Customer config missing")
         exit(1)
     app.run(host=customer_ip, port=customer_port, debug=True)

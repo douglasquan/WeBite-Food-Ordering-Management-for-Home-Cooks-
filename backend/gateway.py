@@ -16,12 +16,16 @@ def chef():
         response = requests.post(routes['chef'], json=r)
         return response.json(), response.status_code
     elif request.method == 'DELETE':
-        r = request.get_json()
-        response = requests.delete(routes['chef'], json=r)
+        r = request.query_string.decode()
+        params = request.get_json()
+        new_url = routes['chef'] + f'?{r}'
+        response = requests.delete(new_url, json=params)
         return response.json(), response.status_code
     elif request.method == 'PUT':
-        r = request.get_json()
-        response = requests.put(routes['chef'], json=r)
+        r = request.query_string.decode()
+        params = request.get_json()
+        new_url = routes['chef'] + f'?{r}'
+        response = requests.put(new_url, json=params)
         return response.json(), response.status_code
     else:
         return "Bad Request", 400
@@ -31,20 +35,24 @@ def chef():
 def order():
     if request.method == 'GET':
         r = request.query_string.decode()
-        new_url = routes['orders'] + f'?{r}'
+        new_url = routes['order'] + f'?{r}'
         response = requests.get(new_url)
         return response.json(), response.status_code
     elif request.method == 'POST':
         r = request.get_json()
-        response = requests.post(routes['orders'], json=r)
+        response = requests.post(routes['order'], json=r)
         return response.json(), response.status_code
     elif request.method == 'DELETE':
-        r = request.get_json()
-        response = requests.delete(routes['orders'], json=r)
+        r = request.query_string.decode()
+        params = request.get_json()
+        new_url = routes['order'] + f'?{r}'
+        response = requests.delete(new_url, json=params)
         return response.json(), response.status_code
     elif request.method == 'PUT':
-        r = request.get_json()
-        response = requests.put(routes['chef'], json=r)
+        r = request.query_string.decode()
+        params = request.get_json()
+        new_url = routes['order'] + f'?{r}'
+        response = requests.put(new_url, json=params)
         return response.json(), response.status_code
     else:
         return "Bad Request", 400
@@ -59,21 +67,57 @@ def user():
         return response.json(), response.status_code
     elif request.method == 'POST':
         r = request.get_json()
-        print(request.endpoint)
-        print(request.url)
-        response = requests.post(routes['customer'], json=r)
+        #print(r)
+        new_url = routes['customer']
+        if r['command'] == 'login':
+            data = request.query_string.decode()
+            #print(data)
+            new_url = routes['customer'] + f'?{data}'
+        #r = request.query_string.decode()
+        #print(request.endpoint)
+        #print(request.url)
+        response = requests.post(new_url, json=r)
         return response.json(), response.status_code
     elif request.method == 'DELETE':
-        r = request.get_json()
-        response = requests.delete(routes['customer'], json=r)
+        r = request.query_string.decode()
+        params = request.get_json()
+        new_url = routes['customer'] + f'?{r}'
+        response = requests.delete(new_url, json=params)
         return response.json(), response.status_code
     elif request.method == 'PUT':
-        r = request.get_json()
-        response = requests.put(routes['customer'], json=r)
+        r = request.query_string.decode()
+        params = request.get_json()
+        new_url = routes['customer'] + f'?{r}'
+        response = requests.put(new_url, json=params)
         return response.json(), response.status_code
     else:
         return "Bad Request", 400
 
+@app.route('/meal', methods=['POST', 'GET', 'DELETE', 'PUT'])
+def meal():
+    if request.method == 'GET':
+        r = request.query_string.decode()
+        new_url = routes['meal'] + f'?{r}'
+        response = requests.get(new_url)
+        return response.json(), response.status_code
+    elif request.method == 'POST':
+        r = request.get_json()
+        response = requests.post(routes['meal'], json=r)
+        return response.json(), response.status_code
+    elif request.method == 'DELETE':
+        r = request.query_string.decode()
+        params = request.get_json()
+        new_url = routes['meal'] + f'?{r}'
+        response = requests.delete(new_url, json=params)
+        return response.json(), response.status_code
+    elif request.method == 'PUT':
+        r = request.query_string.decode()
+        params = request.get_json()
+        new_url = routes['meal'] + f'?{r}'
+        response = requests.put(new_url, json=params)
+        return response.json(), response.status_code
+    else:
+        return "Bad Request", 400
 
 if __name__ == "__main__":
     # getting config
@@ -85,18 +129,20 @@ if __name__ == "__main__":
     try:
         orders_ip = config_data['OrderService']['ip']
         orders_port = config_data['OrderService']['port']
-
         customer_ip = config_data['CustomerService']['ip']
         customer_port = config_data['CustomerService']['port']
 
         chef_ip = config_data['ChefService']['ip']
         chef_port = config_data['ChefService']['port']
+        meal_ip = config_data['MealService']['ip']
+        meal_port = config_data['MealService']['port']
     except KeyError:
         print("Config file missing services")
         exit(1)
     routes = {
         "customer": f"http://{customer_ip}:{customer_port}/customer",
         "chef": f"http://{chef_ip}:{chef_port}/chef",
-        "orders": f"http://{orders_ip}:{orders_port}/order"
+        "order": f"http://{orders_ip}:{orders_port}/order",
+        "meal": f"http://{meal_ip}:{meal_port}/meal"
     }
     app.run(port=config_data['Gateway']['port'], host=config_data['Gateway']['ip'], debug=True)
