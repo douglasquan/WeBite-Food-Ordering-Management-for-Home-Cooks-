@@ -26,6 +26,7 @@ def create_tables():
     #cursor_cus = conn_cus.cursor()
     conn_meal = get_db_connection('meals.db')
     cursor_meal = conn_meal.cursor()
+    cursor_meal.execute('''DROP TABLE IF EXISTS meals;''')
 
     #cursor_cus.execute(tables[0])
     cursor_meal.execute(tables[1])
@@ -36,7 +37,6 @@ def create_tables():
     conn_meal.close()
 
 
-@app.cli.command('init_db')
 def initialize_database():
     create_tables()
 
@@ -65,13 +65,13 @@ def create_meal():
     response = {"id": id,
                 "name": name,
                 "cost": cost,}
-    return response, 201
+    return response, 200
 
 
 @app.route('/meal', methods=['GET'])
 def get_meal_cost():
     meal_id = request.args.get('id')
-    conn = get_db_connection('customers.db')
+    conn = get_db_connection('meals.db')
     meal = conn.execute('SELECT * FROM meals WHERE id = ?',
                         (meal_id,)).fetchone()
     conn.close()
@@ -96,6 +96,7 @@ def delete_meal():
 
 
 if __name__ == '__main__':
+    initialize_database()
     current_dir = os.getcwd()
     config_path = os.path.abspath(
         os.path.join(os.path.join(os.path.join(current_dir, os.pardir), os.pardir), "config.json"))
