@@ -85,15 +85,15 @@ def handler_put():
         data = request.get_json()
 
         # Check if 'id' is present in the JSON data
-        if 'id' not in data:
-            return jsonify({"error": "Missing 'id' field in JSON data"}), 404
+        # if 'id' not in data:
+        #     return jsonify({"error": "Missing 'id' field in JSON data"}), 404
 
-        # Check if the provided 'id' matches the route parameter 'id'
-        if id != data['id']:
-            return jsonify({"error": "Mismatched 'id' in URL and JSON data"}), 404
+        # # Check if the provided 'id' matches the route parameter 'id'
+        # if id != data['id']:
+        #     return jsonify({"error": "Mismatched 'id' in URL and JSON data"}), 404
 
         # Remove 'id' from the data to prevent updating it
-        del data['id']
+        # del data['id']
 
         # Generate the SET clause dynamically based on provided fields
         set_clause = ", ".join([f"{key} = ?" for key in data.keys()])
@@ -123,7 +123,7 @@ def handler_delete():
     if request.method == "DELETE":
         data = request.get_json()
         # Check if all required fields are present in the JSON data
-        required_fields = ["id", "name", "phone_num", "email", "password"]
+        required_fields = ["name", "phone_num", "email", "password"]
         for field in required_fields:
             if field not in data:
                 return jsonify({"error": f"Missing '{field}' field in JSON data"}), 400
@@ -133,7 +133,7 @@ def handler_delete():
         chef = cursor.fetchone()
         if chef is None:
             return jsonify({"error": "Chef not found with the provided ID"}), 404
-
+        print(chef)
         # Perform authentication here, check if all fields match with the database
         if data["name"] != chef[1]:
             return jsonify({"error": "Authentication failed. Invalid name"}), 401
@@ -158,11 +158,12 @@ if __name__ == "__main__":
     config_path = os.path.abspath(os.path.join(os.path.join(os.path.join(current_dir, os.pardir), os.pardir), "config.json"))
     with open(config_path, 'r') as config_file:
         config_data = json.load(config_file)
-    # getting ip for everything
+    # getting ip for everything        
     try:
-        chef_ip = config_data['CustomerService']['ip']
-        chef_port = config_data['CustomerService']['port']
+        chef_ip = config_data['ChefService']['ip']
+        chef_port = config_data['ChefService']['port']
+        # print(f"chef port:{chef_port} chef ip: {chef_ip}")
     except KeyError:
-        print("Order config missing")
+        print("Chef config missing")
         exit(1)
     app.run(host=chef_ip, port=chef_port, debug=True)
