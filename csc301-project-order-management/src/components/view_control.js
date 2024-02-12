@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 // Function to fetch menu information from the backend for customer page
 export const fetchMenu = async (chefID) => {
     try {
@@ -18,26 +20,39 @@ export const fetchMenu = async (chefID) => {
 // Function to createUser and update databases
 export const createUser = async (username, password) => {
     try {
-        console.log("called");
         const name = "John doe";
         const phone_num = 1234567890;
         console.log(name);
         console.log(phone_num);
         console.log(username);
         console.log(password);
-        const response = await fetch("http://127.0.0.1:14000/chef", {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ "name": name, "phone_num": phone_num, "email": username, "password": password}), // Your data to be sent to Flask backend
+
+        const response = "";
+        axios.post('/api', {
+            "name": name,
+            "phone_num": phone_num,
+            "email": username,
+            "password": password
+        })
+            .then(response => {
+            console.log(response.data);
+        })
+            .catch(error => {
+            console.error('Error:', error);
         });
-        
-        if (!response.ok) {
-            throw new Error('Failed to create user');    
-        }
-        //  console.log(response);
-        return await response.json();   
+        // const response = await fetch("/api", {
+        //     method: 'POST',
+        //     headers: {
+        //       'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({ "name": name, "phone_num": phone_num, "email": username, "password": password}), // Your data to be sent to Flask backend
+        // });
+        // console.log(response);
+        // if (!response.ok) {
+        //     throw new Error('Failed to create user');    
+        // }
+        return response;    
+        //return await response.json();   
     } catch (error) {
         console.error('Error fetching menu:', error);
         throw error; // Rethrow the error to handle it where the function is called

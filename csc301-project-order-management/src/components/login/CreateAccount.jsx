@@ -7,9 +7,8 @@ import { createUser } from "../view_control.js";
 function CreateAccount() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const email = document.getElementById("email");
-  // const password = document.getElementById("password");
-  // const confirmPassword = document.getElementById("confirmPassword");
+  const [email, setEmail] = useState("");
+  
   const [passwordsMatch, setPasswordsMatch] = useState(true);
   const [showPasswordMismatchMessage, setShowPasswordMismatchMessage] = useState(false);
 
@@ -25,7 +24,7 @@ function CreateAccount() {
       return;
     } else {
       // create user
-      createUser(email.value, password.value);
+      createUser(email, password);
     }
 
     // Passwords match, proceed with form submission
@@ -42,7 +41,7 @@ function CreateAccount() {
             <h2>Create Account</h2>
             <div className="form-group">
               <label htmlFor="email">Email:</label>
-              <input type="email" id="email" name="email" required />
+              <input type="email" id="email" name="email" required onChange={(e) => setEmail(e.target.value)}/>
             </div>
             <div className="form-group">
               <label htmlFor="password">Password:</label>
