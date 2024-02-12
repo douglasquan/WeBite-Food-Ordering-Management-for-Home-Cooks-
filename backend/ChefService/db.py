@@ -4,6 +4,7 @@ conn = sqlite3.connect("chef.db")
 
 cursor = conn.cursor()
 cursor.execute('''DROP TABLE IF EXISTS chef;''')
+conn.commit()
 
 sql_query = """ CREATE TABLE chef (
     id BIGINT PRIMARY KEY,
@@ -13,3 +14,4 @@ sql_query = """ CREATE TABLE chef (
     password VARCHAR(30) NOT NULL
 )"""
 cursor.execute(sql_query)
+conn.commit()

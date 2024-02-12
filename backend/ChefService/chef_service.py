@@ -32,16 +32,13 @@ def post_handler():
             new_phone_num = data["phone_num"]
             new_email = data["email"]
             new_password = data["password"]
+            
             sql = """INSERT INTO chef (id, name, phone_num, email, password)
-                    VALUES (?, ?, ?, ?, ?)"""
-            print("called")
-            print(new_id, new_name, new_phone_num, new_email, new_password)
+                    VALUES (?, ?, ?, ?, ?);"""
             cursor = cursor.execute(
-                sql, (new_id, new_name, new_phone_num, new_email, new_password))
-            print("called1")
+            sql, (new_id, new_name, new_phone_num, new_email, new_password))
             conn.commit()
             conn.close()
-            print("called2")
             response = {
                 "id": new_id,
                 "name": new_name,
@@ -177,8 +174,8 @@ if __name__ == "__main__":
         config_data = json.load(config_file)
     # getting ip for everything
     try:
-        chef_ip = config_data['CustomerService']['ip']
-        chef_port = config_data['CustomerService']['port']
+        chef_ip = config_data['ChefService']['ip']
+        chef_port = config_data['ChefService']['port']
     except KeyError:
         print("Order config missing")
         exit(1)

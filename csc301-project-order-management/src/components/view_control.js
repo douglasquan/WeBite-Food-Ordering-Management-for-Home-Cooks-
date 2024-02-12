@@ -3,8 +3,8 @@ import axios from 'axios';
 // Function to fetch menu information from the backend for customer page
 export const fetchMenu = async (chefID) => {
     try {
-        const url = '/chef/' + chefID; 
-        console.log(url)
+        // const url = '/chef/' + chefID; 
+        //console.log(url)
         // const response = await fetch('/chef/1'); // Adjust the API endpoint according to your Flask backend route
         // if (!response.ok) {
         // throw new Error('Failed to fetch menu');    
@@ -28,7 +28,8 @@ export const createUser = async (username, password) => {
         console.log(password);
 
         const response = "";
-        axios.post('/api', {
+        //'/api/14000/chef'
+        axios.post(`/api/chef`, {
             "name": name,
             "phone_num": phone_num,
             "email": username,
@@ -40,17 +41,6 @@ export const createUser = async (username, password) => {
             .catch(error => {
             console.error('Error:', error);
         });
-        // const response = await fetch("/api", {
-        //     method: 'POST',
-        //     headers: {
-        //       'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({ "name": name, "phone_num": phone_num, "email": username, "password": password}), // Your data to be sent to Flask backend
-        // });
-        // console.log(response);
-        // if (!response.ok) {
-        //     throw new Error('Failed to create user');    
-        // }
         return response;    
         //return await response.json();   
     } catch (error) {
