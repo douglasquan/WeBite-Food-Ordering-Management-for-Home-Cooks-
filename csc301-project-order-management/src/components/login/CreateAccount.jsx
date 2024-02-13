@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import './style.css'; // Assuming a single CSS file for all components
 import Navbar from "../navbar/Navbar.jsx"
 import { postReq } from "../view_control.js";
-import { getReq } from "../view_control.js";
 
 function CreateAccount() {
   const [password, setPassword] = useState("");
@@ -23,19 +22,12 @@ function CreateAccount() {
         setShowPasswordMismatchMessage(false);
       }, 3000); // Hide message after 3 seconds
       return;
-    } else {
-      // create user
-      const name = "John doe";
-      const phone_num = 1234567890;
-      const data = {"name": name, "phone_num": phone_num, "email": email, "password": password};
-      //postReq("chef", data);
-      const response = getReq("chef/1270780230")
-      console.log(response);
     }
-
-    // Passwords match, proceed with form submission
-    // Add your form submission logic here
-    console.log("Form submitted successfully");
+    // create user
+    const name = "John doe";
+    const phone_num = 1234567890;
+    const data = {"name": name, "phone_num": phone_num, "email": email, "password": password};
+    postReq("chef", data);
   };
 
   return (

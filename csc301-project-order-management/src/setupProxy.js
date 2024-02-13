@@ -7,7 +7,6 @@ module.exports = function(app) {
       target: 'http://127.0.0.1:14000', // Your API server URL without the endpoint
       changeOrigin: true,
       pathRewrite: (path) => {
-        console.log(path.replace(/^\/api/, ''));
         return path.replace(/^\/api/, '');
       },
     })
