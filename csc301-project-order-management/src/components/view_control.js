@@ -50,4 +50,38 @@ export const createUser = async (username, password) => {
 };
 
 
-fetchMenu("1");
+// Function to create a post request
+export const postReq = async (endpoint, data) => {
+    try {
+        const response = "";
+        //'/api/14000/chef'
+        const url = '/api/' + endpoint;
+        axios.post(url, data)
+            .then(response => {
+            console.log(response.data);
+        })
+            .catch(error => {
+            console.error('Error:', error);
+        });
+        return response;    
+        //return await response.json();   
+    } catch (error) {
+        console.error('Error fetching menu:', error);
+        throw error; // Rethrow the error to handle it where the function is called
+    }
+};
+
+
+// Function to create a get request
+export const getReq = async (endpoint) => {
+    try {
+        const url = '/api/' + endpoint;
+        console.log(url);
+        const response = await axios.get(url);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        throw error;
+    }
+};

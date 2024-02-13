@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 
 import './style.css'; // Assuming a single CSS file for all components
 import Navbar from "../navbar/Navbar.jsx"
-import { createUser } from "../view_control.js";
+import { postReq } from "../view_control.js";
+import { getReq } from "../view_control.js";
 
 function CreateAccount() {
   const [password, setPassword] = useState("");
@@ -24,7 +25,12 @@ function CreateAccount() {
       return;
     } else {
       // create user
-      createUser(email, password);
+      const name = "John doe";
+      const phone_num = 1234567890;
+      const data = {"name": name, "phone_num": phone_num, "email": email, "password": password};
+      //postReq("chef", data);
+      const response = getReq("chef/1270780230")
+      console.log(response);
     }
 
     // Passwords match, proceed with form submission

@@ -12,7 +12,9 @@ app.config['CORS_HEADERS'] = 'application/json'
 @cross_origin()
 def chef():
     if request.method == 'GET':
+        print("called")
         r = request.query_string.decode()
+        print(r)
         new_url = routes['chef'] + f'?{r}'
         response = requests.get(new_url)
         return response.json(), response.status_code
@@ -30,6 +32,7 @@ def chef():
         response = requests.put(routes['chef'], json=r)
         return response.json(), response.status_code
     else:
+        print("called")
         return "Bad Request", 400
 
 
