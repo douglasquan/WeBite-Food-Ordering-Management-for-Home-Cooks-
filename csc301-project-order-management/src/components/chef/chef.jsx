@@ -1,20 +1,29 @@
 import React from "react"
-import Badge from 'react-bootstrap/Badge';
-import Carousel from 'react-bootstrap/Carousel';
+import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
-import ListGroup from 'react-bootstrap/ListGroup';
+import Offcanvas from 'react-bootstrap/Offcanvas';
 
 import './chef.css';
 import Navbar from "../navbar/Navbar.jsx"
+import { getReq } from "../view_control.js";
 
 function Chef() {
+  // var id = '1';
+  // const menuData = getReq("chef", id);
+
   const menuItems = [
     { id: 1, name: 'Order 1', price: '$10.99' },
     { id: 2, name: 'Order 2', price: '$8.99' },
     { id: 3, name: 'Order 3', price: '$12.99' },
-  
   ];
 
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+  const addItem = (event) => {
+    console.log("hellow world")
+  }
 
   return (
     <div> 
@@ -49,6 +58,28 @@ function Chef() {
             </ul>
           </div>
         </div>
+
+        <Button variant="primary" onClick={handleShow}>
+          Toggle static offcanvas
+        </Button>
+
+
+        <Offcanvas className="offcontainer" show={show} onHide={handleClose} placement={"bottom"} backdrop="static">
+          <Offcanvas.Header className="offclose" closeButton>
+            Edit Your Menu !!!
+          </Offcanvas.Header>
+          <Offcanvas.Body className="offbody">
+            <Button variant="primary" onClick={addItem}>
+              I will not close if you click outside of me.
+            </Button>
+            <Button variant="primary" onClick={addItem}>
+              I will not close if you click outside of me.
+            </Button>
+            
+          </Offcanvas.Body>
+        </Offcanvas>
+
+
       </main>
 
 
