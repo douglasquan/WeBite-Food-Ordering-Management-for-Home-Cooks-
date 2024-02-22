@@ -5,9 +5,14 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 
 import './chef.css';
 import Navbar from "../navbar/Navbar.jsx"
-import { getReq } from "../view_control.js";
+import { getReq, postReq } from "../view_control.js";
 
 function Chef() {
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+
+
+
   // var id = '1';
   // const menuData = getReq("chef", id);
 
@@ -21,14 +26,27 @@ function Chef() {
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  const addItem = (event) => {
-    console.log("hellow world")
+
+  const handleSubmit = (event) => {
+    // Prevent the browser from reloading the page
+    event.preventDefault();
+
+    console.log(name);
+    console.log(price);
+
+    const data = {"name": name, "price": price};
+    // postReq("chef", data);
   }
+
+  const reset = () => { 
+    setName();
+    setPrice();
+  }
+
 
   return (
     <div> 
       <Navbar />
-
       <main>
         <h2 class="menu">Menu</h2>
         <div class="menu-container">
@@ -69,12 +87,19 @@ function Chef() {
             Edit Your Menu !!!
           </Offcanvas.Header>
           <Offcanvas.Body className="offbody">
-            <Button variant="primary" onClick={addItem}>
-              I will not close if you click outside of me.
-            </Button>
-            <Button variant="primary" onClick={addItem}>
-              I will not close if you click outside of me.
-            </Button>
+            <form method="post" onSubmit={handleSubmit}>
+              <label>
+                Dish Name: <input name="myInput" required onChange={(e) => setName(e.target.value)}/>
+              </label>
+              <hr />
+              <label>
+                Dish Price: <input name="myInput" required onChange={(e) => setPrice(e.target.value)}/>
+              </label>
+              <button type="reset" onClick={reset} >Reset form</button>
+              <button type="submit">Submit form</button>
+            </form>
+
+ 
             
           </Offcanvas.Body>
         </Offcanvas>
@@ -88,3 +113,6 @@ function Chef() {
 }
   
 export default Chef;
+{/* <Button variant="primary" onClick={addItem}>
+I will not close if you click outside of me.
+</Button>  */}
