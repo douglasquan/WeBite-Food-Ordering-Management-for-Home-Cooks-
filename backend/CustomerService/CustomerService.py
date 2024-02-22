@@ -117,13 +117,19 @@ def get_customer():
 
 @app.route('/customer', methods=['DELETE'])
 def delete_customer():
+    customer_data = request.json
+    name = customer_data.get('name')
+    email = customer_data.get('email')
+    password = customer_data.get('password_hash')
     customer_id = request.args.get('id')
     conn = get_db_connection('customers.db')
     customer = conn.execute('SELECT * FROM customers WHERE id = ?', (customer_id,)).fetchone()
     if customer is None:
         conn.close()
         return jsonify({"message": "Customer not found"}), 404
-
+    if name != customer['name'] or email != customer['email'] or not check_password_hash(customer['password_hash'], password):
+        conn.close()
+        return jsonify({"message": "Authentication failed"}), 409
     conn.execute('DELETE FROM customers WHERE id = ?', (customer_id,))
     conn.commit()
     conn.close()

@@ -92,6 +92,7 @@ def test_delete_customer(id_to_delete, order_data):
         print("Request failed with response:", response.json())
 
 
+
 def test_customer_login(email_to_login, password_to_login, login_data):
     login_data["command"] = "login"
     #print(login_data)

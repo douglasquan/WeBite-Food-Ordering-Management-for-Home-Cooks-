@@ -92,11 +92,15 @@ update_data = {
 }
 
 meal_to_delete = {
-    "meal_id": 1005,
+    "customer_id": 1005,
     "chef_id": 2005,
     "quantity": 2,
     "price": 20.0,
 }
+# meal_to_delete = {
+#     "name": "pasta",
+#     "cost": 3
+# }
 
 
 if __name__ == '__main__':
@@ -112,3 +116,4 @@ if __name__ == '__main__':
     # Delete a customer
     test_delete_meal(1, meal_to_delete)
     test_get_meal_by_id(1)
+
