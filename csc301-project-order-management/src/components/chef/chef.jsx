@@ -2,10 +2,13 @@ import React from "react"
 import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
+import Tab from 'react-bootstrap/Tab';
+import Tabs from 'react-bootstrap/Tabs';
 
 import './chef.css';
 import Navbar from "../navbar/Navbar.jsx"
 import { getReq, postReq } from "../view_control.js";
+import OffcanvasBody from "react-bootstrap/esm/OffcanvasBody.js";
 
 function Chef() {
   const [name, setName] = useState("");
@@ -26,8 +29,29 @@ function Chef() {
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  const handleAdd = (event) => {
+    // Prevent the browser from reloading the page
+    event.preventDefault();
 
-  const handleSubmit = (event) => {
+    console.log(name);
+    console.log(price);
+
+    const data = {"name": name, "price": price};
+    // postReq("chef", data);
+  }
+
+  const handleDelete = (event) => {
+    // Prevent the browser from reloading the page
+    event.preventDefault();
+
+    console.log(name);
+    console.log(price);
+
+    const data = {"name": name, "price": price};
+    // postReq("chef", data);
+  }
+
+  const handleUpdate = (event) => {
     // Prevent the browser from reloading the page
     event.preventDefault();
 
@@ -51,7 +75,7 @@ function Chef() {
         <h2 class="menu">Menu</h2>
         <div class="menu-container">
           <div class="column">
-            <ul>
+            
               {menuItems.map((item, index) => (
                 <ul key={index} className="order-item">
                   <a class = "order" href={`/order/${item.id}`} className="order">
@@ -60,11 +84,11 @@ function Chef() {
                   </a>
                 </ul>
               ))}
-            </ul>
+            
           </div>
 
           <div class="column">
-            <ul>
+            
               {menuItems.map((item, index) => (
                 <ul key={index} className="order-item">
                   <a class = "order" href={`/order/${item.id}`} className="order">
@@ -73,34 +97,83 @@ function Chef() {
                   </a>
                 </ul>
               ))}
-            </ul>
+            
           </div>
         </div>
-
         <Button variant="primary" onClick={handleShow}>
-          Toggle static offcanvas
+          Edit your menu !!!
         </Button>
 
-
-        <Offcanvas className="offcontainer" show={show} onHide={handleClose} placement={"bottom"} backdrop="static">
-          <Offcanvas.Header className="offclose" closeButton>
-            Edit Your Menu !!!
+        <Offcanvas show={show} onHide={handleClose} placement="bottom" backdrop="static" scroll = {true}>
+          <Offcanvas.Header className="offHeader" closeButton>
+            MENU EDITS!!!
           </Offcanvas.Header>
-          <Offcanvas.Body className="offbody">
-            <form method="post" onSubmit={handleSubmit}>
-              <label>
-                Dish Name: <input name="myInput" required onChange={(e) => setName(e.target.value)}/>
-              </label>
-              <hr />
-              <label>
-                Dish Price: <input name="myInput" required onChange={(e) => setPrice(e.target.value)}/>
-              </label>
-              <button type="reset" onClick={reset} >Reset form</button>
-              <button type="submit">Submit form</button>
-            </form>
 
  
-            
+          <Offcanvas.Body >
+            <Tabs
+              defaultActiveKey="profile"
+              id="fill-tab-example"
+              className="mb-3"
+              fill
+            >
+            <Tab eventKey="Add" title="Add" className = "offbody">
+               <form method="post" onSubmit={handleAdd}>
+                  <div className = 'offInputs'>
+                    <label>
+                      Dish Name: <input name="myInput" required onChange={(e) => setName(e.target.value)}/>
+                    </label>
+                    <hr />
+                    <label>
+                      Dish Price: <input name="myInput" required onChange={(e) => setPrice(e.target.value)}/>
+                    </label>
+                  </div>
+
+                 <div className = "offButtons">
+                   <button type="reset" onClick={reset} >Reset form</button>
+                   <button type="submit">Submit form</button>
+                 </div>
+               </form>
+            </Tab>
+            <Tab eventKey="Delete" title="Delete" className = "offbody">
+               <form method="post" onSubmit={handleDelete}>
+                  <div className = 'offInputs'>
+                    <label>
+                      Dish Name: <input name="myInput" required onChange={(e) => setName(e.target.value)}/>
+                    </label>
+                    <hr />
+                    <label>
+                      Dish Price: <input name="myInput" required onChange={(e) => setPrice(e.target.value)}/>
+                    </label>
+                  </div>
+
+                 <div className = "offButtons">
+                   <button type="reset" onClick={reset} >Reset form</button>
+                   <button type="submit">Submit form</button>
+                 </div>
+               </form>
+            </Tab>
+            <Tab eventKey="Update" title="Update" className = "offbody">
+               <form method="post" onSubmit={handleUpdate}>
+                  <div className = 'offInputs'>
+                    <label>
+                      Dish Name: <input name="myInput" required onChange={(e) => setName(e.target.value)}/>
+                    </label>
+                    <hr />
+                    <label>
+                      Dish Price: <input name="myInput" required onChange={(e) => setPrice(e.target.value)}/>
+                    </label>
+                  </div>
+
+                 <div className = "offButtons">
+                   <button type="reset" onClick={reset} >Reset form</button>
+                   <button type="submit">Submit form</button>
+                 </div>
+               </form>
+            </Tab>
+          </Tabs>
+
+
           </Offcanvas.Body>
         </Offcanvas>
 
@@ -113,6 +186,34 @@ function Chef() {
 }
   
 export default Chef;
-{/* <Button variant="primary" onClick={addItem}>
-I will not close if you click outside of me.
-</Button>  */}
+
+
+
+
+// <Tabs
+// defaultActiveKey="profile"
+// id="fill-tab-example"
+// className="mb-3"
+// >
+// <Tab eventKey="add" title="add">
+//   <form method="post" onSubmit={handleSubmit}>
+//     <label>
+//       Dish Name: <input name="myInput" required onChange={(e) => setName(e.target.value)}/>
+//     </label>
+//     <hr />
+//     <label>
+//       Dish Price: <input name="myInput" required onChange={(e) => setPrice(e.target.value)}/>
+//     </label>
+//     <div className = "offButtons">
+//       <button type="reset" onClick={reset} >Reset form</button>
+//       <button type="submit">Submit form</button>
+//     </div>
+//   </form>
+// </Tab>
+// <Tab eventKey="profile" title="Profile">
+//   Tab content for Profile
+// </Tab>
+// <Tab eventKey="contact" title="Contact">
+//   Tab content for Contact
+// </Tab>
+// </Tabs>
