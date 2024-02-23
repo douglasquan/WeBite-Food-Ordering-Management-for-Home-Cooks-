@@ -93,6 +93,7 @@ def user():
     else:
         return "Bad Request", 400
 
+
 @app.route('/meal', methods=['POST', 'GET', 'DELETE', 'PUT'])
 def meal():
     if request.method == 'GET':
@@ -119,6 +120,18 @@ def meal():
     else:
         return "Bad Request", 400
 
+
+@app.route('/food', defaults={'path': ''})
+@app.route('/food/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def food(path):
+    if request.method == 'POST' and path == "order":
+        r = request.get_json()
+        #full_url = f"http://127.0.0.1:14004/food/order"
+        response = requests.post(routes['food']+'/order', json=r)
+        return response.json(), response.status_code
+    else:
+        return jsonify({"error": "Method not supported by the gateway"}), 404
+
 if __name__ == "__main__":
     # getting config
     current_dir = os.getcwd()
@@ -136,6 +149,8 @@ if __name__ == "__main__":
         chef_port = config_data['ChefService']['port']
         meal_ip = config_data['MealService']['ip']
         meal_port = config_data['MealService']['port']
+        food_ip = config_data['FoodService']['ip']
+        food_port = config_data['FoodService']['port']
     except KeyError:
         print("Config file missing services")
         exit(1)
@@ -143,6 +158,7 @@ if __name__ == "__main__":
         "customer": f"http://{customer_ip}:{customer_port}/customer",
         "chef": f"http://{chef_ip}:{chef_port}/chef",
         "order": f"http://{orders_ip}:{orders_port}/order",
-        "meal": f"http://{meal_ip}:{meal_port}/meal"
+        "meal": f"http://{meal_ip}:{meal_port}/meal",
+        "food": f"http://{food_ip}:{food_port}/food"
     }
     app.run(port=config_data['Gateway']['port'], host=config_data['Gateway']['ip'], debug=True)
