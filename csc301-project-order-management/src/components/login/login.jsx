@@ -1,15 +1,31 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import './style.css'; // Ensure this is the correct path to your CSS file
 import Navbar from "../navbar/Navbar.jsx"
 
+import LoginForm from './LoginForm';
 
 function Login() {
   let navigate = useNavigate();
+  const [user, setUser] = useState(null);
 
-  const handleLogin = (event) => {
+  useEffect(() => {
+    const loggedInUser = localStorage.getItem('user');
+    if (loggedInUser) {
+      setUser(JSON.parse(loggedInUser));
+    }
+  }, []);
+
+  const handleLogin = (userData) => {
     navigate('/Login');
+    localStorage.setItem('user', JSON.stringify(userData));
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setUser(null);
   };
 
   return (
@@ -17,24 +33,14 @@ function Login() {
       <Navbar />
       <main>
         <div className="form-container">
-          <form id="loginForm" onSubmit={handleLogin}>
-            <h2>Login</h2>
-            <div className="form-group">
-              <label htmlFor="email">Email/Username:</label>
-              <input type="email" id="email" name="email" required />
-            </div>
-            <div className="form-group">
-              <label htmlFor="password">Password:</label>
-              <input type="password" id="password" name="password" required />
-            </div>
-            <button type="submit">Login</button>
-            <div className="helper-links">
-              <a href = "forgot-password" className="forgot-password">Forgot Password?</a>
-              <button type="button" className="create-account-btn">
-                <a href = "/create-account"className= "create-account-btn"> Create Account </a>
-              </button>
-            </div>
-          </form>
+        {user ? (
+        <div>
+          <h1>Welcome, {user.email}!</h1>
+          <button onClick={handleLogout}>Logout</button>
+        </div>
+      ) : (
+        <LoginForm onLogin={handleLogin} />
+      )}
         </div>
       </main>
       <footer> {/* This footer will stick to the bottom */}
