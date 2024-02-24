@@ -124,6 +124,60 @@ def meal():
     else:
         return "Bad Request", 400
 
+
+@app.route('/address', methods=['POST', 'GET', 'DELETE', 'PUT'])
+def address():
+    if request.method == 'GET':
+        r = request.query_string.decode()
+        new_url = routes['address'] + f'?{r}'
+        response = requests.get(new_url)
+        return response.json(), response.status_code
+    elif request.method == 'POST':
+        r = request.get_json()
+        response = requests.post(routes['address'], json=r)
+        return response.json(), response.status_code
+    elif request.method == 'DELETE':
+        r = request.query_string.decode()
+        params = request.get_json()
+        new_url = routes['address'] + f'?{r}'
+        response = requests.delete(new_url, json=params)
+        return response.json(), response.status_code
+    elif request.method == 'PUT':
+        r = request.query_string.decode()
+        params = request.get_json()
+        new_url = routes['address'] + f'?{r}'
+        response = requests.put(new_url, json=params)
+        return response.json(), response.status_code
+    else:
+        return "Bad Request", 400
+
+
+@app.route('/review', methods=['POST', 'GET', 'DELETE', 'PUT'])
+def review():
+    if request.method == 'GET':
+        r = request.query_string.decode()
+        new_url = routes['review'] + f'?{r}'
+        response = requests.get(new_url)
+        return response.json(), response.status_code
+    elif request.method == 'POST':
+        r = request.get_json()
+        response = requests.post(routes['review'], json=r)
+        return response.json(), response.status_code
+    elif request.method == 'DELETE':
+        r = request.query_string.decode()
+        params = request.get_json()
+        new_url = routes['review'] + f'?{r}'
+        response = requests.delete(new_url, json=params)
+        return response.json(), response.status_code
+    elif request.method == 'PUT':
+        r = request.query_string.decode()
+        params = request.get_json()
+        new_url = routes['review'] + f'?{r}'
+        response = requests.put(new_url, json=params)
+        return response.json(), response.status_code
+    else:
+        return "Bad Request", 400
+
 @app.route('/food', defaults={'path': ''})
 @app.route('/food/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def food(path):
@@ -135,6 +189,7 @@ def food(path):
     else:
         return jsonify({"error": "Method not supported by the gateway"}), 404
 
+
 if __name__ == "__main__":
     # getting config
     current_dir = os.getcwd()
@@ -145,12 +200,28 @@ if __name__ == "__main__":
     try:
         orders_ip = config_data['OrderService']['ip']
         orders_port = config_data['OrderService']['port']
+        
+        customer_ip = config_data['CustomerService']['ip']
+        customer_port = config_data['CustomerService']['port']
+        
+        chef_ip = config_data['ChefService']['ip']
+        chef_port = config_data['ChefService']['port']
+        
+        address_ip = config_data['AddressService']['ip']
+        address_port = config_data['AddressService']['port']
+        
+        review_ip = config_data['ReviewService']['ip']
+        review_port = config_data['ReviewService']['port']
+        
         user_ip = config_data['UserService']['ip']
         user_port = config_data['UserService']['port']
+        
         meal_ip = config_data['MealService']['ip']
         meal_port = config_data['MealService']['port']
+        
         food_ip = config_data['FoodService']['ip']
         food_port = config_data['FoodService']['port']
+
     except KeyError:
         print("Config file missing services")
         exit(1)
@@ -158,6 +229,8 @@ if __name__ == "__main__":
         "user": f"http://{user_ip}:{user_port}",
         "order": f"http://{orders_ip}:{orders_port}/order",
         "meal": f"http://{meal_ip}:{meal_port}/meal",
+        "address": f"http://{address_ip}:{address_port}/address",
+        "review": f"http://{review_ip}:{review_port}/review",
         "food": f"http://{food_ip}:{food_port}/food"
     }
     app.run(port=config_data['Gateway']['port'], host=config_data['Gateway']['ip'], debug=True)
