@@ -1,0 +1,206 @@
+/* Reset margin and padding for all elements */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Universal Header */
+/*
+/*
+/* 
+/*  */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333;
+  color: #fff;
+  padding: 10px 20px;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links li {
+  padding: 0 15px;
+}
+
+.nav-links li a {
+  text-decoration: none;
+  color: white;
+  transition: color 0.3s ease;
+}
+
+.nav-links li a:hover {
+  color: #61c0d8;
+}
+
+.login-btn {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.login-btn:hover {
+  background-color: #4bdd50;
+}
+
+html, body {
+  height: 100%; /* Make sure the html and body are at least the height of the viewport */
+  margin: 0;
+  padding: 0;
+  background-color: #d0d3d4;
+}
+
+body {
+  display: flex;
+  flex-direction: column; /* Stack content vertically */
+  font-family: verdana, sans-serif;    
+}
+
+main {
+  flex: 1;
+  padding-bottom: 150px; /* Space between content and footer */
+  display: flex; /* Enables flexbox */
+  flex-direction: column; /* Stack children vertically */
+  align-items: center; /* Center children horizontally */
+  justify-content: center; /* Center children vertically if there's space */
+  /* min-height: calc(100vh - 128px - 128px - height_of_header - height_of_footer); Adjust height to ensure footer is at the bottom */
+}
+
+
+/* login.html main */
+/*
+/*
+/* 
+/*  */
+.form-container {
+  background-color: #dfdfdf;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+button[type="submit"] {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover {
+  background-color: #45a049;
+}
+
+h2 {
+  text-align: center;
+}
+
+.helper-links {
+  text-align: center; /* Center the links and button */
+  margin-top: 20px; /* Space from the login button */
+}
+
+.forgot-password {
+  display: block; /* Make the link a block to occupy its own line */
+  margin-bottom: 10px; /* Space between the forgot password and create account button */
+  color: #00b8d4; /* Same as other links */
+  text-decoration: none; /* Removes underline from links */
+}
+
+.forgot-password:hover {
+  color: #b2f5ea; /* Hover color for link */
+}
+
+
+
+.create-account-btn {
+  background-color: #00b8d4; /* Same as link color for consistency */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.create-account-btn:hover {
+  background-color: #0097a7; /* Darker shade for hover effect */
+}
+
+/* Universal Footer */
+/*
+/*
+/* 
+/*  */
+body, .wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensure the body takes at least the height of the viewport */
+}
+
+footer {
+  position: relative;
+  margin-top: 15px;
+  height: 3rem; /* Set the height of the footer */
+  padding: 1.5rem;
+  display: flex;
+  font-family: verdana, sans-serif;
+  justify-content: center; /* Center the content horizontally */
+  align-items: center; /* Center the content vertically */
+  background-color: #333333; /* Match the background color to your design */
+  color: white; /* Change the text color to white*/
+  font-size: 1rem; /* Set the font size*/
+}

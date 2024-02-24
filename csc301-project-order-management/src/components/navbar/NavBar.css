@@ -1,0 +1,51 @@
+
+
+.navbar{
+    top: 0;
+    position: sticky;
+    background-color: rgb(52, 152, 219);
+    display: flex;
+    flex-direction: row;
+    justify-content: stretch;
+}
+
+.nav-title{
+    color: white;
+    font-size: 6ex;
+    justify-content: flex-start;
+    padding-left: 2ex;
+}
+
+.nav-title:hover{
+    cursor: default;
+}
+
+.nav-links{
+    margin-right: 2ex;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    flex:2
+}
+
+
+.nav-element{
+    list-style: none;
+    display: inline-block;
+    padding: 1ex;
+    margin-left: 1.5ex;
+}
+
+#link{  
+    color: gray;
+    font-size: 2.5ex;
+    background-color: white;
+    padding: 1ex;
+    text-decoration: none;
+    border-radius: 5%;
+}
+
+#link:hover {
+    background-color: whitesmoke;
+    color: black;
+}

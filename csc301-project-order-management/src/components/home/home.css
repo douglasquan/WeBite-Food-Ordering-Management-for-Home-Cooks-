@@ -1,0 +1,62 @@
+
+.chef-container{
+    margin: 3ex;
+    height: 25em;
+}
+
+.chef-list{
+    border-radius: 2em;
+    background-color:beige;
+    display: flex;
+    justify-content: space-around;
+}
+
+.chef-list li{
+    width: 10ex;
+    height: 10ex;
+    text-align: center;
+    line-height: 10ex;
+    border-radius: 1ex;
+    background-color: lightblue;
+    margin:3ex;
+    list-style: none;
+    display: inline-block;
+    padding: 1ex;
+    margin-left: 1.5ex;
+    font-size: 3ex;
+}
+
+.chef-link{
+    text-decoration: none;
+}
+
+.customer-container{
+    margin: 3ex;
+    height: 25em;
+}
+
+.customer-list{
+    border-radius: 2em;
+    background-color:beige;
+    display: flex;
+    justify-content: space-around;
+}
+
+.customer-list li{
+    width: 10ex;
+    height: 10ex;
+    text-align: center;
+    line-height: 10ex;
+    border-radius: 1ex;
+    background-color: lightblue;
+    margin:3ex;
+    list-style: none;
+    display: inline-block;
+    padding: 1ex;
+    margin-left: 1.5ex;
+    font-size: 3ex;
+}
+
+.customer-link{
+    text-decoration: none;
+}
