@@ -83,3 +83,24 @@ color: white;
     border-radius: 10px;
     transition: background-color 0.3s ease;
 }
+
+.offHeader {
+    height: 20%;
+}
+
+.offbody {
+    display: flex;
+}
+
+.offInputs {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.offButtons {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: space-evenly;
+    align-items: center;
+}

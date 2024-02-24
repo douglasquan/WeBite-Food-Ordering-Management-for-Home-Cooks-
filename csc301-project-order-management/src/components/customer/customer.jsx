@@ -27,7 +27,6 @@ function Customer() {
         <h2 class="menu">Menu</h2>
         <div class="menu-container">
           <div class="menu-column">
-            <ul>
               {menuItems.map((item, index) => (
                 <ul key={index} className="menu-item">
                   <a href={`/dish/${item.id}`} className="dish-link">
@@ -36,11 +35,9 @@ function Customer() {
                   </a>
                 </ul>
               ))}
-            </ul>
           </div>
 
           <div class="menu-column">
-            <ul>
               {menuItems.map((item, index) => (
                 <ul key={index} className="menu-item">
                   <a href={`/dish/${item.id}`} className="dish-link">
@@ -49,7 +46,6 @@ function Customer() {
                   </a>
                 </ul>
               ))}
-            </ul>
           </div>
 
         </div>
