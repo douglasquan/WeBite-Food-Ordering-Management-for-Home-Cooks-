@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import json
 import sys
 import os
+import uuid
 
 app = Flask(__name__)
 
@@ -54,53 +55,54 @@ def get_db_connection(db_name):
 
 @app.route('/customer', methods=['POST'])
 def post_handler():
-    data = request.json
-    command = data.get('command')
-    if command == 'create':
-        response = create_customer()
-        return response
-    elif command == 'login':
-        response = login_customer()
-        return response
-    else:
-        return jsonify({"message": "Command's wrong"}), 409
+    # data = request.json
+    return create_customer()
+    # command = data.get('command')
+    # if command == 'create':
+    #     response = create_customer()
+    #     return response
+    # elif command == 'login':
+    #     response = login_customer()
+    #     return response
+    # else:
+    #     return jsonify({"message": "Command's wrong"}), 409
 
 
 def create_customer():
     customer_data = request.json
     # print(request.json)
     # id = customer_data.get('id')
-    name = customer_data.get('name')
-    email = customer_data.get('email')
-    password = customer_data.get('password_hash')
+    # name = customer_data.get('name')
+    # email = customer_data.get('email')
+    # password = customer_data.get('password_hash')
     # print(name, email, password)
 
-    if not (name and email and password):
-        # print("no")
-        return jsonify({"message": "Missing fields"}), 400
-    password_hash = generate_password_hash(password)
+    # if not (name and email and password):
+    #     # print("no")
+    #     return jsonify({"message": "Missing fields"}), 400
+    # password_hash = generate_password_hash(password)
     # print("password_hash")
     try:
         # print("3")
-        conn = get_db_connection('users.db')
+        conn = get_db_connection('../users.db')
         cur = conn.cursor()
+        new_id = abs(uuid.uuid4().int) % (10 ** 10)
         # print("4")
         # sql = """INSERT INTO customers (name, email, password_hash) VALUES (?, ?, ?)"""
         # cur = cur.execute(sql, (name, email, password_hash))
-        cur.execute('INSERT INTO customers (name, email, password_hash) VALUES (?, ?, ?)',
-                    (name, email, password_hash))
+        cur.execute('INSERT INTO customer (custid, uid) VALUES (?, ?)',
+                    (new_id, customer_data["uid"]))
         # print("5")
         conn.commit()
+        conn.close()
         id = cur.lastrowid
         # print("id", id)
     except sqlite3.IntegrityError:
         return jsonify({"message": "Email already exists"}), 409
-    finally:
-        conn.close()
-    response = {"id": id,
-                "name": name,
-                "email": email,
-                "password_hash": password_hash}
+
+    response = {"custid": new_id,
+                "uid": customer_data["uid"]
+                }
     # print(response)
     return response, 200
 
@@ -108,13 +110,19 @@ def create_customer():
 @app.route('/customer', methods=['GET'])
 def get_customer():
     customer_id = request.args.get('id')
-    conn = get_db_connection('customers.db')
-    customer = conn.execute('SELECT * FROM customers WHERE id = ?',
+    conn = get_db_connection('../users.db')
+    customer = conn.execute('SELECT * FROM customer WHERE custid = ?',
                             (customer_id,)).fetchone()
-    conn.close()
     if customer is None:
         return jsonify({"message": "Customer not found"}), 404
-    return jsonify(dict(customer)), 200
+    response = dict(customer)
+    result2 = conn.execute("SELECT * FROM User WHERE uid = ?", (response["uid"],))
+    user = result2.fetchone()
+    response["username"] = user[1]
+    response["email"] = user[2]
+    response["date_created"] = user[4]
+    response["phone_number"] = user[5]
+    return jsonify(response), 200
 
 
 @app.route('/customer', methods=['DELETE'])

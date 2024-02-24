@@ -21,9 +21,9 @@ def chef():
         # handles chef creation
         r = request.get_json()
         try:
-            uid = create_new_user(r["email"], r["username"], r["password"], r["phone_number"])
-        except KeyError:
             uid = create_new_user(r["email"], r["username"], r["password"])
+        except KeyError:
+            return jsonify({"message": "Missing fields"}), 400
         creation = {
             "uid": uid
         }
@@ -56,12 +56,11 @@ def customer():
         return response.json(), response.status_code
     elif request.method == 'POST':
         # handle customer creation
-        # handles chef creation
         r = request.get_json()
         try:
-            uid = create_new_user(r["email"], r["username"], r["password"], r["phone_number"])
-        except KeyError:
             uid = create_new_user(r["email"], r["username"], r["password"])
+        except KeyError:
+            return jsonify({"message": "Missing fields"}), 400
         creation = {
             "uid": uid
         }
@@ -139,7 +138,7 @@ def create_database():
         rating FLOAT,
         chef_description VARCHAR,
         deliver_address VARCHAR,
-        FOREIGN KEY (uid) REFERENCES User(uid)
+        FOREIGN KEY (uid) REFERENCES User(uid) ON DELETE CASCADE
     );
     """
 
@@ -148,7 +147,7 @@ def create_database():
         custid BIGINT,
         uid BIGINT PRIMARY KEY,
         pickup_address VARCHAR,
-        FOREIGN KEY (uid) REFERENCES User(uid)
+        FOREIGN KEY (uid) REFERENCES User(uid) ON DELETE CASCADE
     );
     """
     cursor.execute(sql_query1)

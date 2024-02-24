@@ -56,17 +56,19 @@ def handler_get():
     conn = db_connection()
     cursor = conn.cursor()
     if request.method == "GET":
-        cursor = conn.execute("SELECT * FROM Chef WHERE chefid = ?", (id,))
-        chef = cursor.fetchone()
-        print(chef)
+        result = cursor.execute("SELECT * FROM Chef WHERE chefid = ?", (id,))
+        chef = result.fetchone()
         if chef is not None:
             response = {
-                "id": chef[0],
-                "name": chef[1],
-                "phone_num": chef[2],
-                "email": chef[3],
-                "password": chef[4]
+                "chefid": chef[0],
+                "uid": chef[1]
             }
+            result2 = cursor.execute("SELECT * FROM User WHERE uid = ?", (chef[1],))
+            user = result2.fetchone()
+            response["username"] = user[1]
+            response["email"] = user[2]
+            response["date_created"] = user[4]
+            response["phone_number"] = user[5]
             return response, 200
         else:
             return jsonify({"error": "chef id not found"}), 404
