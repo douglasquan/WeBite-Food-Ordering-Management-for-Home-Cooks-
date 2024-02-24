@@ -10,10 +10,11 @@ app = Flask(__name__)
 def db_connection():
     conn = None
     try:
-        conn = sqlite3.connect("chef.db")
+        conn = sqlite3.connect("../users.db")
     except sqlite3.error as e:
         print(e)
     return conn
+
 
 @app.route("/chef", methods=["POST"])
 def post_handler():
@@ -24,25 +25,21 @@ def post_handler():
         try:
             data = request.get_json()
             new_id = abs(uuid.uuid4().int) % (10 ** 10)
-            new_name = data["name"]
-            new_phone_num = data["phone_num"]
-            new_email = data["email"]
-            new_password = data["password"]
-            sql = """INSERT INTO chef (id, name, phone_num, email, password)
-                    VALUES (?, ?, ?, ?, ?)"""
-            cursor = cursor.execute(sql, (new_id, new_name, new_phone_num, new_email, new_password))
+            # new_name = data["name"]
+            # new_phone_num = data["phone_num"]
+            # new_email = data["email"]
+            # new_password = data["password"]
+            sql = """INSERT INTO chef (chefid, uid)
+                    VALUES (?, ?)"""
+            cursor = cursor.execute(sql, (new_id, data["uid"]))
             conn.commit()
             conn.close()
             response = {
-                "id": new_id,
-                "name": new_name,
-                "phone_num": new_phone_num,
-                "email": new_email,
-                "password": new_password,
-                }
+                "chefid": new_id,
+            }
             print(f"chef with the id: {new_id} created successfully")
             return response, 200
-        
+
         except json.JSONDecodeError:
             return jsonify({"error": "Invalid JSON data"}), 400
         except ValueError as ve:
@@ -55,21 +52,23 @@ def post_handler():
 
 @app.route("/chef", methods=["GET"])
 def handler_get():
-    id = request.args.get('id', default=None, type=int)  
+    id = request.args.get('id', default=None, type=int)
     conn = db_connection()
     cursor = conn.cursor()
     if request.method == "GET":
-        cursor = conn.execute("SELECT * FROM chef WHERE id = ?", (id,))
-        chef = cursor.fetchone() 
-        print(chef)
+        result = cursor.execute("SELECT * FROM Chef WHERE chefid = ?", (id,))
+        chef = result.fetchone()
         if chef is not None:
             response = {
-                "id": chef[0],
-                "name": chef[1],
-                "phone_num": chef[2],
-                "email": chef[3],
-                "password": chef[4]
+                "chefid": chef[0],
+                "uid": chef[1]
             }
+            result2 = cursor.execute("SELECT * FROM User WHERE uid = ?", (chef[1],))
+            user = result2.fetchone()
+            response["username"] = user[1]
+            response["email"] = user[2]
+            response["date_created"] = user[4]
+            response["phone_number"] = user[5]
             return response, 200
         else:
             return jsonify({"error": "chef id not found"}), 404
@@ -77,23 +76,12 @@ def handler_get():
 
 @app.route("/chef", methods=["PUT"])
 def handler_put():
-    id = request.args.get('id', default=None, type=int)  
+    id = request.args.get('id', default=None, type=int)
     conn = db_connection()
     cursor = conn.cursor()
-    
+
     if request.method == "PUT":
         data = request.get_json()
-
-        # Check if 'id' is present in the JSON data
-        # if 'id' not in data:
-        #     return jsonify({"error": "Missing 'id' field in JSON data"}), 404
-
-        # # Check if the provided 'id' matches the route parameter 'id'
-        # if id != data['id']:
-        #     return jsonify({"error": "Mismatched 'id' in URL and JSON data"}), 404
-
-        # Remove 'id' from the data to prevent updating it
-        # del data['id']
 
         # Generate the SET clause dynamically based on provided fields
         set_clause = ", ".join([f"{key} = ?" for key in data.keys()])
@@ -116,10 +104,10 @@ def handler_put():
 
 @app.route("/chef", methods=["DELETE"])
 def handler_delete():
-    id = request.args.get('id', default=None, type=int)  
+    id = request.args.get('id', default=None, type=int)
     conn = db_connection()
     cursor = conn.cursor()
-    
+
     if request.method == "DELETE":
         data = request.get_json()
         # Check if all required fields are present in the JSON data
@@ -148,14 +136,16 @@ def handler_delete():
         cursor.execute("DELETE FROM chef WHERE id = ?", (id,))
         conn.commit()
         conn.close()
-        
+
         return jsonify({"message": "Chef information deleted successfully"}), 200
 
     return jsonify({"error": "Invalid request method"}), 405
 
+
 if __name__ == "__main__":
     current_dir = os.getcwd()
-    config_path = os.path.abspath(os.path.join(os.path.join(os.path.join(current_dir, os.pardir), os.pardir), "config.json"))
+    config_path = os.path.abspath(
+        os.path.join(os.path.join(current_dir, os.pardir), "config.json"))
     with open(config_path, 'r') as config_file:
         config_data = json.load(config_file)
     # getting ip for everything        
