@@ -1,47 +1,74 @@
 import React from 'react';
+import './input.css';
 import { useNavigate } from 'react-router-dom';
+// Ensure Tailwind CSS is correctly imported in your project setup
+import Navbar from "../navbar/Navbar.jsx";
+import backgroundImage from './background.jpg';
 
-import './style.css'; // Ensure this is the correct path to your CSS file
-import Navbar from "../navbar/Navbar.jsx"
 
-
-function Login() {
-  let navigate = useNavigate();
-
-  const handleLogin = (event) => {
-    navigate('/Login');
-  };
-
-  return (
-    <div className="wrapper"> 
-      <Navbar />
-      <main>
-        <div className="form-container">
-          <form id="loginForm" onSubmit={handleLogin}>
-            <h2>Login</h2>
-            <div className="form-group">
-              <label htmlFor="email">Email/Username:</label>
-              <input type="email" id="email" name="email" required />
-            </div>
-            <div className="form-group">
-              <label htmlFor="password">Password:</label>
-              <input type="password" id="password" name="password" required />
-            </div>
-            <button type="submit">Login</button>
-            <div className="helper-links">
-              <a href = "forgot-password" className="forgot-password">Forgot Password?</a>
-              <button type="button" className="create-account-btn">
-                <a href = "/create-account"className= "create-account-btn"> Create Account </a>
-              </button>
-            </div>
-          </form>
+const Login = () => {
+    return (
+        <div className="flex flex-col min-h-screen bg-gray-100">
+            <Navbar />
+            <div className="flex flex-grow">
+            {/* Left Side: Login Form */}
+            <div className="w-2/3 flex items-center justify-center p-12 bg-custom-grey">
+                <div className="w-full max-w-md">
+                <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+                    <h2 className="text-2xl font-bold mb-8 text-center">Welcome.</h2>
+                    <form>
+                    {/* Email Input */}
+                    <div className="mb-4">
+                        <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
+                        Email address
+                        </label>
+                        <input
+                        id="email"
+                        type="email"
+                        placeholder="Email address"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        />
+                    </div>
+                    {/* Password Input */}
+                        <div className="mb-6">
+                        <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
+                        Password
+                        </label>
+                        <input
+                        id="password"
+                        type="password"
+                        placeholder="Password"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+                        />
+                    </div>
+                    {/* Submit Button */}
+                    <div className="flex items-center justify-between">
+                        <button
+                        type="submit"
+                        className="bg-black hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        >
+                        Log In
+                        </button>
+                        {/* Register Link */}
+                        <a className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="/register">
+                        Register here
+                        </a>
+                    </div>
+                    </form>
+                </div>
+                </div>
+            </div>    
+    
+          {/* Right Side: Background Image */}
+          <div className="hidden lg:block lg:w-1/2" style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center center' }}>
+            {/* Empty div to hold background image */}
+          </div>
         </div>
-      </main>
-      <footer> {/* This footer will stick to the bottom */}
-        <p>Copyright 2024 by WeBite.Inc.</p>
-      </footer>
-    </div>
-  );
-}
+        </div>
+      );
+    };
+    
+    
+    
 
 export default Login;
