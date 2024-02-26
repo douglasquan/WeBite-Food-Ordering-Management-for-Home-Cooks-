@@ -21,7 +21,7 @@ const products = [
 const HeroSection = () => {
   return (
     <div className="relative text-white text-center py-36 px-12">
-      <div className="absolute inset-0 bg-cover bg-center opacity-50" style={{ backgroundImage: `url(${backgroundImage})`, backdropFilter: 'blur(1px)' }}></div>
+      <div className="absolute inset-0 bg-cover bg-center opacity-50" style={{ backgroundImage: `url(${backgroundImage})`, backdropFilter: 'blur(0px)' }}></div>
       {/* Content Overlay */}
       <div className="relative z-10">
         <h1 className="text-7xl font-bold mb-4" style={{ textShadow: '0px 4px 8px rgba(0, 0, 0, 0.5)' }}>Quan's Kitchen</h1>

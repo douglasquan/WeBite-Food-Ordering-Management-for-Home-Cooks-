@@ -28,20 +28,32 @@ const Chef = () => {
               <div className="w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none">
                 <img
                   src={product.imageUrl}
+                  alt={product.name}
                   className="w-full h-full object-center object-cover lg:w-full lg:h-full"
                 />
               </div>
               <div className="mt-4 flex justify-between">
                 <div>
                   <h3 className="text-sm text-gray-700">
-                    <span aria-hidden="true" className="absolute inset-0" />
                     {product.name}
                   </h3>
                 </div>
                 <p className="text-sm font-medium text-gray-900">${product.price}</p>
               </div>
+              {/* Edit button */}
+              <button className="absolute top-0 right-0 mt-2 mr-2 text-xs text-white bg-blue-700 hover:bg-blue-600 px-2 py-1 rounded">
+                Edit
+              </button>
             </div>
           ))}
+          {/* Add Product button */}
+          <div className="flex items-center justify-center w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none">
+            <button className="text-gray-700 bg-transparent hover:bg-gray-300 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
+              <svg className="h-6 w-6" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="5" viewBox="0 0 24 24" stroke="currentColor">
+                <path d="M12 4v16m8-8H4"/>
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
