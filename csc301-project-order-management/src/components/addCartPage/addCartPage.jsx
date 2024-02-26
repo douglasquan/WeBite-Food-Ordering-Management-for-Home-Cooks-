@@ -1,13 +1,9 @@
 import React from "react"
-import Badge from 'react-bootstrap/Badge';
-import Carousel from 'react-bootstrap/Carousel';
-import Button from 'react-bootstrap/Button';
-import ListGroup from 'react-bootstrap/ListGroup';
 
 import './chef.css';
 import Navbar from "../navbar/Navbar.jsx"
 
-function Chef() {
+function AddCart() {
   const menuItems = [
     { id: 1, name: 'Order 1', price: '$10.99' },
     { id: 2, name: 'Order 2', price: '$8.99' },
@@ -37,10 +33,8 @@ function Chef() {
           </div>
         </div>
       </main>
-
-
     </div>
   );
 }
   
-export default Chef;
+export default AddCart;
