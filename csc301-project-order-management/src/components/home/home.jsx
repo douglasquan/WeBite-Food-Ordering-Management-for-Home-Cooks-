@@ -1,12 +1,15 @@
 import { Link } from "react-router-dom";
 import './home.css';
-import Navbar from "../navbar/Navbar.jsx"
+import Navbar from "../navbar/Navbar.jsx";
+
+const UserInfo = JSON.parse(localStorage.getItem('user'));
 
 function Home() {
   return (
     <div className="App">
         <Navbar />
         <div className='chef-container'>
+          <h1>Welcome {UserInfo !== null? UserInfo.email : 'Guest'}</h1>
           <h1>CHEF CONTAINER</h1>
           <div className='chef-info'>
             <ul className='chef-list'>
