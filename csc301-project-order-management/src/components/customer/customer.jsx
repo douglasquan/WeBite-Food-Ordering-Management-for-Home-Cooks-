@@ -33,7 +33,7 @@ function Customer() {
                   <a href={`/dish/${item.id}`} className="dish-link">
                     <span className="dish-name">{item.name}</span>
                     <span className="dish-price">{item.price}</span>
-                    <button><a id="link" href="AddCart">Add to Cart</a></button>
+                    <Link to="/addCartPage">Add to Cart</Link>
                   </a>
                 </ul>
               ))}
@@ -45,7 +45,7 @@ function Customer() {
                   <a href={`/dish/${item.id}`} className="dish-link">
                     <span className="dish-name">{item.name}</span>
                     <span className="dish-price">{item.price}</span>
-                    <button><a id="link" href="AddCart">Add to Cart</a></button>
+                    <Link to="/addCartPage">Add to Cart</Link>
                   </a>
                 </ul>
               ))}

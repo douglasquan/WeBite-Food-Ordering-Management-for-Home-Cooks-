@@ -1,6 +1,6 @@
 import React from "react"
 
-import './chef.css';
+import './addCartPage.css';
 import Navbar from "../navbar/Navbar.jsx"
 
 function AddCart() {
@@ -15,7 +15,6 @@ function AddCart() {
   return (
     <div> 
       <Navbar />
-
       <main>
         <h2 class="cart">Cart</h2>
         <div class="cart-container">
