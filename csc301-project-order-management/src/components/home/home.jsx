@@ -5,10 +5,13 @@ import logo from './logo.png';
 import './input.css';
 import backgroundImage from './background.jpg';
 
+const UserInfo = JSON.parse(localStorage.getItem('user'));
+
 function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <Navbar />
+      <h1>Welcome {UserInfo !== null? UserInfo.email : 'Guest'}</h1>
       {/* Hero Section */}
       <div className="relative text-white text-center py-36 px-12">
         <div className="absolute inset-0 bg-cover bg-center opacity-25" style={{ backgroundImage: `url(${backgroundImage})`, backdropFilter: 'blur(0px)' }}></div>

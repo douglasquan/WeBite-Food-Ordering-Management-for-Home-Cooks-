@@ -25,9 +25,8 @@ function CreateAccount() {
     }
     // create user
     const name = "John doe";
-    const phone_num = 1234567890;
-    const data = {"name": name, "phone_num": phone_num, "email": email, "password": password};
-    postReq("chef", data);
+    const data = {"username": name, "email": email, "password": password};
+    postReq("user", data);
   };
 
   return (
