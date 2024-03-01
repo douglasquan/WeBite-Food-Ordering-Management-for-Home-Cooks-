@@ -1,10 +1,17 @@
-import React from "react"
+import React, { useState } from "react"
 
 import './customer.css';
 import Navbar from "../navbar/Navbar.jsx"
 import { Link } from "react-router-dom";
-
+var addedItems = [];
 function Customer() {
+
+  const handleAddItem = (item) => {
+    addedItems.push(item)
+    console.log(item)
+    //return <Link to={{ pathname: "/addCartPage", state: { addedItems } }} />
+  };
+
   const menuItems = [
     { id: 1, name: 'Dish 1', price: '$10.99' },
     { id: 2, name: 'Dish 2', price: '$8.99' },
@@ -33,7 +40,7 @@ function Customer() {
                   <a href={`/dish/${item.id}`} className="dish-link">
                     <span className="dish-name">{item.name}</span>
                     <span className="dish-price">{item.price}</span>
-                    <Link to="/addCartPage">Add to Cart</Link>
+                    <Link to="/addCartPage" onClick={() => handleAddItem(item)}>Add to Cart</Link>
                   </a>
                 </ul>
               ))}
@@ -45,7 +52,7 @@ function Customer() {
                   <a href={`/dish/${item.id}`} className="dish-link">
                     <span className="dish-name">{item.name}</span>
                     <span className="dish-price">{item.price}</span>
-                    <Link to="/addCartPage">Add to Cart</Link>
+                    <Link to="/addCartPage" onClick={() => handleAddItem(item)}>Add to Cart</Link>
                   </a>
                 </ul>
               ))}
@@ -53,10 +60,10 @@ function Customer() {
 
         </div>
       </main>
-
-
+      
     </div>
   );
 }
   
+export {addedItems};
 export default Customer;
