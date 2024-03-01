@@ -11,7 +11,6 @@ import Chef from "./components/chef/chef.jsx";
 import Login from "./components/login/login.jsx";
 import Create_Account from "./components/login/CreateAccount.jsx";
 import Forget_Password from "./components/login/ForgotPassword.jsx";
-import AddCart from "./components/addCartPage/addCartPage.jsx";
  
 function Landing() {
     return (
@@ -46,10 +45,6 @@ function Landing() {
                     <Route 
                         path="/forgot-password" 
                         element={<Forget_Password />} 
-                    />
-                    <Route 
-                        path="/addCartPage" 
-                        element={<AddCart />} 
                     />
                 </Routes>
             </Router>
