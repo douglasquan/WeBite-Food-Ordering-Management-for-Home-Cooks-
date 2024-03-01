@@ -2,6 +2,15 @@ import React from 'react';
 import Navbar from "../navbar/Navbar.jsx";
 import './customer.css'
 import backgroundImage from './hero.jpg';
+import { Link } from "react-router-dom";
+
+var items = [];
+
+const handleAddItem = (item) => {
+  items.push(item)
+  console.log(item)
+  //return <Link to={{ pathname: "/addCartPage", state: { addedItems } }} />
+};
 
 const products = [
   // Add your product details here
@@ -39,6 +48,7 @@ const Customer = () => {
       <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
         <div className="mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
           {products.map((product) => (
+            <div>
             <div key={product.id} className="group relative">
               <div className="w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none">
                 <img
@@ -56,11 +66,13 @@ const Customer = () => {
                 <p className="text-sm font-medium text-gray-900">${product.price}</p>
               </div>
             </div>
+              <Link to="/cart" onClick={() => handleAddItem(product)}>Add to Cart</Link>
+            </div>
           ))}
         </div>
       </div>
     </div>
   );
 };
-
+export { items };
 export default Customer;
