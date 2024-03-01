@@ -31,32 +31,39 @@ function CreateAccount() {
   };
 
   return (
-    <div className="wrapper"> 
+    <div className="flex flex-col min-h-screen bg-gray-100"> 
       <Navbar />
-      <main>
-        <div className="form-container">
-          <form id="createAccountForm" onSubmit={handleSubmit}>
-            <h2>Create Account</h2>
-            <div className="form-group">
-              <label htmlFor="email">Email:</label>
-              <input type="email" id="email" name="email" required onChange={(e) => setEmail(e.target.value)}/>
+      <main className="flex flex-grow items-center justify-center bg-custom-grey">
+        <div className="w-full max-w-md p-8 bg-white shadow-md rounded">
+          <form id="createAccountForm" onSubmit={handleSubmit} className="space-y-6">
+            <h2 className="text-2xl font-bold mb-4 text-center">Create Account</h2>
+            <div className="form-group mb-4">
+              <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">Email:</label>
+              <input type="email" id="email" name="email" required
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                onChange={(e) => setEmail(e.target.value)}/>
             </div>
-            <div className="form-group">
-              <label htmlFor="password">Password:</label>
-              <input type="password" id="password" name="password" required onChange={(e) => setPassword(e.target.value)}/>
+            <div className="form-group mb-4">
+              <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">Password:</label>
+              <input type="password" id="password" name="password" required
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                onChange={(e) => setPassword(e.target.value)}/>
             </div>
-            <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm Password:</label>
-              <input type="password" id="confirmPassword" name="confirmPassword" required onChange={(e) => setConfirmPassword(e.target.value)}/>
+            <div className="form-group mb-4">
+              <label htmlFor="confirmPassword" className="block text-gray-700 text-sm font-bold mb-2">Confirm Password:</label>
+              <input type="password" id="confirmPassword" name="confirmPassword" required
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                onChange={(e) => setConfirmPassword(e.target.value)}/>
             </div>
-            {!passwordsMatch && showPasswordMismatchMessage && <p style={{ color: 'red' }}>Passwords do not match</p>}
-            <button type="submit">Create Account</button>
+            {!passwordsMatch && showPasswordMismatchMessage && 
+              <p className="text-red-500 text-sm text-center">Passwords do not match</p>}
+            <button type="submit" 
+              className="bg-black hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">
+              Create Account
+            </button>
           </form>
         </div>
       </main>
-      <footer> {/* This footer will stick to the bottom */}
-        <p>Copyright 2024 by WeBite.Inc.</p>
-      </footer>
     </div>
   );
 }
