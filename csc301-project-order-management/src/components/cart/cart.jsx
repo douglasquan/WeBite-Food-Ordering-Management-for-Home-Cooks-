@@ -8,8 +8,7 @@ const chefID = UserInfo?.chefid;
 const customerid = UserInfo?.custid;
 // console.log(UserInfo);
 const checkout = async () => {
-  console.log(items[0].name);
-  const data = {"chefid": chefID, "custid": customerid, "mealid": 1, "quantity": 1, "price": items[0].price};
+  const data = {"chefid": chefID, "custid": customerid, "mealid": 1, "quantity": 1, "price": items[0].cost};
   const response = await postReq("order", data);
 
   console.log(response);
@@ -32,7 +31,7 @@ const Cart = () => {
                 <ul key={index} className="order-item">
                     <span className="order-name">{item.name}</span>
                     <br />
-                    <span className="order-price">{item.price}</span>
+                    <span className="order-price">{item.cost}</span>
                 </ul>
               ))}
           </div>

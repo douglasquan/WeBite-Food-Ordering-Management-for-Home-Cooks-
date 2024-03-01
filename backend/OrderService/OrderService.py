@@ -30,9 +30,9 @@ def handle_post():
         }
         return response, 200
     except KeyError:
-        return "Missing values", 400
+        return {"message":"Missing values"}, 400
     except sqlite3.OperationalError:
-        return "Bad token", 400
+        return {"message":"Missing values"}, 400
 
 
 @app.route('/order', methods=['GET'])
