@@ -1,0 +1,33 @@
+{
+      "OrderService": {
+          "port": 14002,
+          "ip": "127.0.0.1"
+      },
+      "UserService": {
+          "port": 14001,
+          "ip": "127.0.0.1"
+      },
+      "Gateway": {
+          "port": 14000,
+          "ip": "127.0.0.1"
+      },
+    "MealService": {
+            "port": 14003,
+            "ip": "127.0.0.1"
+        }
+        ,
+    "AddressService": {
+            "port": 14004,
+            "ip": "127.0.0.1"
+        }
+        ,
+    "ReviewService": {
+            "port": 14005,
+            "ip": "127.0.0.1"
+        },
+     "FoodService": {
+            "port": 14006,
+            "ip": "127.0.0.1"
+     }
+  }
+
