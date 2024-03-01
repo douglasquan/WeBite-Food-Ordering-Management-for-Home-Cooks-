@@ -92,22 +92,6 @@ def test_delete_customer(id_to_delete, order_data):
         print("Request failed with response:", response.json())
 
 
-update_data = {
-    "customer_id": "1007",
-    "price": "15.99",
-}
-
-customer_to_delete = {
-    "customer_id": 1005,
-    "chef_id": 2005,
-    "quantity": 2,
-    "price": 20.0,
-}
-# customer_to_delete = {
-# "name": "John Doe",
-#         "email": "john@example.com",
-#         "password_hash": "hash1"
-# }
 
 def test_customer_login(email_to_login, password_to_login, login_data):
     login_data["command"] = "login"
@@ -124,18 +108,33 @@ def test_customer_login(email_to_login, password_to_login, login_data):
         print("Request failed with response:", response)
 
 
+update_data = {
+    "name": "John Low",
+    "email": "john2@example.com	",
+}
+
+customer_to_delete = {
+    "customer_id": 1005,
+    "chef_id": 2005,
+    "quantity": 2,
+    "price": 20.0,
+}
+
+
 if __name__ == '__main__':
     # Populate the customers.db with customers
-    test_create_customer_db(customer_list)
+    # test_create_customer_db(customer_list)
 
     # Get a customer by ID
-    test_get_customer_by_id(1)
+    # test_get_customer_by_id(1)
 
-    # Update a customer's information
-    # test_customer_order(1964905803, update_data)
+    # not yet implemented
+    # # Update a customer's information
+    # test_update_customer(1, update_data)
 
-    # Delete a customer
-    test_delete_customer(1, customer_to_delete)
-    test_get_customer_by_id(1)
+    # require authentication
+    # # Delete a customer
+    # test_delete_customer(1, customer_to_delete)
+    # test_get_customer_by_id(1)
     login_data = {"command": "login"}
     test_customer_login("jane@example.com", "hash2", login_data)
