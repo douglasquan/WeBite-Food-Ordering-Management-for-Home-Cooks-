@@ -1,5 +1,5 @@
 import React from "react"
-import { useState } from 'react';
+import { useState, useEffect} from 'react';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import Tab from 'react-bootstrap/Tab';
@@ -10,8 +10,6 @@ import Navbar from "../navbar/Navbar.jsx"
 import { getReq, postReq } from "../view_control.js";
 import OffcanvasBody from "react-bootstrap/esm/OffcanvasBody.js";
 
-const UserInfo = JSON.parse(localStorage.getItem('user'));
-const chefID = UserInfo.chefID;
 // const getMenuData = async () => {
 //   const chefID = "1";
 //   const data = await getReq("meal/chef", chefID)
@@ -19,28 +17,66 @@ const chefID = UserInfo.chefID;
 //   return data; 
 // };
 
-// const menuData = await getMenuData(); 
-// console.log(menuData);
+// var products = [];
 
+// const UserInfo = JSON.parse(localStorage.getItem('user'));
+// const chefID = UserInfo.chefID;
+
+// if (chefID === null) {
+//   products = [];
+// } else {
+//   const menuData = await getMenuData(); 
+//   console.log(menuData);
+// }
+
+// console.log(UserInfo)
+var UserInfo = null;
+var chefID = null;
 const Chef = () => {
 
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
+  const [products, setProducts] = useState([]);
 
-  const products = [
-    // Add your product details here
-    { id: 1, name: "Show Me Your Love", price: 9.99, imageUrl: './food.jpg' },
-    { id: 2, name: "Hong Kong Style Curry Beef Tendon Rice", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1610266834410-0232b52c2c4a?q=80&w=1972&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
-    { id: 3, name: "Poke Bowl", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1609710219171-f86ae613c8d8?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
-    { id: 4, name: "Siu Mai", price: 9.99, imageUrl: 'https://plus.unsplash.com/premium_photo-1674601033631-79eeffaac6f9?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGhvbmclMjBrb25nJTIwZm9vZHxlbnwwfHwwfHx8MA%3D%3D' },
-    { id: 5, name: "Dim Sum", price: 9.99, imageUrl: 'https://plus.unsplash.com/premium_photo-1674601031608-1a38ca161523?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8aG9uZyUyMGtvbmclMjBmb29kfGVufDB8fDB8fHww' },
-    { id: 6, name: "Hagao", price: 9.99, imageUrl: 'https://plus.unsplash.com/premium_photo-1674601033003-d028c1b148e6?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fGhvbmclMjBrb25nJTIwZm9vZHxlbnwwfHwwfHx8MA%3D%3D' },
-    { id: 7, name: "Ramen", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1593906115209-6d0011a840e8?q=80&w=1972&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
-    { id: 8, name: "Beef Brisket Noodle", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1529690678884-189e81f34ef6?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fGhvbmclMjBrb25nJTIwZm9vZHxlbnwwfHwwfHx8MA%3D%3D' },
-    { id: 9, name: "Sweet and Sour Pork", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1623689048105-a17b1e1936b8?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Q2hpbmVzZSUyMGZvb2R8ZW58MHx8MHx8fDA%3D' },
-    { id: 10, name: "Pad thai", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1637806930600-37fa8892069d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGFkJTIwdGhhaXxlbnwwfHwwfHx8MA%3D%3D' },
-    // ... other products
-  ];
+  useEffect(() => {
+    const fetchMenuData = async () => {
+      UserInfo = JSON.parse(localStorage.getItem('user'));
+      chefID = UserInfo?.chefid;
+      console.log(chefID);
+      if (chefID) {
+        const menuData = await getReq("meal/chef", chefID);
+        if (menuData !== null) {
+          console.log(menuData);
+          setProducts(menuData || []);
+        } else {
+          setProducts([]);
+        }
+
+      } else {
+        setProducts([]);
+      }
+      // console.log(chefID);
+    };
+
+    fetchMenuData();
+  }, []);
+  
+  // const products = [
+  //   // Add your product details here
+  //   { id: 1, name: "Show Me Your Love", price: 9.99, imageUrl: './food.jpg' },
+  //   { id: 2, name: "Hong Kong Style Curry Beef Tendon Rice", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1610266834410-0232b52c2c4a?q=80&w=1972&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+  //   { id: 3, name: "Poke Bowl", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1609710219171-f86ae613c8d8?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+  //   { id: 4, name: "Siu Mai", price: 9.99, imageUrl: 'https://plus.unsplash.com/premium_photo-1674601033631-79eeffaac6f9?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGhvbmclMjBrb25nJTIwZm9vZHxlbnwwfHwwfHx8MA%3D%3D' },
+  //   { id: 5, name: "Dim Sum", price: 9.99, imageUrl: 'https://plus.unsplash.com/premium_photo-1674601031608-1a38ca161523?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8aG9uZyUyMGtvbmclMjBmb29kfGVufDB8fDB8fHww' },
+  //   { id: 6, name: "Hagao", price: 9.99, imageUrl: 'https://plus.unsplash.com/premium_photo-1674601033003-d028c1b148e6?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fGhvbmclMjBrb25nJTIwZm9vZHxlbnwwfHwwfHx8MA%3D%3D' },
+  //   { id: 7, name: "Ramen", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1593906115209-6d0011a840e8?q=80&w=1972&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+  //   { id: 8, name: "Beef Brisket Noodle", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1529690678884-189e81f34ef6?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fGhvbmclMjBrb25nJTIwZm9vZHxlbnwwfHwwfHx8MA%3D%3D' },
+  //   { id: 9, name: "Sweet and Sour Pork", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1623689048105-a17b1e1936b8?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Q2hpbmVzZSUyMGZvb2R8ZW58MHx8MHx8fDA%3D' },
+  //   { id: 10, name: "Pad thai", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1637806930600-37fa8892069d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGFkJTIwdGhhaXxlbnwwfHwwfHx8MA%3D%3D' },
+  //   // ... other products
+  // ];
+
+  // products = [];
 
 
   const [show, setShow] = useState(false);
@@ -55,7 +91,7 @@ const Chef = () => {
     // console.log(name);
     // console.log(price);
 
-    const data = {"chef_id": 1, "name": name, "cost": price};
+    const data = {"chef_id": chefID, "name": name, "cost": price};
     // console.log(data);
     const response = await postReq("meal/None", data);
     // const response = await getReq("meal", "1");
@@ -111,7 +147,7 @@ const Chef = () => {
                     {product.name}
                   </h3>
                 </div>
-                <p className="text-sm font-medium text-gray-900">${product.price}</p>
+                <p className="text-sm font-medium text-gray-900">${product.cost}</p>
               </div>
               {/* Edit button */}
               {/* <button className="absolute top-0 right-0 mt-2 mr-2 text-xs text-white bg-blue-700 hover:bg-blue-600 px-2 py-1 rounded">

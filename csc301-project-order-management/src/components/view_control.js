@@ -24,7 +24,7 @@ export const postReq = async (endpoint, data) => {
 // Function to create a get request
 export const getReq = async (endpoint, id) => {
     try {
-        const url = '/api/' + endpoint + "?" + id;
+        const url = '/api/' + endpoint + "?id=" + id;
         console.log(url);
         const response = await axios.get(url);
         console.log(response);
