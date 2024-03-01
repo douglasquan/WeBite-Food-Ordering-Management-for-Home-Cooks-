@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link } from "react-router-dom";
 import Navbar from "../navbar/Navbar.jsx";
 import logo from './logo.png';
@@ -26,10 +27,10 @@ function Home() {
           <div className="bg-gray-400 text-white m-2 rounded-lg p-4">
             <h2 className="text-2xl font-bold mb-4">CHEF CONTAINER</h2>
             <div className="grid grid-cols-4 gap-4">
-              <Link to="/chef/1" className="bg-white rounded shadow p-4 block text-center" href="Chef">Chef 1</Link>
-              <Link to="/chef/2" className="bg-white rounded shadow p-4 block text-center" href="Chef">Chef 2</Link>
-              <Link to="/chef/3" className="bg-white rounded shadow p-4 block text-center" href="Chef">Chef 3</Link>
-              <Link to="/chef/4" className="bg-white rounded shadow p-4 block text-center" href="Chef">Chef 4</Link>
+              <Link to="/chef" className="bg-white rounded shadow p-4 block text-center" href="Chef">Chef 1</Link>
+              <Link to="/chef" className="bg-white rounded shadow p-4 block text-center" href="Chef">Chef 2</Link>
+              <Link to="/chef" className="bg-white rounded shadow p-4 block text-center" href="Chef">Chef 3</Link>
+              <Link to="/chef" className="bg-white rounded shadow p-4 block text-center" href="Chef">Chef 4</Link>
             </div>
           </div>
         </div>
@@ -38,10 +39,10 @@ function Home() {
           <div className="bg-gray-400 text-white m-2 rounded-lg p-4">
             <h2 className="text-2xl font-bold mb-4">CUSTOMER CONTAINER</h2>
             <div className="grid grid-cols-4 gap-4">
-              <Link to="/customer/1" className="bg-white rounded shadow p-4 block text-center" href="Customer">Customer 1</Link>
-              <Link to="/customer/2" className="bg-white rounded shadow p-4 block text-center" href="Customer">Customer 2</Link>
-              <Link to="/customer/3" className="bg-white rounded shadow p-4 block text-center" href="Customer">Customer 3</Link>
-              <Link to="/customer/4" className="bg-white rounded shadow p-4 block text-center" href="Customer">Customer 4</Link>
+              <Link to="/customer" className="bg-white rounded shadow p-4 block text-center" href="Customer">Customer 1</Link>
+              <Link to="/customer" className="bg-white rounded shadow p-4 block text-center" href="Customer">Customer 2</Link>
+              <Link to="/customer" className="bg-white rounded shadow p-4 block text-center" href="Customer">Customer 3</Link>
+              <Link to="/customer" className="bg-white rounded shadow p-4 block text-center" href="Customer">Customer 4</Link>
             </div>
           </div>
         </div>
@@ -49,7 +50,7 @@ function Home() {
       {/* Footer */}
       <footer className="bg-white">
         <p className="text-center text-sm text-gray-600 py-4">
-          Copyright © 2024 by YourService.Inc.
+          Copyright © 2024 by WeBite.Inc.
         </p>
       </footer>
     </div>

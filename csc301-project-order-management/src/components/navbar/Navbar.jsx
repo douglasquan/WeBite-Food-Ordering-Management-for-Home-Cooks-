@@ -8,7 +8,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center">
         <div>
             {/* Logo Image */}
-            <a href="#" className="p-0">
+            <a href="/home" className="p-0">
               <img src={logoImage} alt="Logo" className="h-10 w-auto sm:h-10" />
             </a>
           </div>
