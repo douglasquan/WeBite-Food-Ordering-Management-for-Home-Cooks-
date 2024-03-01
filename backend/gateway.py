@@ -11,23 +11,51 @@ def user(role):
     if request.method == 'GET':
         r = request.query_string.decode()
         print(r)
-        new_url = routes['user'] + f'/{role}?{r}'
+        new_url = routes['user'] + f'{role}?{r}'
         response = requests.get(new_url)
         return response.json(), response.status_code
     elif request.method == 'POST':
         r = request.get_json()
-        response = requests.post(routes['user'] + f'/{role}', json=r)
+        response = requests.post(routes['user'] + f'{role}', json=r)
         return response.json(), response.status_code
     elif request.method == 'DELETE':
         r = request.query_string.decode()
         params = request.get_json()
-        new_url = routes['user'] + f'/{role}?{r}'
+        new_url = routes['user'] + f'{role}?{r}'
         response = requests.delete(new_url, json=params)
         return response.json(), response.status_code
     elif request.method == 'PUT':
         r = request.query_string.decode()
         params = request.get_json()
-        new_url = routes['user'] + f'/{role}?{r}'
+        new_url = routes['user'] + f'{role}?{r}'
+        response = requests.put(new_url, json=params)
+        return response.json(), response.status_code
+    else:
+        return "Bad Request", 400
+
+
+@app.route("/user", methods=['POST', 'GET', 'DELETE', 'PUT'])
+def account():
+    if request.method == 'GET':
+        r = request.query_string.decode()
+        print(r)
+        new_url = routes['user'] + f'account?{r}'
+        response = requests.get(new_url)
+        return response.json(), response.status_code
+    elif request.method == 'POST':
+        r = request.get_json()
+        response = requests.post(routes['user'] + 'account', json=r)
+        return response.json(), response.status_code
+    elif request.method == 'DELETE':
+        r = request.query_string.decode()
+        params = request.get_json()
+        new_url = routes['user'] + 'account'
+        response = requests.delete(new_url, json=params)
+        return response.json(), response.status_code
+    elif request.method == 'PUT':
+        r = request.query_string.decode()
+        params = request.get_json()
+        new_url = routes['user'] + 'account'
         response = requests.put(new_url, json=params)
         return response.json(), response.status_code
     else:
@@ -226,7 +254,7 @@ if __name__ == "__main__":
         print("Config file missing services")
         exit(1)
     routes = {
-        "user": f"http://{user_ip}:{user_port}",
+        "user": f"http://{user_ip}:{user_port}/",
         "order": f"http://{orders_ip}:{orders_port}/order",
         "meal": f"http://{meal_ip}:{meal_port}/meal",
         "address": f"http://{address_ip}:{address_port}/address",
