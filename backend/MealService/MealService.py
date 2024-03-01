@@ -86,6 +86,7 @@ def get_meal_cost():
 @app.route('/meal/chef', methods=['GET'])
 def get_meals_by_chef():
     chef_id = request.args.get('id')
+    print(chef_id)
     # print(chef_id)
     # print(request.args)
     conn = get_db_connection('meals.db')
@@ -95,7 +96,7 @@ def get_meals_by_chef():
         print(meals)
         return jsonify([dict(meal) for meal in meals]), 200
     else:
-        return jsonify({"error": "No meals found for the specified chef"}), 404
+        return jsonify([]), 200
 
 
 @app.route('/meal', methods=['DELETE'])

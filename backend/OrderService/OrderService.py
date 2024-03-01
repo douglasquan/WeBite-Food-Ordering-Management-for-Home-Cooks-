@@ -19,7 +19,7 @@ def handle_post():
         print(data)
         cursorp.execute(f'''
             INSERT INTO orders
-            VALUES ({unique_id}, {data["customer_id"]}, {data["chef_id"]}, {data["quantity"]}, {data["price"]}, 'In progress');
+            VALUES ({unique_id}, {data["custid"]}, {data["chefid"]}, {data["quantity"]}, {data["price"]}, 'In progress');
         ''')
         databasep.commit()
         databasep.close()

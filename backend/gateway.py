@@ -241,12 +241,6 @@ if __name__ == "__main__":
         orders_ip = config_data['OrderService']['ip']
         orders_port = config_data['OrderService']['port']
         
-        customer_ip = config_data['CustomerService']['ip']
-        customer_port = config_data['CustomerService']['port']
-        
-        chef_ip = config_data['ChefService']['ip']
-        chef_port = config_data['ChefService']['port']
-        
         address_ip = config_data['AddressService']['ip']
         address_port = config_data['AddressService']['port']
         
