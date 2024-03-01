@@ -93,8 +93,8 @@ def other():
         query = json.loads(json.dumps(parse_qs(r)))
         print(query)
         result = find_user([query["email"][0], query["password"][0]])
-        if result:
-            return jsonify({"uid": result}), 200
+        if result is not None:
+            return jsonify({"uid": result[0], "custid": result[1], "chefid": result[2]}), 200
         else:
             return jsonify({"status": "failed"}), 404
         # new_url = routes['customer'] + f'?{r}'
@@ -156,8 +156,10 @@ def find_user(data):
     if user is None:
         return None
     else:
-        print(user)
-        return user[0]
+        cust = conn.execute('SELECT * FROM Customer WHERE uid = ?',
+                                (user[0],)).fetchone()
+        chef = cursor.execute("SELECT * FROM Chef WHERE uid = ?", (user[0],)).fetchone()
+        return user[0], cust[0], chef[0]
 
 
 # creates the user database for chef service, customer service and user service
