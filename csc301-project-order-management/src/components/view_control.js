@@ -25,11 +25,26 @@ export const postReq = async (endpoint, data) => {
 export const getReq = async (endpoint, id) => {
     try {
         const url = '/api/' + endpoint + "?id=" + id;
+        console.log(url);
         const response = await axios.get(url);
+        console.log(response);
         return response.data;
     } catch (error) {
         console.error('Error fetching data:', error);
-        throw error;
+        return "invalid user";
+    }
+};
+
+// Function to create a get request with multiple params
+export const multiGetReq = async (endpoint, id) => {
+    try {
+        const url = '/api/' + endpoint + "?" + id;
+        const response = await axios.get(url);
+        console.log(response);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        return "invalid user";
     }
 };
 

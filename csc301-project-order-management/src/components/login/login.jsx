@@ -1,47 +1,57 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import './input.css';
+import React, { useState, useEffect } from 'react';
+// Ensure Tailwind CSS is correctly imported in your project setup
+import Navbar from "../navbar/Navbar.jsx";
+import backgroundImage from './background.jpg';
 
-import './style.css'; // Ensure this is the correct path to your CSS file
-import Navbar from "../navbar/Navbar.jsx"
-
+import LoginForm from './LoginForm';
 
 function Login() {
-  let navigate = useNavigate();
+  const [user, setUser] = useState(null);
+    
+  useEffect(() => {
+    const loggedInUser = localStorage.getItem('user');
+    if (loggedInUser) {
+      setUser(JSON.parse(loggedInUser));
+    }
+  }, []);
 
-  const handleLogin = (event) => {
-    navigate('/Login');
+  const handleLogin = async (userData) => {
+    localStorage.setItem('user', JSON.stringify(userData));
+    setUser(userData);
+    window.location.reload();
   };
 
-  return (
-    <div className="wrapper"> 
-      <Navbar />
-      <main>
-        <div className="form-container">
-          <form id="loginForm" onSubmit={handleLogin}>
-            <h2>Login</h2>
-            <div className="form-group">
-              <label htmlFor="email">Email/Username:</label>
-              <input type="email" id="email" name="email" required />
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setUser(null);
+  };
+
+
+    return (
+        <div className="flex flex-col min-h-screen bg-gray-100">
+            <Navbar />
+            <div className="flex flex-grow">
+                <div className="w-2/3 flex items-center justify-center p-12 bg-custom-grey">
+                    <div className="w-full max-w-md">
+                        <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+                            <h2 className="text-2xl font-bold mb-8 text-center">Welcome.</h2>
+                            {user ? (
+                                <div>
+                                    <h1>Welcome, {user.email}!</h1>
+                                    <button onClick={handleLogout}>Logout</button>
+                                </div>
+                                ) : (
+                                <LoginForm onLogin={handleLogin} />
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                <div className="hidden lg:block lg:w-1/2" style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center center' }}>
+                </div>
             </div>
-            <div className="form-group">
-              <label htmlFor="password">Password:</label>
-              <input type="password" id="password" name="password" required />
-            </div>
-            <button type="submit">Login</button>
-            <div className="helper-links">
-              <a href = "forgot-password" className="forgot-password">Forgot Password?</a>
-              <button type="button" className="create-account-btn">
-                <a href = "/create-account"className= "create-account-btn"> Create Account </a>
-              </button>
-            </div>
-          </form>
         </div>
-      </main>
-      <footer> {/* This footer will stick to the bottom */}
-        <p>Copyright 2024 by WeBite.Inc.</p>
-      </footer>
-    </div>
-  );
-}
+    );
+};
 
 export default Login;
