@@ -3,6 +3,14 @@ import Navbar from "../navbar/Navbar.jsx";
 import './customer.css'
 import backgroundImage from './hero.jpg';
 
+import { Link } from "react-router-dom";
+var addedItems = [];
+
+const handleAddItem = (item) => {
+  addedItems.push(item)
+  console.log(item)
+  //return <Link to={{ pathname: "/addCartPage", state: { addedItems } }} />
+};
 const products = [
   // Add your product details here
   { id: 1, name: "Show Me Your Love", price: 9.99, imageUrl: './food.jpg' },
@@ -54,6 +62,7 @@ const Customer = () => {
                   </h3>
                 </div>
                 <p className="text-sm font-medium text-gray-900">${product.price}</p>
+                <Link to="/addCartPage" onClick={() => handleAddItem(item)}>Add to Cart</Link>
               </div>
             </div>
           ))}
@@ -63,4 +72,5 @@ const Customer = () => {
   );
 };
 
+export {addedItems};
 export default Customer;
