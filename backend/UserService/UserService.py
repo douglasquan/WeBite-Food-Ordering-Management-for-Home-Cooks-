@@ -4,6 +4,7 @@ import os
 import sqlite3
 import datetime
 import uuid
+from urllib.parse import parse_qs
 from ChefService.chef_service import app as chefser
 from CustomerService.CustomerService import app as custser
 
@@ -84,8 +85,37 @@ def customer():
     return jsonify({"response": "customer"}), 200
 
 
-@app.route('/', methods=['POST', 'GET', 'DELETE', 'PUT'])
+@app.route('/account', methods=['POST', 'GET', 'DELETE', 'PUT'])
 def other():
+    if request.method == 'GET':
+        r = request.query_string.decode()
+        print(r)
+        query = json.loads(json.dumps(parse_qs(r)))
+        print(query)
+        result = find_user([query["email"][0], query["password"][0]])
+        if result is not None:
+            return jsonify({"uid": result[0], "custid": result[1], "chefid": result[2]}), 200
+        else:
+            return jsonify({"status": "failed"}), 404
+        # new_url = routes['customer'] + f'?{r}'
+        # response = requests.get(new_url)
+        # return response.json(), response.status_code
+    elif request.method == 'POST':
+        # handle customer creation
+        r = request.get_json()
+        try:
+            uid = create_new_user(r["email"], r["username"], r["password"])
+        except KeyError:
+            return jsonify({"message": "Missing fields"}), 400
+        creation = {
+            "uid": uid
+        }
+        response1 = requests.post(routes['customer'], json=creation)
+        response2 = requests.post(routes['chef'], json=creation)
+        creation.update(response1.json())
+        creation.update(response2.json())
+        print(creation)
+        return creation, response1.status_code
     return jsonify({"response": "other"}), 404
 
 
@@ -112,6 +142,24 @@ def create_new_user(email, username, password, phone_number="None"):
     con.commit()
     con.close()
     return uid
+
+
+def find_user(data):
+    conn = sqlite3.connect("users.db")
+
+    cursor = conn.cursor()
+    sql_query1 = """ 
+    SELECT * FROM User u WHERE email = ? AND password = ?
+    """
+    user = cursor.execute(sql_query1, (data[0], data[1],))
+    user = user.fetchone()
+    if user is None:
+        return None
+    else:
+        cust = conn.execute('SELECT * FROM Customer WHERE uid = ?',
+                                (user[0],)).fetchone()
+        chef = cursor.execute("SELECT * FROM Chef WHERE uid = ?", (user[0],)).fetchone()
+        return user[0], cust[0], chef[0]
 
 
 # creates the user database for chef service, customer service and user service

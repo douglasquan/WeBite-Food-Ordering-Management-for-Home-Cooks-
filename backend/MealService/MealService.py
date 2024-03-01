@@ -18,7 +18,8 @@ def create_tables():
         """CREATE TABLE IF NOT EXISTS meals (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
-            cost DECIMAL NOT NULL
+            cost DECIMAL NOT NULL,
+            chef_id INTEGER NOT NULL
         )"""
     ]
 
@@ -52,19 +53,21 @@ def create_meal():
     meal_data = request.json
     name = meal_data.get('name')
     cost = meal_data.get('cost')
+    chef_id = meal_data.get('chef_id')
 
     if not name or cost is None:
         return jsonify({"message": "Name and cost are required"}), 400
 
     conn = get_db_connection('meals.db')
     cur = conn.cursor()
-    cur.execute('INSERT INTO meals (name, cost) VALUES (?, ?)', (name, cost))
+    cur.execute('INSERT OR IGNORE INTO meals (name, cost, chef_id) VALUES (?, ?, ?)', (name, cost, chef_id))
     conn.commit()
     id = cur.lastrowid
     conn.close()
     response = {"id": id,
                 "name": name,
-                "cost": cost,}
+                "cost": cost,
+                "chef_id": chef_id}
     return response, 200
 
 
@@ -77,7 +80,23 @@ def get_meal_cost():
     conn.close()
     if meal is None:
         return jsonify({"message": "Meal not found"}), 404
-    return jsonify({"name": meal["name"], "cost": meal["cost"]}), 200
+    return jsonify({"name": meal["name"], "cost": meal["cost"], "chef_id":meal["chef_id"]}), 200
+
+
+@app.route('/meal/chef', methods=['GET'])
+def get_meals_by_chef():
+    chef_id = request.args.get('id')
+    print(chef_id)
+    # print(chef_id)
+    # print(request.args)
+    conn = get_db_connection('meals.db')
+    meals = conn.execute('SELECT * FROM meals WHERE chef_id = ?', (chef_id,)).fetchall()
+    conn.close()
+    if meals:
+        print(meals)
+        return jsonify([dict(meal) for meal in meals]), 200
+    else:
+        return jsonify([]), 200
 
 
 @app.route('/meal', methods=['DELETE'])
@@ -86,12 +105,13 @@ def delete_meal():
     meal_data = request.json
     name = meal_data.get('name')
     cost = meal_data.get('cost')
+    chef_id = meal_data.get('chef_id')
     conn = get_db_connection('meals.db')
     meal = conn.execute('SELECT * FROM meals WHERE id = ?', (meal_id,)).fetchone()
     if meal is None:
         conn.close()
         return jsonify({"message": "Meal not found"}), 404
-    if name != meal['name'] or cost != meal['cost']:
+    if name != meal['name'] or cost != meal['cost'] or chef_id != meal['chef_id']:
         conn.close()
         return jsonify({"message": "Authentication failed"}), 409
     conn.execute('DELETE FROM meals WHERE id = ?', (meal_id,))
