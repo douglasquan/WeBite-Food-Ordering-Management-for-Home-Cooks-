@@ -1,17 +1,33 @@
-import React from 'react';
 import './input.css';
+React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // Ensure Tailwind CSS is correctly imported in your project setup
 import Navbar from "../navbar/Navbar.jsx";
 import backgroundImage from './background.jpg';
 
 
-const Login = () => {
-    let navigate = useNavigate();
+function Login() {
+  let navigate = useNavigate();
+  const [user, setUser] = useState(null);
 
-    const handleLogin = (event) => {
-        navigate('/Login');
-    };
+  useEffect(() => {
+    const loggedInUser = localStorage.getItem('user');
+    if (loggedInUser) {
+      setUser(JSON.parse(loggedInUser));
+    }
+  }, []);
+
+  const handleLogin = (userData) => {
+    navigate('/Login');
+    localStorage.setItem('user', JSON.stringify(userData));
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setUser(null);
+  };
+
 
     return (
         <div className="flex flex-col min-h-screen bg-gray-100">
