@@ -1,5 +1,5 @@
 import './input.css';
-React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // Ensure Tailwind CSS is correctly imported in your project setup
 import Navbar from "../navbar/Navbar.jsx";
