@@ -2,6 +2,7 @@ import React from 'react';
 import Navbar from "../navbar/Navbar.jsx";
 import './customer.css'
 import backgroundImage from './hero.jpg';
+
 import { Link } from "react-router-dom";
 var addedItems = [];
 
@@ -70,5 +71,6 @@ const Customer = () => {
     </div>
   );
 };
+
 export {addedItems};
 export default Customer;

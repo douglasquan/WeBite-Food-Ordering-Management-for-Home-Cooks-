@@ -1,47 +1,94 @@
-import React from 'react';
+import './input.css';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import './style.css'; // Ensure this is the correct path to your CSS file
-import Navbar from "../navbar/Navbar.jsx"
+// Ensure Tailwind CSS is correctly imported in your project setup
+import Navbar from "../navbar/Navbar.jsx";
+import backgroundImage from './background.jpg';
 
 
 function Login() {
   let navigate = useNavigate();
+  const [user, setUser] = useState(null);
 
-  const handleLogin = (event) => {
+  useEffect(() => {
+    const loggedInUser = localStorage.getItem('user');
+    if (loggedInUser) {
+      setUser(JSON.parse(loggedInUser));
+    }
+  }, []);
+
+  const handleLogin = (userData) => {
     navigate('/Login');
+    localStorage.setItem('user', JSON.stringify(userData));
+    setUser(userData);
   };
 
-  return (
-    <div className="wrapper"> 
-      <Navbar />
-      <main>
-        <div className="form-container">
-          <form id="loginForm" onSubmit={handleLogin}>
-            <h2>Login</h2>
-            <div className="form-group">
-              <label htmlFor="email">Email/Username:</label>
-              <input type="email" id="email" name="email" required />
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setUser(null);
+  };
+
+
+    return (
+        <div className="flex flex-col min-h-screen bg-gray-100">
+            <Navbar />
+            <div className="flex flex-grow">
+                <div className="w-2/3 flex items-center justify-center p-12 bg-custom-grey">
+                    <div className="w-full max-w-md">
+                        <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+                            <h2 className="text-2xl font-bold mb-8 text-center">Welcome.</h2>
+                            <form onSubmit={handleLogin}>
+                                <div className="mb-4">
+                                    <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
+                                        Email address
+                                    </label>
+                                    <input
+                                        id="email"
+                                        type="email"
+                                        placeholder="Email address"
+                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    />
+                                </div>
+                                <div className="mb-6">
+                                    <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
+                                        Password
+                                    </label>
+                                    <input
+                                        id="password"
+                                        type="password"
+                                        placeholder="Password"
+                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+                                    />
+                                </div>
+                                <div className="flex flex-col items-center justify-between">
+                                    <button
+                                        type="submit"
+                                        className="bg-black hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mb-3"
+                                    >
+                                        Log In
+                                    </button>
+                                    <a
+                                        className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800 mb-2"
+                                        href="/forgot-password"
+                                    >
+                                        Forgot password?
+                                    </a>
+                                    <a
+                                        className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
+                                        href="/create-account"
+                                    >
+                                        Register here
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div className="hidden lg:block lg:w-1/2" style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center center' }}>
+                </div>
             </div>
-            <div className="form-group">
-              <label htmlFor="password">Password:</label>
-              <input type="password" id="password" name="password" required />
-            </div>
-            <button type="submit">Login</button>
-            <div className="helper-links">
-              <a href = "forgot-password" className="forgot-password">Forgot Password?</a>
-              <button type="button" className="create-account-btn">
-                <a href = "/create-account"className= "create-account-btn"> Create Account </a>
-              </button>
-            </div>
-          </form>
         </div>
-      </main>
-      <footer> {/* This footer will stick to the bottom */}
-        <p>Copyright 2024 by WeBite.Inc.</p>
-      </footer>
-    </div>
-  );
-}
+    );
+};
 
 export default Login;
