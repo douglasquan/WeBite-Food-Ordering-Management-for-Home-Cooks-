@@ -98,11 +98,17 @@ def order():
 
 
 
-@app.route('/meal', methods=['POST', 'GET', 'DELETE', 'PUT'])
-def meal():
-    if request.method == 'GET':
+@app.route('/meal', defaults={'path': ''})
+@app.route('/meal/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def meal(path):
+    if request.method == 'GET' and path != 'chef':
         r = request.query_string.decode()
         new_url = routes['meal'] + f'?{r}'
+        response = requests.get(new_url)
+        return response.json(), response.status_code
+    elif request.method == 'GET' and path == 'chef':
+        r = request.query_string.decode()
+        new_url = routes['meal'] + '/chef'+ f'?{r}'
         response = requests.get(new_url)
         return response.json(), response.status_code
     elif request.method == 'POST':
@@ -132,6 +138,12 @@ def food(path):
         #full_url = f"http://127.0.0.1:14004/food/order"
         response = requests.post(routes['food']+'/order', json=r)
         return response.json(), response.status_code
+    # elif request.method == 'GET' and path == "menu":
+    #     print("1")
+    #     r = request.query_string.decode()
+    #     new_url = routes['food']+'/menu'+f'?{r}'
+    #     response = requests.get(new_url)
+    #     return response.json(), response.status_code
     else:
         return jsonify({"error": "Method not supported by the gateway"}), 404
 

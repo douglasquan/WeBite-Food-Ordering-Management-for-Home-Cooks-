@@ -26,6 +26,15 @@ def place_bulk_orders():
 
     return jsonify({"results": results}), 200
 
+# @app.route('/food/menu', methods=['GET'])
+# def get_menu():
+#     id = request.query_string.decode()
+#     print("id", id)
+#     print("3")
+#     new_url = meal_url + '/menu' + f'?{id}'
+#     response = requests.get(new_url)
+#     return response, 200
+
 if __name__ == '__main__':
     current_dir = os.getcwd()
     config_path = os.path.abspath(
@@ -38,10 +47,13 @@ if __name__ == '__main__':
         food_port = config_data['FoodService']['port']
         order_ip = config_data['OrderService']['ip']
         order_port = config_data['OrderService']['port']
+        meal_ip = config_data['MealService']['ip']
+        meal_port = config_data['MealService']['port']
     except KeyError:
         print("config missing")
         exit(1)
     order_url = f"http://{order_ip}:{order_port}/order"
+    meal_url = f"http://{meal_ip}:{meal_port}/meal"
     app.run(host=food_ip, port=food_port, debug=True)
 
 

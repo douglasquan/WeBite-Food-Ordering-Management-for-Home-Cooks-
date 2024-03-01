@@ -50,6 +50,20 @@ def test_populate_order_db(order_list):
         print("Request failed with status code:", response.status_code)
         print("Request failed with response:", response.json())
 
+def test_menu(chef_id):
+    response = requests.get(GATEWAY_URI + "food/menu"+ f"?id={chef_id}")
+    if response.status_code == 200:
+        try:
+            data = response.json()
+            print("Response JSON:", data)
+        except ValueError:
+            print("Response is not in JSON format")
+    elif response.status_code == 404:
+        print("customer id not found.")
+    else:
+        print("Request failed with status code:", response.status_code)
+        print("Request failed with response:", response.json())
 
 if __name__ == '__main__':
     test_populate_order_db(orders_json)
+    test_menu(1)
