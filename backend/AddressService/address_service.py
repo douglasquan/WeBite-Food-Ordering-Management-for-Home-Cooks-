@@ -3,6 +3,7 @@ import json
 import sqlite3
 import uuid
 import os
+import math
 
 app = Flask(__name__)
 
@@ -15,6 +16,7 @@ def db_connection():
         print(e)
     return conn
 
+
 @app.route("/address", methods=["POST"])
 def handler_post():
     conn = db_connection()
@@ -23,7 +25,7 @@ def handler_post():
     if request.method == "POST":
         try:
             data = request.get_json()
-            new_address_id = abs(uuid.uuid4().int) % (10 ** 10)
+            #new_address_id = abs(uuid.uuid4().int) % (10 ** 10)
             new_unit_number = data["unit_number"]
             new_street_number = data["street_number"]
             new_address_line1 = data["address_line1"]
@@ -32,14 +34,17 @@ def handler_post():
             new_province = data["province"]
             new_postal_code = data["postal_code"]
             new_country = data["country"]
+            new_latitude = data["latitude"]
+            new_longitude = data["longitude"]
 
-            sql = """INSERT INTO address (address_id, unit_number, street_number, address_line1, address_line2, city, province, postal_code, country)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"""
-            cursor = cursor.execute(sql, (new_address_id, new_unit_number, new_street_number, new_address_line1, new_address_line2, new_city, new_province, new_postal_code, new_country))
+            sql = """INSERT INTO address (unit_number, street_number, address_line1, address_line2, city, province, postal_code, country, latitude, longitude)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
+            cursor = cursor.execute(sql, (new_unit_number, new_street_number, new_address_line1, new_address_line2, new_city, new_province, new_postal_code, new_country, new_latitude, new_longitude))
             conn.commit()
             conn.close()
+            #"address_id": new_address_id,
             response = {
-                "address_id": new_address_id,
+
                 "unit_number": new_unit_number,
                 "street_number": new_street_number,
                 "address_line1": new_address_line1,
@@ -48,9 +53,10 @@ def handler_post():
                 "province": new_province,
                 "postal_code": new_postal_code,
                 "country": new_country,
-
+                "latitude": new_latitude,
+                "longitude": new_longitude
                 }
-            print(f"address with the id: {new_address_id} created successfully")
+           # print(f"address with the id: {new_address_id} created successfully")
             return response, 200
         
         except json.JSONDecodeError:
@@ -83,6 +89,8 @@ def handler_get():
                 "province": address[6],
                 "postal_code": address[7],
                 "country": address[8],
+                "latitude": address[9],
+                "longitude": address[10]
             }
             return response, 200
         else:
@@ -127,7 +135,7 @@ def handler_delete():
     if request.method == "DELETE":
         data = request.get_json()
         # Check if all required fields (except address_id) are present in the JSON data
-        required_fields = ["unit_number", "street_number", "address_line1", "address_line2", "city", "province", "postal_code", "country"]
+        required_fields = ["unit_number", "street_number", "address_line1", "address_line2", "city", "province", "postal_code", "country", "latitude", "longitude"]
         for field in required_fields:
             if field not in data:
                 return jsonify({"error": f"Missing '{field}' field in JSON data"}), 400
@@ -155,6 +163,10 @@ def handler_delete():
             return jsonify({"error": "Authentication failed. Invalid postal code"}), 401
         elif data["country"] != address[8]:
             return jsonify({"error": "Authentication failed. Invalid country"}), 401
+        elif data["latitude"] != address[9]:
+            return jsonify({"error": "Authentication failed. Invalid country"}), 401
+        elif data["longitude"] != address[10]:
+            return jsonify({"error": "Authentication failed. Invalid country"}), 401
         else: # Delete the address's information from the database
             cursor.execute("DELETE FROM address WHERE address_id = ?", (address_id,))
         conn.commit()
@@ -164,15 +176,66 @@ def handler_delete():
 
     return jsonify({"error": "Invalid request method"}), 405
 
+
+@app.route('/address/convenience', methods=['POST'])
+def get_convenience_location():
+    data = request.get_json()
+    city = data.get('city')
+    latitude = data.get('latitude')
+    longitude = data.get('longitude')
+    conn = db_connection()
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    query = """
+        SELECT *
+        FROM address 
+        WHERE city = ?;
+        """
+    cursor.execute(query, (city,))
+    rows = cursor.fetchall()
+    addresses = [dict(row) for row in rows]
+    conn.commit()
+    conn.close()
+    response = []
+    for address in addresses:
+        #print(address)
+        lati_pick = address['latitude']
+        longi_pick = address['longitude']
+        distance = haversine(latitude, longitude, lati_pick, longi_pick)
+        if distance <= 10:# we consider <=10km as convenience
+            response.append(address)
+    #print(response)
+    if response != []:
+        return jsonify(response), 200
+    return jsonify({"message": "No convenient pick-up location"}), 200
+
+
+def haversine(lat1, lon1, lat2, lon2):
+    # Convert latitude and longitude from degrees to radians
+    lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
+
+    # Haversine formula
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
+    c = 2 * math.asin(math.sqrt(a))
+
+    # Radius of Earth in kilometers.
+    r = 6371
+
+    # Calculate the result
+    return c * r
+
+
 if __name__ == "__main__":
     # initialize db
     conn = sqlite3.connect("address.db")
 
     cursor = conn.cursor()
     cursor.execute('''DROP TABLE IF EXISTS address;''')
-
+    #`address_id` BIGINT NOT NULL PRIMARY KEY
     sql_query = """ CREATE TABLE address(
-        `address_id` BIGINT NOT NULL PRIMARY KEY,
+        `address_id` INTEGER PRIMARY KEY AUTOINCREMENT, 
         `unit_number` INT NOT NULL,
         `street_number` INT NOT NULL,
         `address_line1` VARCHAR(30) NOT NULL,
@@ -180,7 +243,9 @@ if __name__ == "__main__":
         `city` VARCHAR(30) NOT NULL,
         `province` VARCHAR(30) NULL,
         `postal_code` VARCHAR(7) NOT NULL,
-        `country` VARCHAR(30) NULL
+        `country` VARCHAR(30) NULL,
+        `latitude` FLOAT(24) NOT NULL,
+        `longitude` FLOAT(24) NOT NULL
     );"""
     cursor.execute(sql_query)
     
