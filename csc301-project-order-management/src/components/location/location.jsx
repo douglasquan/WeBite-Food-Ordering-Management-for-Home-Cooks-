@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from "../navbar/Navbar.jsx"
 import { getReq, postReq } from "../view_control.js";
+import './location.css'
 
 function Location() {
   const [formData, setFormData] = useState({
