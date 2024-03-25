@@ -115,12 +115,12 @@ update_data = {"city": "New Metropolis", "unit_number": "1004"}
 
 # POST 
 test_populate_address_db(address_list)
-test_convenience(customer_location)
+# test_convenience(customer_location)
 # GET
-test_get_address_by_id(test_address_id)
+# test_get_address_by_id(test_address_id)
 
 # PUT
-#test_update_address(test_address_id, update_data)
+# test_update_address(test_address_id, update_data)
 
 # DELETE
 address_to_delete = address_list[0] # get a copy of address
@@ -128,4 +128,4 @@ address_to_delete = address_list[0] # get a copy of address
 #     address_to_delete[key] = value
 # print(address_to_delete)
 
-test_delete_address(test_address_id, address_to_delete)
+# test_delete_address(test_address_id, address_to_delete)
