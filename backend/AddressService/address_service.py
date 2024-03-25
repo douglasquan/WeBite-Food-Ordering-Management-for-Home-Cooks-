@@ -206,6 +206,8 @@ def get_convenience_location():
         longi_pick = address['longitude']
         distance = haversine(latitude, longitude, lati_pick, longi_pick)
         if distance <= 10:# we consider <=10km as convenience
+            if 'address_id' in address:
+                del address['address_id']
             response.append(address)
     print(response)
     if response != []:
