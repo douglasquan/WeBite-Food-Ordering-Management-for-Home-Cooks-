@@ -12,6 +12,7 @@ import Login from "./components/login/login.jsx";
 import Create_Account from "./components/login/CreateAccount.jsx";
 import Forget_Password from "./components/login/ForgotPassword.jsx";
 import Cart from "./components/cart/cart.jsx";
+import Location from "./components/location/location.jsx";
  
 function Landing() {
     return (
@@ -50,6 +51,10 @@ function Landing() {
                     <Route 
                         path="/cart" 
                         element={<Cart />} 
+                    />
+                    <Route
+                        path="/location"
+                        element={<Location />}
                     />
                 </Routes>
             </Router>
