@@ -2,64 +2,78 @@ from flask import *
 import requests
 import os
 
+from requests import RequestException
+
 app = Flask(__name__)
 
 
-@app.route("/user/<role>", methods=['POST', 'GET', 'DELETE', 'PUT'])
-def user(role):
-    print(role)
-    if request.method == 'GET':
-        r = request.query_string.decode()
-        print(r)
-        new_url = routes['user'] + f'{role}?{r}'
-        response = requests.get(new_url)
-        return response.json(), response.status_code
-    elif request.method == 'POST':
-        r = request.get_json()
-        response = requests.post(routes['user'] + f'{role}', json=r)
-        return response.json(), response.status_code
-    elif request.method == 'DELETE':
-        r = request.query_string.decode()
-        params = request.get_json()
-        new_url = routes['user'] + f'{role}?{r}'
-        response = requests.delete(new_url, json=params)
-        return response.json(), response.status_code
-    elif request.method == 'PUT':
-        r = request.query_string.decode()
-        params = request.get_json()
-        new_url = routes['user'] + f'{role}?{r}'
-        response = requests.put(new_url, json=params)
-        return response.json(), response.status_code
-    else:
-        return "Bad Request", 400
+@app.route('/user/<role>', methods=['POST'])
+@app.route('/user/<role>/<int:user_id>', methods=['GET', 'DELETE', 'PUT'])
+def user(role=None, user_id=None):
+    try:
+        if role is None:
+            abort(400, description="role(chef or customer) is required for requests")
+        if request.method == 'POST':
+            response = requests.post(f"{routes['user']}/{role}", json=request.json)
+        else:
+            if user_id is None:
+                abort(400, description="user_id is required for GET, PUT, DELETE requests")
+
+            if request.method == 'GET':
+                print(user_id)
+                if not user_id:
+                    abort(400, description="user_id query parameter is required for GET request")
+                response = requests.get(f"{routes['user']}/{role}/{user_id}")
+
+            elif request.method == 'PUT':
+                if not user_id:
+                    abort(400, description="user_id query parameter is required for PUT request")
+                response = requests.put(f"{routes['user']}/{role}/{user_id}", json=request.json)
+
+            elif request.method == 'DELETE':
+                if not user_id:
+                    abort(400, description="user_id query parameter is required for DELETE request")
+                response = requests.delete(f"{routes['user']}/{role}/{user_id}")
+
+        return jsonify(response.json()), response.status_code
+    except RequestException as e:
+        abort(502, description="Bad Gateway. Error connecting to UserService.")  # 502 Bad Gateway
+    except Exception as e:
+        abort(500, description="An unexpected error occurred.")  # 500 Internal Server Error
 
 
-@app.route("/user", methods=['POST', 'GET', 'DELETE', 'PUT'])
-def account():
-    if request.method == 'GET':
-        r = request.query_string.decode()
-        print(r)
-        new_url = routes['user'] + f'account?{r}'
-        response = requests.get(new_url)
-        return response.json(), response.status_code
-    elif request.method == 'POST':
-        r = request.get_json()
-        response = requests.post(routes['user'] + 'account', json=r)
-        return response.json(), response.status_code
-    elif request.method == 'DELETE':
-        r = request.query_string.decode()
-        params = request.get_json()
-        new_url = routes['user'] + 'account'
-        response = requests.delete(new_url, json=params)
-        return response.json(), response.status_code
-    elif request.method == 'PUT':
-        r = request.query_string.decode()
-        params = request.get_json()
-        new_url = routes['user'] + 'account'
-        response = requests.put(new_url, json=params)
-        return response.json(), response.status_code
-    else:
-        return "Bad Request", 400
+@app.route('/user', methods=['POST'])
+@app.route('/user/<int:user_id>', methods=['GET', 'DELETE', 'PUT'])
+def account(user_id=None):
+    try:
+        if request.method == 'POST':
+            response = requests.post(routes['user'], json=request.json)
+        else:
+            if user_id is None:
+                abort(400, description="user_id is required for GET, PUT, DELETE requests")
+
+            if request.method == 'GET':
+                print(user_id)
+                if not user_id:
+                    abort(400, description="user_id query parameter is required for GET request")
+                response = requests.get(f"{routes['user']}/{user_id}")
+
+            elif request.method == 'PUT':
+                if not user_id:
+                    abort(400, description="user_id query parameter is required for PUT request")
+                response = requests.put(f"{routes['user']}/{user_id}", json=request.json)
+
+            elif request.method == 'DELETE':
+                if not user_id:
+                    abort(400, description="user_id query parameter is required for DELETE request")
+                response = requests.delete(f"{routes['user']}/{user_id}")
+
+        return jsonify(response.json()), response.status_code
+    except RequestException as e:
+        abort(502, description="Bad Gateway. Error connecting to UserService.")  # 502 Bad Gateway
+    except Exception as e:
+        abort(500, description="An unexpected error occurred.")  # 500 Internal Server Error
+
 
 
 @app.route('/order', methods=['POST', 'GET', 'DELETE', 'PUT'])
@@ -233,9 +247,10 @@ def food(path):
 if __name__ == "__main__":
     # getting config
     current_dir = os.getcwd()
-    config_path = os.path.abspath(os.path.join(os.path.join(current_dir, os.pardir), "config.json"))
+    config_path = os.path.abspath(os.path.join(current_dir, "config.json"))
     with open(config_path, 'r') as config_file:
         config_data = json.load(config_file)
+
     # getting ip for everything
     try:
         orders_ip = config_data['OrderService']['ip']
@@ -260,7 +275,7 @@ if __name__ == "__main__":
         print("Config file missing services")
         exit(1)
     routes = {
-        "user": f"http://{user_ip}:{user_port}/",
+        "user": f"http://{user_ip}:{user_port}/user",
         "order": f"http://{orders_ip}:{orders_port}/order",
         "meal": f"http://{meal_ip}:{meal_port}/meal",
         "address": f"http://{address_ip}:{address_port}/address",
