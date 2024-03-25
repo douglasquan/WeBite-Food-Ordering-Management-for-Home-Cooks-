@@ -25,8 +25,8 @@ function Location() {
 
     // Use the postReq function for the POST request
     try {
-      const data = await postReq('your_endpoint', formData); // Replace 'your_endpoint' with the actual endpoint suffix
-      console.log(data); // Assuming you might do something with the data or adjust based on your needs
+      const data = await postReq('address/convenience', formData);
+      console.log(data);
       setLocations(data); // Update locations state with the response
     } catch (error) {
       console.error('Error:', error);
