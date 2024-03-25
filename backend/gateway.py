@@ -173,6 +173,7 @@ def address(path):
         return response.json(), response.status_code
     elif request.method == 'POST' and path == 'convenience':
         r = request.get_json()
+        print(r)
         response = requests.post(routes['address']+'/convenience', json=r)
         return response.json(), response.status_code
     elif request.method == 'DELETE':

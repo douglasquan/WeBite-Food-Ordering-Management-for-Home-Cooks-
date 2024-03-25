@@ -180,9 +180,12 @@ def handler_delete():
 @app.route('/address/convenience', methods=['POST'])
 def get_convenience_location():
     data = request.get_json()
+    print(data)
     city = data.get('city')
     latitude = data.get('latitude')
+    latitude = float(latitude)
     longitude = data.get('longitude')
+    longitude = float(longitude)
     conn = db_connection()
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
@@ -204,7 +207,7 @@ def get_convenience_location():
         distance = haversine(latitude, longitude, lati_pick, longi_pick)
         if distance <= 10:# we consider <=10km as convenience
             response.append(address)
-    #print(response)
+    print(response)
     if response != []:
         return jsonify(response), 200
     return jsonify({"message": "No convenient pick-up location"}), 200
