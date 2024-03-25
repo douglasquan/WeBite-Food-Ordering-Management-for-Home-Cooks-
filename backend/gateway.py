@@ -242,7 +242,17 @@ def food(path):
     #     return response.json(), response.status_code
     else:
         return jsonify({"error": "Method not supported by the gateway"}), 404
-
+@app.route('/image', methods=['POST'])
+@app.route('/image/<int:image_id>', methods=['GET'])
+def image(image_id=None):
+    if request.method == 'GET':
+        response = requests.get(f"{routes['image']}/{image_id}")
+        return response.json(), response.status_code
+    elif request.method == 'POST':
+        response = requests.post(f"{routes['image']}/")
+        return response.json(), response.status_code
+    else:
+        return "Bad Request", 400
 
 if __name__ == "__main__":
     # getting config
@@ -271,6 +281,9 @@ if __name__ == "__main__":
         food_ip = config_data['FoodService']['ip']
         food_port = config_data['FoodService']['port']
 
+        image_ip = config_data['ImageService']['ip']
+        image_port = config_data['ImageService']['port']
+
     except KeyError:
         print("Config file missing services")
         exit(1)
@@ -280,6 +293,7 @@ if __name__ == "__main__":
         "meal": f"http://{meal_ip}:{meal_port}/meal",
         "address": f"http://{address_ip}:{address_port}/address",
         "review": f"http://{review_ip}:{review_port}/review",
-        "food": f"http://{food_ip}:{food_port}/food"
+        "food": f"http://{food_ip}:{food_port}/food",
+        "image": f"http://{image_ip}:{image_port}/image",
     }
     app.run(port=config_data['Gateway']['port'], host=config_data['Gateway']['ip'], debug=True)
