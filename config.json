@@ -7,6 +7,14 @@
           "port": 14001,
           "ip": "127.0.0.1"
       },
+        "CustomerService": {
+            "port": 15001,
+            "ip": "127.0.0.1"
+        },
+        "ChefService": {
+            "port": 15002,
+            "ip": "127.0.0.1"
+        },
       "Gateway": {
           "port": 14000,
           "ip": "127.0.0.1"
