@@ -19,7 +19,7 @@ allowed_extensions = {'png', 'jpg', 'jpeg', 'gif'}
 
 class MealImage(db.Model):
     image_id = db.Column(db.Integer, primary_key=True)
-    image_filename = db.Column(db.String(255), unique=True, nullable=False)
+    image_filename = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     mimetype = db.Column(db.String(255), nullable=False)
     meal_id = db.Column(db.Integer, unique=True, nullable=True)

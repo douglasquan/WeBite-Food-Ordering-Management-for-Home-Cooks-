@@ -1,15 +1,63 @@
 from flask import *
 import requests
 import os
+from flask_cors import CORS
 
 from requests import RequestException
 
 app = Flask(__name__)
 
+CORS(app, supports_credentials=True, origins=['http://localhost:3000'])
+
+@app.route('/user/chef/is-chef', methods=['GET'])
+def is_chef():
+    user_service_response = requests.get(f"{routes['user']}/chef/is-chef", cookies=request.cookies)
+    response = make_response(jsonify(user_service_response.json()), user_service_response.status_code)
+    for key, value in user_service_response.headers.items():
+        response.headers[key] = value
+    return response, response.status_code
+
+@app.route('/user/register', methods=['POST'])
+@app.route('/user/login', methods=['POST'])
+@app.route('/user/logout', methods=['POST'])
+@app.route('/user/@me', methods=['GET'])
+def account():
+    try:
+        if request.method == 'POST':
+            # Get the last part of the path (e.g., "register", "login", "logout")
+            action = request.path.split('/')[-1]
+            url = f"{routes['user']}/{action}"
+            user_service_response = requests.post(url, json=request.json)
+            # Create a response object from the Flask app
+            response = make_response(jsonify(user_service_response.json()), user_service_response.status_code)
+
+            # Forward all headers from the user service response
+            for key, value in user_service_response.headers.items():
+                # You may not want to forward all headers
+                # if key.lower() not in ['content-length', 'content-type', 'content-encoding']:
+                    response.headers[key] = value
+
+        elif request.method == 'GET':
+            user_service_response = requests.get(f"{routes['user']}/@me", cookies=request.cookies)
+            # Create a response object from the Flask app
+            response = make_response(jsonify(user_service_response.json()), user_service_response.status_code)
+            # Forward all headers from the user service response
+            for key, value in user_service_response.headers.items():
+                # You may not want to forward all headers
+                # if key.lower() not in ['content-length', 'content-type', 'content-encoding']:
+                    response.headers[key] = value
+
+        return response, response.status_code
+
+    # except RequestException as e:
+    #     abort(502, description="Bad Gateway. Error connecting to UserService.")  # 502 Bad Gateway
+    except Exception as e:
+        abort(500, description="An unexpected error occurred.")  # 500 Internal Server Error
+
 
 @app.route('/user/<role>', methods=['POST'])
 @app.route('/user/<role>/<int:user_id>', methods=['GET', 'DELETE', 'PUT'])
-def user(role=None, user_id=None):
+def user_role(role=None, user_id=None):
     try:
         if role is None:
             abort(400, description="role(chef or customer) is required for requests")
@@ -44,7 +92,7 @@ def user(role=None, user_id=None):
 
 @app.route('/user', methods=['POST'])
 @app.route('/user/<int:user_id>', methods=['GET', 'DELETE', 'PUT'])
-def account(user_id=None):
+def user(user_id=None):
     try:
         if request.method == 'POST':
             response = requests.post(routes['user'], json=request.json)
@@ -53,7 +101,6 @@ def account(user_id=None):
                 abort(400, description="user_id is required for GET, PUT, DELETE requests")
 
             if request.method == 'GET':
-                print(user_id)
                 if not user_id:
                     abort(400, description="user_id query parameter is required for GET request")
                 response = requests.get(f"{routes['user']}/{user_id}")
@@ -68,12 +115,12 @@ def account(user_id=None):
                     abort(400, description="user_id query parameter is required for DELETE request")
                 response = requests.delete(f"{routes['user']}/{user_id}")
 
+        print(response.json())
         return jsonify(response.json()), response.status_code
     except RequestException as e:
         abort(502, description="Bad Gateway. Error connecting to UserService.")  # 502 Bad Gateway
     except Exception as e:
         abort(500, description="An unexpected error occurred.")  # 500 Internal Server Error
-
 
 
 @app.route('/order', methods=['POST', 'GET', 'DELETE', 'PUT'])
@@ -139,7 +186,6 @@ def order():
 #         return "Bad Request", 400
 
 
-
 @app.route('/meal', defaults={'path': ''})
 @app.route('/meal/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def meal(path):
@@ -150,7 +196,7 @@ def meal(path):
         return response.json(), response.status_code
     elif request.method == 'GET' and path == 'chef':
         r = request.query_string.decode()
-        new_url = routes['meal'] + '/chef'+ f'?{r}'
+        new_url = routes['meal'] + '/chef' + f'?{r}'
         response = requests.get(new_url)
         return response.json(), response.status_code
     elif request.method == 'POST':
@@ -226,13 +272,14 @@ def review():
     else:
         return "Bad Request", 400
 
+
 @app.route('/food', defaults={'path': ''})
 @app.route('/food/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def food(path):
     if request.method == 'POST' and path == "order":
         r = request.get_json()
-        #full_url = f"http://127.0.0.1:14004/food/order"
-        response = requests.post(routes['food']+'/order', json=r)
+        # full_url = f"http://127.0.0.1:14004/food/order"
+        response = requests.post(routes['food'] + '/order', json=r)
         return response.json(), response.status_code
     # elif request.method == 'GET' and path == "menu":
     #     print("1")
@@ -242,6 +289,8 @@ def food(path):
     #     return response.json(), response.status_code
     else:
         return jsonify({"error": "Method not supported by the gateway"}), 404
+
+
 @app.route('/image', methods=['POST'])
 @app.route('/image/<int:image_id>', methods=['GET'])
 def image(image_id=None):
@@ -254,6 +303,7 @@ def image(image_id=None):
     else:
         return "Bad Request", 400
 
+
 if __name__ == "__main__":
     # getting config
     current_dir = os.getcwd()
@@ -265,19 +315,19 @@ if __name__ == "__main__":
     try:
         orders_ip = config_data['OrderService']['ip']
         orders_port = config_data['OrderService']['port']
-        
+
         address_ip = config_data['AddressService']['ip']
         address_port = config_data['AddressService']['port']
-        
+
         review_ip = config_data['ReviewService']['ip']
         review_port = config_data['ReviewService']['port']
-        
+
         user_ip = config_data['UserService']['ip']
         user_port = config_data['UserService']['port']
-        
+
         meal_ip = config_data['MealService']['ip']
         meal_port = config_data['MealService']['port']
-        
+
         food_ip = config_data['FoodService']['ip']
         food_port = config_data['FoodService']['port']
 
