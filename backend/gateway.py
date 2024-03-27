@@ -159,16 +159,22 @@ def meal(path):
         return "Bad Request", 400
 
 
-@app.route('/address', methods=['POST', 'GET', 'DELETE', 'PUT'])
-def address():
+@app.route('/address', defaults={'path': ''})
+@app.route('/address/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def address(path):
     if request.method == 'GET':
         r = request.query_string.decode()
         new_url = routes['address'] + f'?{r}'
         response = requests.get(new_url)
         return response.json(), response.status_code
-    elif request.method == 'POST':
+    elif request.method == 'POST' and path == 'None':
         r = request.get_json()
         response = requests.post(routes['address'], json=r)
+        return response.json(), response.status_code
+    elif request.method == 'POST' and path == 'convenience':
+        r = request.get_json()
+        print(r)
+        response = requests.post(routes['address']+'/convenience', json=r)
         return response.json(), response.status_code
     elif request.method == 'DELETE':
         r = request.query_string.decode()

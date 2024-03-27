@@ -30,6 +30,7 @@ const Navbar = () => {
             <a className="my-1 text-sm text-gray-700 leading-5 hover:text-blue-600 md:mx-4 md:my-0" href="Chef">Chef</a>
             <a className="my-1 text-sm text-gray-700 leading-5 hover:text-blue-600 md:mx-4 md:my-0" href="Customer">Customer</a>
             <a className="my-1 text-sm text-gray-700 leading-5 hover:text-blue-600 md:mx-4 md:my-0" href="Login">Login</a>
+            <a className="my-1 text-sm text-gray-700 leading-5 hover:text-blue-600 md:mx-4 md:my-0" href="Location">Location</a>
           </div>
         </div>
       </div>
