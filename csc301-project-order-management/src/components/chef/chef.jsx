@@ -1,12 +1,12 @@
-import React from "react"
-import { useState, useEffect} from 'react';
-import Button from 'react-bootstrap/Button';
-import Offcanvas from 'react-bootstrap/Offcanvas';
-import Tab from 'react-bootstrap/Tab';
-import Tabs from 'react-bootstrap/Tabs';
+import React from "react";
+import { useState, useEffect } from "react";
+import Button from "react-bootstrap/Button";
+import Offcanvas from "react-bootstrap/Offcanvas";
+import Tab from "react-bootstrap/Tab";
+import Tabs from "react-bootstrap/Tabs";
 
-import './chef.css';
-import Navbar from "../navbar/Navbar.jsx"
+import "./chef.css";
+import Navbar from "../navbar/Navbar.jsx";
 import { getReq, postReq } from "../view_control.js";
 import OffcanvasBody from "react-bootstrap/esm/OffcanvasBody.js";
 
@@ -14,7 +14,7 @@ import OffcanvasBody from "react-bootstrap/esm/OffcanvasBody.js";
 //   const chefID = "1";
 //   const data = await getReq("meal/chef", chefID)
 //   // console.log(data);
-//   return data; 
+//   return data;
 // };
 
 // var products = [];
@@ -25,7 +25,7 @@ import OffcanvasBody from "react-bootstrap/esm/OffcanvasBody.js";
 // if (chefID === null) {
 //   products = [];
 // } else {
-//   const menuData = await getMenuData(); 
+//   const menuData = await getMenuData();
 //   console.log(menuData);
 // }
 
@@ -33,14 +33,13 @@ import OffcanvasBody from "react-bootstrap/esm/OffcanvasBody.js";
 var UserInfo = null;
 var chefID = null;
 const Chef = () => {
-
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
     const fetchMenuData = async () => {
-      UserInfo = JSON.parse(localStorage.getItem('user'));
+      UserInfo = JSON.parse(localStorage.getItem("user"));
       chefID = UserInfo?.chefid;
       console.log(chefID);
       if (chefID) {
@@ -51,7 +50,6 @@ const Chef = () => {
         } else {
           setProducts([]);
         }
-
       } else {
         setProducts([]);
       }
@@ -60,7 +58,7 @@ const Chef = () => {
 
     fetchMenuData();
   }, []);
-  
+
   // const products = [
   //   // Add your product details here
   //   { id: 1, name: "Show Me Your Love", price: 9.99, imageUrl: './food.jpg' },
@@ -78,7 +76,6 @@ const Chef = () => {
 
   // products = [];
 
-
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
@@ -91,7 +88,7 @@ const Chef = () => {
     // console.log(name);
     // console.log(price);
 
-    const data = {"chef_id": chefID, "name": name, "cost": price};
+    const data = { chef_id: chefID, name: name, cost: price };
     // console.log(data);
     const response = await postReq("meal/None", data);
     // const response = await getReq("meal", "1");
@@ -105,7 +102,7 @@ const Chef = () => {
     console.log(name);
     console.log(price);
 
-    const data = {"name": name, "cost": price};
+    const data = { name: name, cost: price };
     // postReq("chef", data);
   };
 
@@ -116,22 +113,82 @@ const Chef = () => {
     console.log(name);
     console.log(price);
 
-    const data = {"name": name, "cost": price};
+    const data = { name: name, cost: price };
     // postReq("chef", data);
   };
 
-  const reset = () => { 
+  const reset = () => {
     setName();
     setPrice();
-  }
+  };
 
+  const [preview, setPreview] = useState("");
+  const [file, setFile] = useState(null);
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    // Create a FormData object to build the data for submission
+    const formData = new FormData();
+    formData.append("image", file);
+
+    // Post the form data to the server
+    // You need to handle the server response here
+    fetch("http://localhost:14007/image", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+        // Handle success
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        // Handle error
+      });
+  };
+
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    setFile(file);
+    setPreview(URL.createObjectURL(file));
+  };
 
   return (
     <div className="bg-white">
       <Navbar />
       <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
-        <h2 className="text-4xl font-extrabold tracking-tight text-gray-900">Your Store</h2>
+        <h2 className="text-4xl font-extrabold tracking-tight text-gray-900">
+          Your Store
+        </h2>
         <div className="mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
+          <div className="container mx-auto mt-10">
+            <div className="max-w-md mx-auto bg-white p-5 border rounded-md">
+              <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+                {preview && (
+                  <img
+                    src={preview}
+                    alt="Preview"
+                    className="w-full h-auto bg-cover"
+                  />
+                )}
+                <input
+                  type="file"
+                  name="image"
+                  onChange={handleImageChange}
+                  className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"
+                />
+                <button
+                  type="submit"
+                  className="mt-4 py-2 px-4 bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
+                >
+                  Upload a file
+                </button>
+              </form>
+            </div>
+          </div>
+
           {products.map((product) => (
             <div key={product.id} className="group relative">
               <div className="w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none">
@@ -143,11 +200,11 @@ const Chef = () => {
               </div>
               <div className="mt-4 flex justify-between">
                 <div>
-                  <h3 className="text-sm text-gray-700">
-                    {product.name}
-                  </h3>
+                  <h3 className="text-sm text-gray-700">{product.name}</h3>
                 </div>
-                <p className="text-sm font-medium text-gray-900">${product.cost}</p>
+                <p className="text-sm font-medium text-gray-900">
+                  ${product.cost}
+                </p>
               </div>
               {/* Edit button */}
               {/* <button className="absolute top-0 right-0 mt-2 mr-2 text-xs text-white bg-blue-700 hover:bg-blue-600 px-2 py-1 rounded">
@@ -166,76 +223,121 @@ const Chef = () => {
               Edit your menu !!!
             </Button>
 
-            <Offcanvas show={show} onHide={handleClose} placement="bottom" backdrop="static" scroll = {true}>
+            <Offcanvas
+              show={show}
+              onHide={handleClose}
+              placement="bottom"
+              backdrop="static"
+              scroll={true}
+            >
               <Offcanvas.Header className="offHeader" closeButton>
                 MENU EDITS!!!
               </Offcanvas.Header>
 
-    
-              <Offcanvas.Body >
+              <Offcanvas.Body>
                 <Tabs
                   defaultActiveKey="profile"
                   id="fill-tab-example"
                   className="mb-3"
                   fill
                 >
-                <Tab eventKey="Add" title="Add" className = "offbody">
-                  <form method="post" onSubmit={handleAdd}>
-                      <div className = 'offInputs'>
+                  <Tab eventKey="Add" title="Add" className="offbody">
+                    <form method="post" onSubmit={handleAdd}>
+                      <div className="offInputs">
                         <label>
-                          Dish Name: <input className = 'labelContainer' name="myInput" required onChange={(e) => setName(e.target.value)}/>
+                          Dish Name:{" "}
+                          <input
+                            className="labelContainer"
+                            name="myInput"
+                            required
+                            onChange={(e) => setName(e.target.value)}
+                          />
                         </label>
                         <hr />
                         <label>
-                          Dish Price: <input className = 'labelContainer' name="myInput" required onChange={(e) => setPrice(e.target.value)}/>
+                          Dish Price:{" "}
+                          <input
+                            className="labelContainer"
+                            name="myInput"
+                            required
+                            onChange={(e) => setPrice(e.target.value)}
+                          />
                         </label>
                       </div>
 
-                    <div className = "offButtons">
-                      <button type="reset" onClick={reset} >Reset form</button>
-                      <button type="submit">Submit form</button>
-                    </div>
-                  </form>
-                </Tab>
-                <Tab eventKey="Delete" title="Delete" className = "offbody">
-                  <form method="post" onSubmit={handleDelete}>
-                      <div className = 'offInputs'>
-                        <label >
-                          Dish Name: <input className = 'labelContainer' name="myInput" required onChange={(e) => setName(e.target.value)}/>
-                        </label>
-                        <hr />
-                        <label >
-                          Dish Price: <input className = 'labelContainer' name="myInput" required onChange={(e) => setPrice(e.target.value)}/>
-                        </label>
+                      <div className="offButtons">
+                        <button type="reset" onClick={reset}>
+                          Reset form
+                        </button>
+                        <button type="submit">Submit form</button>
                       </div>
-
-                    <div className = "offButtons">
-                      <button type="reset" onClick={reset} >Reset form</button>
-                      <button type="submit">Submit form</button>
-                    </div>
-                  </form>
-                </Tab>
-                <Tab eventKey="Update" title="Update" className = "offbody">
-                  <form method="post" onSubmit={handleUpdate}>
-                      <div className = 'offInputs'>
+                    </form>
+                  </Tab>
+                  <Tab eventKey="Delete" title="Delete" className="offbody">
+                    <form method="post" onSubmit={handleDelete}>
+                      <div className="offInputs">
                         <label>
-                          Dish Name: <input className = 'labelContainer' name="myInput" required onChange={(e) => setName(e.target.value)}/>
+                          Dish Name:{" "}
+                          <input
+                            className="labelContainer"
+                            name="myInput"
+                            required
+                            onChange={(e) => setName(e.target.value)}
+                          />
                         </label>
                         <hr />
                         <label>
-                          Dish Price: <input className = 'labelContainer' name="myInput" required onChange={(e) => setPrice(e.target.value)}/>
+                          Dish Price:{" "}
+                          <input
+                            className="labelContainer"
+                            name="myInput"
+                            required
+                            onChange={(e) => setPrice(e.target.value)}
+                          />
                         </label>
                       </div>
 
-                    <div className = "offButtons">
-                      <button type="reset" onClick={reset} >Reset form</button>
-                      <button type="submit">Submit form</button>
-                    </div>
-                  </form>
-                </Tab>
-              </Tabs>
+                      <div className="offButtons">
+                        <button type="reset" onClick={reset}>
+                          Reset form
+                        </button>
+                        <button type="submit">Submit form</button>
+                      </div>
+                    </form>
+                  </Tab>
+                  <Tab eventKey="Update" title="Update" className="offbody">
+                    <form method="post" onSubmit={handleUpdate}>
+                      <div className="offInputs">
+                        <label>
+                          Dish Name:{" "}
+                          <input
+                            className="labelContainer"
+                            name="myInput"
+                            required
+                            onChange={(e) => setName(e.target.value)}
+                          />
+                        </label>
+                        <hr />
+                        <label>
+                          Dish Price:{" "}
+                          <input
+                            className="labelContainer"
+                            name="myInput"
+                            required
+                            onChange={(e) => setPrice(e.target.value)}
+                          />
+                        </label>
+                      </div>
 
-
+                      <div className="offButtons">
+                        <button type="reset" onClick={reset}>
+                          Reset form
+                        </button>
+                        <button type="submit">Submit form</button>
+                      </div>
+                    </form>
+                  </Tab>
+                </Tabs>
               </Offcanvas.Body>
             </Offcanvas>
           </div>

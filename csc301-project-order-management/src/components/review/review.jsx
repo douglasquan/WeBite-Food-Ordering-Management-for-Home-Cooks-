@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Navbar from "../navbar/Navbar.jsx";
-import ChefReviewPage from './ChefReviewPage    .js';
+import Navbar from "../csc301-project-order-management/src/components/navbar/Navbar.jsx";
+import ChefReviewPage from './ChefReviewPage.jsx';
 import CustomerReviewPage from './CustomerReviewPage.jsx';
 
 function Review() {
@@ -18,4 +18,4 @@ function Review() {
   }
   
   export default Review;
-  
+    

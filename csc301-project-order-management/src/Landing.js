@@ -12,8 +12,35 @@ import Login from "./components/login/login.jsx";
 import Create_Account from "./components/login/CreateAccount.jsx";
 import Forget_Password from "./components/login/ForgotPassword.jsx";
 import Cart from "./components/cart/cart.jsx";
- 
+import ChefReviewPage from "./components/review/ChefReviewPage.jsx";
+import CustomerReviewPage from "./components/review/CustomerReviewPage.jsx";
+
+import { useState, useEffect } from 'react';
+import { getReq } from "./components/view_control.js";
+
+// Custom hook to check if the user is a chef
+const useIsChef = () => {
+    const [isChef, setIsChef] = useState(null);
+
+    useEffect(() => {
+        const fetchRole = async () => {
+            try {
+                const response = await getReq("/user/chef/is-chef");
+                setIsChef(response.data.is_chef);
+            } catch (error) {
+                console.error("Error checking if user is a chef", error);
+                setIsChef(false);
+            }
+        };
+
+        fetchRole();
+    }, []);
+
+    return isChef;
+};
+
 function Landing() {
+    const isChef = useIsChef();
     return (
         <>
             <Router>
@@ -25,11 +52,12 @@ function Landing() {
                     />
                     <Route
                         path="/customer"
-                        element={<Customer />}
+                        element={isChef ? <Navigate to="/" /> : <Customer /> }
+
                     />
                     <Route
                         path="/chef"
-                        element={<Chef />}
+                        element={isChef ? <Chef /> : <Navigate to="/" />}
                     />
                     <Route
                         path="/login"
@@ -50,6 +78,10 @@ function Landing() {
                     <Route 
                         path="/cart" 
                         element={<Cart />} 
+                    />
+                    <Route 
+                        path="/review" 
+                        element={isChef ? <CustomerReviewPage /> :<ChefReviewPage />}
                     />
                 </Routes>
             </Router>
