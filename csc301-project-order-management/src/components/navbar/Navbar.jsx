@@ -29,8 +29,8 @@ const Navbar = () => {
             <Link className="my-1 text-sm text-gray-700 leading-5 hover:text-blue-600 md:mx-4 md:my-0" to="/home">Home</Link>
             <Link className="my-1 text-sm text-gray-700 leading-5 hover:text-blue-600 md:mx-4 md:my-0" to="/chef">Chef</Link>
             <Link className="my-1 text-sm text-gray-700 leading-5 hover:text-blue-600 md:mx-4 md:my-0" to="/customer">Customer</Link>
-            <Link className="my-1 text-sm text-gray-700 leading-5 hover:text-blue-600 md:mx-4 md:my-0" to="/login">Login</Link>
             <Link className="my-1 text-sm text-gray-700 leading-5 hover:text-blue-600 md:mx-4 md:my-0" to="/review">Review</Link>
+            <Link className="my-1 text-sm text-gray-700 leading-5 hover:text-blue-600 md:mx-4 md:my-0" to="/login">Login</Link>
           </div>
         </div>
       </div>
