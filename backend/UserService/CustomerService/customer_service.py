@@ -35,7 +35,7 @@ def create_customer():
             data = request.json
             customer = Customer(
                 user_id=data['user_id'],
-                pickup_address_id=data['pickup_address_id']
+                pickup_address_id=data.get("pickup_address_id", None)
             )
             db.session.add(customer)
             db.session.commit()

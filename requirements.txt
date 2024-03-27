@@ -1,0 +1,10 @@
+flask~=3.0.2
+flask-sqlalchemy
+flask-bcrypt
+python-dotenv~=1.0.1
+flask-session
+redis~=5.0.3
+flask-cors
+requests~=2.31.0
+SQLAlchemy~=2.0.29
+Werkzeug~=3.0.1

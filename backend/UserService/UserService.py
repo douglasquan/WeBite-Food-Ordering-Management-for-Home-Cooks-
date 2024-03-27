@@ -2,33 +2,175 @@ from flask import *
 import requests
 import os
 from flask import Flask, request, jsonify
+from flask_bcrypt import Bcrypt
+from flask_cors import CORS
+from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
-import sqlite3
 from datetime import datetime
-import uuid
-from urllib.parse import parse_qs
+from uuid import uuid4
 from requests.exceptions import RequestException
+from dotenv import load_dotenv
+import redis
 
 app = Flask(__name__)
+
+load_dotenv()
+
+app.config['SECRET_KEY'] = os.environ["SECRET_KEY"]
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SECURE'] = False  # True if using HTTPS
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # 'None' for cross-origin
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# app.config["SQLALCHEMY_ECHO"] = True
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 db_path = os.path.join(BASE_DIR, 'db', 'user.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+app.config['SESSION_TYPE'] = "redis"
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_USE_SIGNER"] = True
+app.config['SESSION_REDIS'] = redis.from_url('redis://127.0.0.1:6379')
+
 db = SQLAlchemy(app)
+
+bcrypt = Bcrypt(app)
+# CORS(app, supports_credentials=True)
+server_session = Session(app)
 
 
 # -------------------------Account creation-------------------------
+def get_uuid():
+    return uuid4().hex
+
+
 class User(db.Model):
-    user_id = db.Column(db.Integer, primary_key=True)
+    __tablename__ = 'user'
+    user_id = db.Column(db.String(32), primary_key=True, default=get_uuid, unique=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    phone_number = db.Column(db.String(20), unique=True)
+    phone_number = db.Column(db.String(20), unique=True, nullable=True)
+
 
 with app.app_context():
     db.create_all()
+
+
+@app.route('/user/chef/is-chef', methods=['GET'])
+def is_chef():
+    user_id = session.get("user_id")
+    print(user_id)
+    user_service_response = requests.get(f"{routes['chef']}/is-chef", cookies=request.cookies)
+    print(user_service_response.json())
+    response = make_response(jsonify(user_service_response.json()), user_service_response.status_code)
+    for key, value in user_service_response.headers.items():
+        response.headers[key] = value
+    return response, response.status_code
+
+@app.route("/user/@me", methods=["GET"])
+def get_current_user():
+    user_id = session.get("user_id")
+    print("Get Session contents:", session)  # Log to help with debugging
+
+    if not user_id:
+        print("No user_id in session")
+        return jsonify({"error": "Unauthorized"}), 401
+
+    user = User.query.filter_by(user_id=user_id).first()
+    if user:
+        user_data = {
+            "user_id": user.user_id,
+            "username": user.username,
+            "email": user.email,
+            "phone_number": user.phone_number,
+        }
+        print("Returning user data:", user_data)  # Log to help with debugging
+        return jsonify(user_data)
+    else:
+        print("No user found with user_id:", user_id)
+        return jsonify({"error": "User not found"}), 404
+
+
+@app.route("/user/register", methods=["POST"])
+def register_user():
+    try:
+        data = request.json
+
+        username = data['username']
+        email = data['email']
+        password = data['password']
+        phone_number = data.get('phone_number', None)
+
+        user_email_exists = User.query.filter_by(email=email).first() is not None
+        user_name_exists = User.query.filter_by(username=username).first() is not None
+
+        if user_email_exists or user_name_exists:
+            return jsonify({"error": "Duplicate entry, the user already exists"}), 409
+
+        hashed_password = bcrypt.generate_password_hash(password)
+        new_user = User(
+            username=username,
+            email=email,
+            password=hashed_password,
+            phone_number=phone_number
+        )
+        db.session.add(new_user)
+        db.session.commit()
+
+        session["user_id"] = new_user.user_id
+
+        return jsonify({
+            "user_id": new_user.user_id,
+            "username": new_user.username,
+            "email": new_user.email,
+            "phone_number": new_user.phone_number,
+        }), 200
+    except KeyError:
+        return jsonify({"error": "Missing fields in the JSON data"}), 400
+
+
+@app.route("/user/login", methods=["POST"])
+def login_user():
+    try:
+        data = request.json
+
+        email = data['email']
+        password = data['password']
+
+        user = User.query.filter_by(email=email).first()
+
+        if user is None:
+            return jsonify({"error": "Unauthorized"}), 401
+
+        if not bcrypt.check_password_hash(user.password, password):
+            return jsonify({"error": "Unauthorized"}), 401
+
+        session["user_id"] = user.user_id
+
+        response_data = {
+            "user_id": user.user_id,
+            "username": user.username,
+            "email": user.email,
+            "phone_number": user.phone_number,
+        }
+        response = make_response(jsonify(response_data), 200)
+        return response
+
+    except KeyError:
+        return jsonify({"error": "Missing fields in the JSON data"}), 400
+
+
+@app.route("/user/logout", methods=["POST"])
+def logout_user():
+    session.pop("user_id", None)
+    print(session)
+    response = jsonify({"message": "Logged out successfully"})
+    response.set_cookie('session', '', expires=0)
+    return response, 200
 
 
 @app.route("/user", methods=["POST"])
@@ -367,6 +509,7 @@ def customer(customer_id=None):
 if __name__ == "__main__":
     current_dir = os.getcwd()
     config_path = os.path.abspath(os.path.join(current_dir, "config.json"))
+    print(config_path)
     with open(config_path, 'r') as config_file:
         config_data = json.load(config_file)
     # getting ip for everything

@@ -1,4 +1,7 @@
-from flask import Flask, request, jsonify
+import redis
+from dotenv import load_dotenv
+from flask import Flask, request, jsonify, session
+from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 from flask_migrate import Migrate
@@ -15,6 +18,17 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
+load_dotenv()
+app.config['SECRET_KEY'] = os.environ["SECRET_KEY"]
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SECURE'] = False  # True if using HTTPS
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # 'None' for cross-origin
+app.config['SESSION_TYPE'] = "redis"
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_USE_SIGNER"] = True
+app.config['SESSION_REDIS'] = redis.from_url('redis://127.0.0.1:6379')
+server_session = Session(app)
+
 
 class Chef(db.Model):
     chef_id = db.Column(db.Integer, primary_key=True)
@@ -28,6 +42,20 @@ with app.app_context():
     db.create_all()
 
 
+@app.route("/chef/is-chef", methods=["GET"])
+def is_chef():
+    user_id = session.get("user_id")
+    print(user_id)
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    chef = Chef.query.filter_by(user_id=user_id).first()
+    if chef:
+        return jsonify({"is_chef": True})
+    else:
+        return jsonify({"is_chef": False})
+
+
 @app.route("/chef", methods=["POST"])
 def create_chef():
     if request.method == "POST":
@@ -35,9 +63,9 @@ def create_chef():
             data = request.json
             chef = Chef(
                 user_id=data['user_id'],
-                rating=data['rating'],
-                description=data['description'],
-                delivery_address_id=data['delivery_address_id']
+                rating=data.get('rating', None),
+                description=data.get('description', None),
+                delivery_address_id=data.get('delivery_address_id', None)
             )
             db.session.add(chef)
             db.session.commit()

@@ -36,6 +36,10 @@
      "FoodService": {
             "port": 14006,
             "ip": "127.0.0.1"
+     },
+    "ImageService": {
+            "port": 14007,
+            "ip": "127.0.0.1"
      }
   }
 
