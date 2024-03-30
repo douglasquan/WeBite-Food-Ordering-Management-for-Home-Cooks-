@@ -51,13 +51,9 @@ function Landing() {
                         element={<Home />}
                     />
                     <Route
-                        path="/customer"
-                        element={isChef ? <Navigate to="/" /> : <Customer /> }
+                        path="/menu"
+                        element={isChef ? <Chef /> : <Customer /> }
 
-                    />
-                    <Route
-                        path="/chef"
-                        element={isChef ? <Chef /> : <Navigate to="/" />}
                     />
                     <Route
                         path="/login"
@@ -81,7 +77,11 @@ function Landing() {
                     />
                     <Route 
                         path="/review" 
-                        element={isChef ? <CustomerReviewPage /> :<ChefReviewPage />}
+                        element={isChef ? <ChefReviewPage /> :<CustomerReviewPage />}
+                    />
+                    <Route 
+                        path="/review/chef" 
+                        element={<ChefReviewPage />}
                     />
                 </Routes>
             </Router>
