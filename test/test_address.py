@@ -8,7 +8,7 @@ address_list = [
         "street_number": 5162,
         "address_line1": "Yonge Street",
         "address_line2": " ",
-        "city": "Toronto",
+        "city": "Mississauga",
         "province": "Ontario",
         "postal_code": "M2N 0E9",
         "country": "Canada",
@@ -20,7 +20,7 @@ address_list = [
         "street_number": 231,
         "address_line1": "Queen Street",
         "address_line2": " ",
-        "city": "Toronto",
+        "city": "Mississauga",
         "province": "Ontario",
         "postal_code": "M2N 0E9",
         "country": "Canada",
@@ -32,7 +32,7 @@ address_list = [
         "street_number": 23,
         "address_line1": "King Street",
         "address_line2": " ",
-        "city": "Toronto",
+        "city": "Mississauga",
         "province": "Ontario",
         "postal_code": "M2N 0E9",
         "country": "Canada",
@@ -40,10 +40,11 @@ address_list = [
         "longitude": -79.6625769
     }
 ]
-customer_location = {"city": "Toronto",
-                     "latitude": 43.5481107,
-                     "longitude": -79.6694842
-                     }
+# customer_location = {"city": "Toronto",
+#                      "latitude": 43.5481107,
+#                      "longitude": -79.6694842
+#                      }
+customer_location = {"city": "Toronto", "address": "3359 Mississauga Rd"}
 
 def test_populate_address_db(address_list):
     for address_data in address_list:
@@ -115,7 +116,7 @@ update_data = {"city": "New Metropolis", "unit_number": "1004"}
 
 # POST 
 test_populate_address_db(address_list)
-# test_convenience(customer_location)
+#test_convenience(customer_location)
 # GET
 # test_get_address_by_id(test_address_id)
 
