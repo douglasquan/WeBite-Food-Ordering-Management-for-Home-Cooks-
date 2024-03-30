@@ -1,24 +1,24 @@
 import requests
 
-GATEWAY_URI = "http://127.0.0.1:14000/"  # Change the port to match the review service
+GATEWAY_URI = "http://127.0.0.1:14000/"
 
 review_list = [
     {
         "meal_id": 1,
-        "customer_id": 101,
-        "review_description": "Delicious and well-seasoned meal.",
+        "customer_id": 2,
+        "review_description": "Delicious and satisfying meal.",
         "rating": 5
     },
     {
         "meal_id": 2,
-        "customer_id": 102,
-        "review_description": "Quite good but a bit too spicy for my taste.",
-        "rating": 4
+        "customer_id": 3,
+        "review_description": "Good taste but too pricey.",
+        "rating": 3
     },
     {
-        "meal_id": 3,
-        "customer_id": 103,
-        "review_description": "Not as expected, was a bit cold.",
+        "meal_id": 1,
+        "customer_id": 1,
+        "review_description": "Quite average, nothing special.",
         "rating": 2
     }
 ]
@@ -26,6 +26,7 @@ review_list = [
 def test_populate_review_db(review_list):
     for review_data in review_list:
         response = requests.post(GATEWAY_URI + "review", json=review_data)
+        print(response)
         if response.status_code == 200:
             try:
                 data = response.json()
@@ -34,10 +35,14 @@ def test_populate_review_db(review_list):
                 print("Response is not in JSON format")
         else:
             print("Request failed with status code:", response.status_code)
-            print("Request failed with response:", response.json())
+            if response.text:
+                try:
+                    print("Request failed with response:", response.json())
+                except ValueError:
+                    print("Response is not in JSON format")
 
-def test_get_review_by_id(review_id_to_get):
-    response = requests.get(GATEWAY_URI + f"review?review_id={review_id_to_get}")
+def test_get_review_by_review_id(review_id_to_get):
+    response = requests.get(GATEWAY_URI + f"review/{review_id_to_get}")
     if response.status_code == 200:
         try:
             data = response.json()
@@ -45,13 +50,35 @@ def test_get_review_by_id(review_id_to_get):
         except ValueError:
             print("Response is not in JSON format")
     elif response.status_code == 404:
-        print("Review id not found.")
+        print("Review with given review_id not found.")
     else:
         print("Request failed with status code:", response.status_code)
-        print("Request failed with response:", response.json())
+        if response.text:
+            try:
+                print("Request failed with response:", response.json())
+            except ValueError:
+                print("Response is not in JSON format")
+
+def test_get_reviews_by_meal_id(meal_id_to_get):
+    response = requests.get(GATEWAY_URI + f"review/meal/{meal_id_to_get}")
+    if response.status_code == 200:
+        try:
+            reviews_data = response.json()
+            print("Reviews found for the meal:", reviews_data)
+        except ValueError:
+            print("Response is not in JSON format")
+    elif response.status_code == 404:
+        print("No reviews found for the given meal_id.")
+    else:
+        print("Request failed with status code:", response.status_code)
+        if response.text:
+            try:
+                print("Request failed with response:", response.json())
+            except ValueError:
+                print("Response is not in JSON format")
 
 def test_update_review(review_id_to_update, update_data):
-    response = requests.put(GATEWAY_URI + f"review?review_id={review_id_to_update}", json=update_data)
+    response = requests.put(GATEWAY_URI + f"review/{review_id_to_update}", json=update_data)
     if response.status_code == 200:
         try:
             data = response.json()
@@ -60,10 +87,14 @@ def test_update_review(review_id_to_update, update_data):
             print("Response is not in JSON format")
     else:
         print("Request failed with status code:", response.status_code)
-        print("Request failed with response:", response.json())
+        if response.text:
+            try:
+                print("Request failed with response:", response.json())
+            except ValueError:
+                print("Response is not in JSON format")
 
-def test_delete_review(review_id_to_delete, review_data):
-    response = requests.delete(GATEWAY_URI + f"review?review_id={review_id_to_delete}", json=review_data)
+def test_delete_review(review_id_to_delete):
+    response = requests.delete(GATEWAY_URI + f"review/{review_id_to_delete}")
     if response.status_code == 200:
         try:
             data = response.json()
@@ -72,27 +103,29 @@ def test_delete_review(review_id_to_delete, review_data):
             print("Response is not in JSON format")
     else:
         print("Request failed with status code:", response.status_code)
-        print("Request failed with response:", response.json())
+        if response.text:
+            try:
+                print("Request failed with response:", response.json())
+            except ValueError:
+                print("Response is not in JSON format")
 
-# Test cases:
+# Example usage:
 
-test_review_id = 4454871729
-update_data = {
-    "review_description": "Updated review text here.",
-    "rating": 4
-}
-
-# POST 
+# Populate the database with reviews
 # test_populate_review_db(review_list)
 
-# GET
-# test_get_review_by_id(test_review_id) 
+# Get a review by review ID
+# test_get_review_by_review_id(1)
 
-# PUT
-# test_update_review(test_review_id, update_data)  
+# Get reviews by meal ID
+# test_get_reviews_by_meal_id(1)
 
-# DELETE
-review_to_delete = review_list[0]
-# for key, value in update_data.items(): #update the address manually if you previously ran test_update_address
-#     review_to_delete[key] = value
-test_delete_review(test_review_id, review_to_delete)  
+# Update a review's information
+update_data = {
+    "review_description": "Actually, it was quite good.",
+    "rating": 4
+}
+# test_update_review(1, update_data)
+
+# Delete a review by review ID
+test_delete_review(2)
