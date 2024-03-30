@@ -7,8 +7,7 @@ import axios from "axios";
 function Location() {
   const [formData, setFormData] = useState({
     city: '',
-    latitude: '',
-    longitude: '',
+    address: ''
   });
 
   const [locations, setLocations] = useState([]);
@@ -65,22 +64,12 @@ function Location() {
           />
         </div>
         <div>
-          <label htmlFor="latitude">Latitude:</label>
+          <label htmlFor="address">Address:</label>
           <input
             type="text"
-            id="latitude"
-            name="latitude"
-            value={formData.latitude}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label htmlFor="longitude">Longitude:</label>
-          <input
-            type="text"
-            id="longitude"
-            name="longitude"
-            value={formData.longitude}
+            id="address"
+            name="address"
+            value={formData.address}
             onChange={handleChange}
           />
         </div>
