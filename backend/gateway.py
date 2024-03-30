@@ -123,100 +123,77 @@ def user(user_id=None):
         abort(500, description="An unexpected error occurred.")  # 500 Internal Server Error
 
 
-@app.route('/order', methods=['POST', 'GET', 'DELETE', 'PUT'])
-def order():
-    if request.method == 'GET':
-        r = request.query_string.decode()
-        new_url = routes['order'] + f'?{r}'
-        response = requests.get(new_url)
-        return response.json(), response.status_code
-    elif request.method == 'POST':
-        r = request.get_json()
-        response = requests.post(routes['order'], json=r)
-        return response.json(), response.status_code
-    elif request.method == 'DELETE':
-        r = request.query_string.decode()
-        params = request.get_json()
-        new_url = routes['order'] + f'?{r}'
-        response = requests.delete(new_url, json=params)
-        return response.json(), response.status_code
-    elif request.method == 'PUT':
-        r = request.query_string.decode()
-        params = request.get_json()
-        new_url = routes['order'] + f'?{r}'
-        response = requests.put(new_url, json=params)
-        return response.json(), response.status_code
-    else:
-        return "Bad Request", 400
+@app.route('/meal', methods=['POST'])
+@app.route('/meal/chef/<int:chef_id>', methods=['GET'])
+@app.route('/meal/<int:meal_id>', methods=['GET', 'DELETE', 'PUT'])
+def meal(meal_id=None, chef_id=None):
+    try:
+        if request.method == 'POST':
+            response = requests.post(routes['meal'], json=request.json)
+        else:
+
+            if request.method == 'GET':
+                if not meal_id and not chef_id:
+                    abort(400, description="query parameter is required for GET request")
+                if meal_id:
+                    response = requests.get(f"{routes['meal']}/{meal_id}")
+                if chef_id:
+                    response = requests.get(f"{routes['meal']}/chef/{chef_id}")
+            elif meal_id is None:
+                abort(400, description="meal_id is required for GET, PUT, DELETE requests")
+
+            elif request.method == 'PUT':
+                if not meal_id:
+                    abort(400, description="meal_id query parameter is required for PUT request")
+                response = requests.put(f"{routes['meal']}/{meal_id}", json=request.json)
+
+            elif request.method == 'DELETE':
+                if not meal_id:
+                    abort(400, description="meal_id query parameter is required for DELETE request")
+                response = requests.delete(f"{routes['meal']}/{meal_id}")
+
+        return jsonify(response.json()), response.status_code
+    except RequestException as e:
+        abort(502, description="Bad Gateway. Error connecting to MealService.")  # 502 Bad Gateway
+    except Exception as e:
+        abort(500, description="An unexpected error occurred.")  # 500 Internal Server Error
 
 
-# @app.route('/customer', methods=['POST', 'GET', 'DELETE', 'PUT'])
-# def user():
-#     if request.method == 'GET':
-#         r = request.query_string.decode()
-#         new_url = routes['customer'] + f'?{r}'
-#         response = requests.get(new_url)
-#         return response.json(), response.status_code
-#     elif request.method == 'POST':
-#         r = request.get_json()
-#         # print(r)
-#         new_url = routes['customer']
-#         if r['command'] == 'login':
-#             data = request.query_string.decode()
-#             # print(data)
-#             new_url = routes['customer'] + f'?{data}'
-#         # r = request.query_string.decode()
-#         # print(request.endpoint)
-#         # print(request.url)
-#         response = requests.post(new_url, json=r)
-#         return response.json(), response.status_code
-#     elif request.method == 'DELETE':
-#         r = request.query_string.decode()
-#         params = request.get_json()
-#         new_url = routes['customer'] + f'?{r}'
-#         response = requests.delete(new_url, json=params)
-#         return response.json(), response.status_code
-#     elif request.method == 'PUT':
-#         r = request.query_string.decode()
-#         params = request.get_json()
-#         new_url = routes['customer'] + f'?{r}'
-#         response = requests.put(new_url, json=params)
-#         return response.json(), response.status_code
-#     else:
-#         return "Bad Request", 400
+@app.route('/order', methods=['POST'])
+@app.route('/order/chef/<int:chef_id>', methods=['GET'])
+@app.route('/order/<int:order_id>', methods=['GET', 'DELETE', 'PUT'])
+def order(order_id=None, chef_id=None):
+    try:
+        if request.method == 'POST':
+            response = requests.post(routes['order'], json=request.json)
+        else:
+            if request.method == 'GET':
+                if not order_id and not chef_id:
+                    abort(400, description="query parameter is required for GET request")
+                if order_id:
+                    response = requests.get(f"{routes['order']}/{order_id}")
+                if chef_id:
+                    response = requests.get(f"{routes['order']}/chef/{chef_id}")
+            elif order_id is None:
+                abort(400, description="order_id is required for GET, PUT, DELETE requests")
 
+            elif request.method == 'PUT':
+                if not order_id:
+                    abort(400, description="order_id query parameter is required for PUT request")
+                response = requests.put(f"{routes['order']}/{order_id}", json=request.json)
 
-@app.route('/meal', defaults={'path': ''})
-@app.route('/meal/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
-def meal(path):
-    if request.method == 'GET' and path != 'chef':
-        r = request.query_string.decode()
-        new_url = routes['meal'] + f'?{r}'
-        response = requests.get(new_url)
-        return response.json(), response.status_code
-    elif request.method == 'GET' and path == 'chef':
-        r = request.query_string.decode()
-        new_url = routes['meal'] + '/chef' + f'?{r}'
-        response = requests.get(new_url)
-        return response.json(), response.status_code
-    elif request.method == 'POST':
-        r = request.get_json()
-        response = requests.post(routes['meal'], json=r)
-        return response.json(), response.status_code
-    elif request.method == 'DELETE':
-        r = request.query_string.decode()
-        params = request.get_json()
-        new_url = routes['meal'] + f'?{r}'
-        response = requests.delete(new_url, json=params)
-        return response.json(), response.status_code
-    elif request.method == 'PUT':
-        r = request.query_string.decode()
-        params = request.get_json()
-        new_url = routes['meal'] + f'?{r}'
-        response = requests.put(new_url, json=params)
-        return response.json(), response.status_code
-    else:
-        return "Bad Request", 400
+            elif request.method == 'DELETE':
+                if not order_id:
+                    abort(400, description="order_id query parameter is required for DELETE request")
+                response = requests.delete(f"{routes['order']}/{order_id}")
+
+        print(response.json())
+        return jsonify(response.json()), response.status_code
+    except RequestException as e:
+        abort(502, description="Bad Gateway. Error connecting to OrderService.")  # 502 Bad Gateway
+    except Exception as e:
+        abort(500, description="An unexpected error occurred.")  # 500 Internal Server Error
+
 
 
 @app.route('/address', methods=['POST', 'GET', 'DELETE', 'PUT'])
@@ -246,31 +223,42 @@ def address():
         return "Bad Request", 400
 
 
-@app.route('/review', methods=['POST', 'GET', 'DELETE', 'PUT'])
-def review():
-    if request.method == 'GET':
-        r = request.query_string.decode()
-        new_url = routes['review'] + f'?{r}'
-        response = requests.get(new_url)
-        return response.json(), response.status_code
-    elif request.method == 'POST':
-        r = request.get_json()
-        response = requests.post(routes['review'], json=r)
-        return response.json(), response.status_code
-    elif request.method == 'DELETE':
-        r = request.query_string.decode()
-        params = request.get_json()
-        new_url = routes['review'] + f'?{r}'
-        response = requests.delete(new_url, json=params)
-        return response.json(), response.status_code
-    elif request.method == 'PUT':
-        r = request.query_string.decode()
-        params = request.get_json()
-        new_url = routes['review'] + f'?{r}'
-        response = requests.put(new_url, json=params)
-        return response.json(), response.status_code
-    else:
-        return "Bad Request", 400
+@app.route('/review', methods=['POST'])
+@app.route('/review/meal/<int:meal_id>', methods=['GET'])
+@app.route('/review/<int:review_id>', methods=['GET', 'DELETE', 'PUT'])
+def review(review_id=None, meal_id=None):
+    try:
+        if request.method == 'POST':
+            response = requests.post(routes['review'], json=request.json)
+        else:
+            if request.method == 'GET':
+                if not review_id and not meal_id:
+                    abort(400, description="query parameter is required for GET request")
+                if review_id:
+                    response = requests.get(f"{routes['review']}/{review_id}")
+                if meal_id:
+                    response = requests.get(f"{routes['review']}/meal/{meal_id}")
+            elif review_id is None:
+                abort(400, description="review_id is required for GET, PUT, DELETE requests")
+
+
+            elif request.method == 'PUT':
+                if not review_id:
+                    abort(400, description="review_id query parameter is required for PUT request")
+                response = requests.put(f"{routes['review']}/{review_id}", json=request.json)
+
+            elif request.method == 'DELETE':
+                if not review_id:
+                    abort(400, description="review_id query parameter is required for DELETE request")
+                response = requests.delete(f"{routes['review']}/{review_id}")
+
+        print(response.json())
+        return jsonify(response.json()), response.status_code
+    except RequestException as e:
+        abort(502, description="Bad Gateway. Error connecting to ReviewService.")  # 502 Bad Gateway
+    except Exception as e:
+        abort(500, description="An unexpected error occurred.")  # 500 Internal Server Error
+
 
 
 @app.route('/food', defaults={'path': ''})
@@ -307,7 +295,7 @@ def image(image_id=None):
 if __name__ == "__main__":
     # getting config
     current_dir = os.getcwd()
-    config_path = os.path.abspath(os.path.join(current_dir, '..', 'config.json'))
+    config_path = os.path.abspath(os.path.join(current_dir, "config.json"))
     with open(config_path, 'r') as config_file:
         config_data = json.load(config_file)
 

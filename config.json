@@ -7,11 +7,11 @@
         "port": 14001,
         "ip": "127.0.0.1"
     },
-      "CustomerService": {
+    "CustomerService": {
           "port": 15001,
           "ip": "127.0.0.1"
       },
-      "ChefService": {
+    "ChefService": {
           "port": 15002,
           "ip": "127.0.0.1"
       },
@@ -19,26 +19,26 @@
         "port": 14000,
         "ip": "127.0.0.1"
     },
-  "MealService": {
+    "MealService": {
           "port": 14003,
           "ip": "127.0.0.1"
       }
       ,
-  "AddressService": {
+    "AddressService": {
           "port": 14004,
           "ip": "127.0.0.1"
       }
       ,
-  "ReviewService": {
+    "ReviewService": {
           "port": 14005,
           "ip": "127.0.0.1"
       },
-   "FoodService": {
+    "FoodService": {
           "port": 14006,
           "ip": "127.0.0.1"
-   },
-  "ImageService": {
+    },
+    "ImageService": {
           "port": 14007,
           "ip": "127.0.0.1"
-   }
+  }
 }
