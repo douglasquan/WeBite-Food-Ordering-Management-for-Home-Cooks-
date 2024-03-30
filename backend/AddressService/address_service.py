@@ -1,4 +1,7 @@
+import requests
 from flask import Flask, request, jsonify
+from geopy.geocoders import Nominatim
+from geopy.point import Point
 import json
 import sqlite3
 import uuid
@@ -6,6 +9,7 @@ import os
 import math
 
 app = Flask(__name__)
+GOOGLE_API_KEY = 'AIzaSyD_KOWpLeeAV5f5vKCAio4M65DlxHDlT74'
 
 
 def db_connection():
@@ -179,13 +183,32 @@ def handler_delete():
 
 @app.route('/address/convenience', methods=['POST'])
 def get_convenience_location():
+    # my google api key: AIzaSyD_KOWpLeeAV5f5vKCAio4M65DlxHDlT74
     data = request.get_json()
     print(data)
     city = data.get('city')
-    latitude = data.get('latitude')
-    latitude = float(latitude)
-    longitude = data.get('longitude')
-    longitude = float(longitude)
+    # latitude = data.get('latitude')
+    # latitude = float(latitude)
+    # longitude = data.get('longitude')
+    # longitude = float(longitude)
+    address = data.get('address')
+    full_address = f"{address}, {city}"
+
+    url = f"https://maps.googleapis.com/maps/api/geocode/json?address={full_address}&key={GOOGLE_API_KEY}"
+
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        if data['status'] == 'OK':
+            latitude = data['results'][0]['geometry']['location']['lat']
+            longitude = data['results'][0]['geometry']['location']['lng']
+        else:
+            return jsonify({"error": "Geocoding failed"}), 400
+    else:
+        return jsonify({"error": "Failed to contact geocoding service"}), 500
+
+    # print('latitude:', latitude)
+    # print('longitude:', longitude)
     conn = db_connection()
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
@@ -205,6 +228,7 @@ def get_convenience_location():
         lati_pick = address['latitude']
         longi_pick = address['longitude']
         distance = haversine(latitude, longitude, lati_pick, longi_pick)
+        #print(distance)
         if distance <= 10:# we consider <=10km as convenience
             if 'address_id' in address:
                 del address['address_id']
