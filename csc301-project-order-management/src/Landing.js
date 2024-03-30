@@ -17,8 +17,10 @@ import { useState, useEffect } from 'react';
 import { getReq } from "./components/view_control";
 
 // Custom hook to check if the user is a chef
+// Custom hook to check if the user is a chef, including loading state
 const useIsChef = () => {
-    const [isChef, setIsChef] = useState(null);
+    const [isChef, setIsChef] = useState(false); // Default to false or null based on your logic
+    const [loading, setLoading] = useState(true); // Loading state
 
     useEffect(() => {
         const fetchRole = async () => {
@@ -27,18 +29,25 @@ const useIsChef = () => {
                 setIsChef(response.data.is_chef);
             } catch (error) {
                 console.error("Error checking if user is a chef", error);
-                setIsChef(false);
+                setIsChef(false); // Adjust based on how you want to handle errors
+            } finally {
+                setLoading(false); // Ensure loading is set to false after fetching
             }
         };
 
         fetchRole();
-    }, []);
+    }, []); // Dependency array is empty, so this runs once on component mount
 
-    return isChef;
+    return { isChef, loading }; // Return both isChef and loading states
 };
 
 function Landing() {
-    const isChef = useIsChef();
+   const { isChef, loading } = useIsChef(); // Destructure both isChef and loading
+
+    if (loading) {
+        return <div>Loading...</div>; // Or any loading indicator you prefer
+    }
+
     return (
         <>
             <Router>
@@ -56,6 +65,8 @@ function Landing() {
                     <Route
                         path="/chef"
                         element={isChef ? <Chef /> : <Navigate to="/" />}
+                        // element={<Chef />}
+
                     />
                     <Route
                         path="/login"
