@@ -80,8 +80,7 @@ def delete_customer(customer_id):
 
 if __name__ == '__main__':
     current_dir = os.getcwd()
-    config_path = os.path.abspath(
-        os.path.join(current_dir, "config.json"))
+    config_path = os.path.abspath(os.path.join(current_dir, 'config.json'))
     with open(config_path, 'r') as config_file:
         config_data = json.load(config_file)
     # getting ip for everything

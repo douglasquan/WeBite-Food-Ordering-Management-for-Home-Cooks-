@@ -84,6 +84,24 @@ export const putReq = async (endpoint, id, data) => {
     }
 };
 
+export const uploadImage = async (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+        const response = await axios.post('/api/image', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            withCredentials: true,
+        });
+        return response;
+    } catch (error) {
+        console.error('Error uploading image:', error);
+        throw error;
+    }
+};
+
 // Function to create a delete request
 // export const deleteReq = async (endpoint, id, data) => {
 //     try {

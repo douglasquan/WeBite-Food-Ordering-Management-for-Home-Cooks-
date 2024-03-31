@@ -35,9 +35,10 @@ def allowed_file(filename):
         filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
 
-@app.route('/image', methods=['POST'])
+@app.route('/image/', methods=['POST'])
 def upload_image():
     if 'image' not in request.files:
+        print(request.files)
         return jsonify({"error": "No image part"}), 400
 
     file = request.files['image']
@@ -68,8 +69,7 @@ def get_image(image_id):
 
 if __name__ == "__main__":
     current_dir = os.getcwd()
-    config_path = os.path.abspath(
-        os.path.join(current_dir, "config.json"))
+    config_path = os.path.abspath(os.path.join(current_dir, 'config.json'))
     with open(config_path, 'r') as config_file:
         config_data = json.load(config_file)
     try:

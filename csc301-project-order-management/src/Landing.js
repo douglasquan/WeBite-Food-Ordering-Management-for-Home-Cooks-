@@ -12,6 +12,8 @@ import Login from "./components/login/login.jsx";
 import Create_Account from "./components/login/CreateAccount.jsx";
 import Forget_Password from "./components/login/ForgotPassword.jsx";
 import Cart from "./components/cart/cart.jsx";
+import ChefReviewPage from "./components/review/ChefReviewPage.jsx";
+import CustomerReviewPage from "./components/review/CustomerReviewPage.jsx";
 
 import { useState, useEffect } from 'react';
 import { getReq } from "./components/view_control";
@@ -58,15 +60,16 @@ function Landing() {
                         element={<Home />}
                     />
                     <Route
-                        path="/customer"
-                        element={isChef ? <Navigate to="/" /> : <Customer /> }
-
+                        path="/menu"
+                        element={isChef ? <Chef /> : <Customer />}
                     />
                     <Route
                         path="/chef"
-                        element={isChef ? <Chef /> : <Navigate to="/" />}
-                        // element={<Chef />}
-
+                        element={<Chef />}
+                    />
+                    <Route
+                        path="/customer"
+                        element={<Customer />}
                     />
                     <Route
                         path="/login"
@@ -87,6 +90,14 @@ function Landing() {
                     <Route 
                         path="/cart" 
                         element={<Cart />} 
+                    />
+                    <Route 
+                        path="/review" 
+                        element={isChef ? <ChefReviewPage /> :<CustomerReviewPage />}
+                    />
+                    <Route 
+                        path="/review/chef" 
+                        element={<ChefReviewPage />}
                     />
                 </Routes>
             </Router>
