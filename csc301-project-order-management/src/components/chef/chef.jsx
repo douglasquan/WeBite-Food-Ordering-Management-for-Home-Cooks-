@@ -8,7 +8,7 @@ import Tabs from "react-bootstrap/Tabs";
 import "./chef.css";
 import Navbar from "../navbar/Navbar.jsx";
 import OffcanvasBody from "react-bootstrap/esm/OffcanvasBody.js";
-import { getReq, postReq, putReq, postReqForm } from "../view_control.js"; // Adjust the path as necessary
+import { getReq, postReq, putReq, postReqForm, getImage } from "../view_control.js"; // Adjust the path as necessary
 
 const Chef = () => {
   // chef container stuff
@@ -51,18 +51,6 @@ const Chef = () => {
     }
   };
 
-  const fetchImage = async (mealId) => {
-    try {
-      const response = await fetch(`image/${mealId}`);
-      if (!response.ok) throw new Error("Network response was not ok");
-      const imageBlob = await response.blob();
-      return URL.createObjectURL(imageBlob); // Create a URL for the blob object
-    } catch (error) {
-      console.error(`Failed to fetch image for meal ${mealId}:`, error);
-      return ""; // Return an empty string or a default image URL in case of error
-    }
-  };
-
   const fetchMeals = async (chefIdParam) => {
     const currentChefId = chefIdParam || chefId;
     if (currentChefId === null) return; // Guard clause
@@ -74,7 +62,7 @@ const Chef = () => {
       // Fetch all images concurrently and add image URLs to meals
       const mealsWithImages = await Promise.all(
         meals.map(async (meal) => {
-          const imageUrl = await fetchImage(meal.meal_id); // Use the new fetchImage function
+          const imageUrl = await getImage(meal.meal_id); // Use the new fetchImage function
           console.log(imageUrl);
           return { ...meal, imageUrl }; // Add the imageUrl to the meal object
         })
@@ -102,9 +90,13 @@ const Chef = () => {
         formData.append("meal_id", mealData.meal_id);
 
         // Upload the image with the meal_id
-        const imageResponse = await postReqForm("image", formData, true);
+        await postReqForm("image", formData, true);
       }
+      // If everything is successful, close the off-canvas and refresh the page
       handleClose();
+
+      // This will cause a full page reload
+      window.location.reload();
     } catch (error) {
       console.error("Error adding meal:", error);
     }

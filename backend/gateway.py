@@ -288,6 +288,7 @@ def food(path):
 def image(image_id=None):
     if request.method == 'GET':
         response = requests.get(f"{routes['image']}/{image_id}")
+        print(response)
         # Stream the content directly without reading it into memory completely
         # Flask will handle streaming the content to the client
         def generate():
