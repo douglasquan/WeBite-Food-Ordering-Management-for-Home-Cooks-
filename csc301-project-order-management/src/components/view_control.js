@@ -6,7 +6,7 @@ export const login_postReq = async (endpoint, data) => {
         const url = '/api/' + endpoint;
         // const url = 'http://localhost:14000/' + endpoint; // Point directly for testing
         const response = await axios.post(url, data, { withCredentials: true });
-        console.log(response.data);
+        console.log("login_postReq response " + response.data);
         return response; // Return the response object
     } catch (error) {
         console.error('Error:', error);
@@ -21,9 +21,26 @@ export const postReq = async (endpoint, data = {}) => {
         withCredentials: true
     };
     try {
-        console.log(data);
         const response = await axios.post(url, JSON.stringify(data), config);
-        console.log(response.data);
+        console.log("postReq response " + response.data);
+        return response;
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+};
+
+export const postReqForm = async (endpoint, data) => {
+    const url = '/api/' + endpoint;
+    const config = {
+        // When uploading files, content type should not be manually set. Remove it to allow the browser to set it with the correct boundary.
+        headers:  {'content-type': 'multipart/form-data'},
+        withCredentials: true
+    };
+    try {
+        // If it's a file, data should be a FormData object and not stringified.
+        const response = await axios.post(url, data, config);
+        console.log("postReqForm response " + response.data);
         return response;
     } catch (error) {
         console.error('Error:', error);
@@ -35,7 +52,7 @@ export const getReq = async (endpoint) => {
     try {
         const url = '/api/' + endpoint;
         const response = await axios.get(url, { withCredentials: true });
-        console.log(response);
+        console.log("getReq response " + response.data);
         return response;
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -44,33 +61,6 @@ export const getReq = async (endpoint) => {
 };
 
 
-
-// // Function to create a get request
-// export const getReq = async (endpoint, id) => {
-//     try {
-//         const url = '/api/' + endpoint + "?id=" + id;
-//         console.log(url);
-//         const response = await axios.get(url);
-//         console.log(response);
-//         return response.data;
-//     } catch (error) {
-//         console.error('Error fetching data:', error);
-//         return "invalid user";
-//     }
-// };
-
-// Function to create a get request with multiple params
-export const multiGetReq = async (endpoint, id) => {
-    try {
-        const url = '/api/' + endpoint + "?" + id;
-        const response = await axios.get(url);
-        console.log(response);
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        return "invalid user";
-    }
-};
 
 // Function to create a put request
 export const putReq = async (endpoint, id, data) => {

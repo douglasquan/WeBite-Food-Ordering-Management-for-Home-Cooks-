@@ -37,6 +37,17 @@ def allowed_file(filename):
 
 @app.route('/image', methods=['POST'])
 def upload_image():
+    # Check if meal_id is provided
+    meal_id = request.form.get('meal_id', None)
+    if not meal_id:
+        return jsonify({"error": "No meal_id provided"}), 400
+
+    # Validate the meal_id, for example, checking if it's an integer
+    try:
+        meal_id = int(meal_id)
+    except ValueError:
+        return jsonify({"error": "Invalid meal_id"}), 400
+
     if 'image' not in request.files:
         return jsonify({"error": "No image part"}), 400
 
@@ -53,16 +64,20 @@ def upload_image():
         file.save(filepath)
 
         # Store the filename in the database
-        new_image = MealImage(image_filename=filename, name=filename, mimetype=mimetype)
+        new_image = MealImage(image_filename=filename,
+                              name=filename,
+                              mimetype=mimetype,
+                              meal_id=meal_id)
         db.session.add(new_image)
         db.session.commit()
 
         return jsonify({'message': 'Image uploaded', 'image_id': new_image.image_id}), 200
 
 
-@app.route('/image/<int:image_id>', methods=['GET'])
-def get_image(image_id):
-    image = MealImage.query.get_or_404(image_id)
+@app.route('/image/<int:meal_id>', methods=['GET'])
+def get_image(meal_id):
+    image = MealImage.query.filter_by(meal_id=meal_id).first_or_404()
+    print(image.image_filename)
     return send_from_directory(app.config['UPLOAD_FOLDER'], image.image_filename)
 
 
