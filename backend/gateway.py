@@ -17,6 +17,13 @@ def is_chef():
         response.headers[key] = value
     return response, response.status_code
 
+@app.route('/user/customer/get-id', methods=['GET'])
+def get_customer_id():
+    user_service_response = requests.get(f"{routes['user']}/customer/get-id", cookies=request.cookies)
+    response = make_response(jsonify(user_service_response.json()), user_service_response.status_code)
+    for key, value in user_service_response.headers.items():
+        response.headers[key] = value
+    return response, response.status_code
 @app.route('/user/register', methods=['POST'])
 @app.route('/user/login', methods=['POST'])
 @app.route('/user/logout', methods=['POST'])
@@ -57,6 +64,7 @@ def account():
 
 
 @app.route('/user/<role>', methods=['POST'])
+@app.route('/user/<role>/all', methods=['GET'])
 @app.route('/user/<role>/<int:user_id>', methods=['GET', 'DELETE', 'PUT'])
 def user_role(role=None, user_id=None):
     try:
@@ -65,14 +73,11 @@ def user_role(role=None, user_id=None):
         if request.method == 'POST':
             response = requests.post(f"{routes['user']}/{role}", json=request.json)
         else:
-            if user_id is None:
-                abort(400, description="user_id is required for GET, PUT, DELETE requests")
-
             if request.method == 'GET':
-                print(user_id)
                 if not user_id:
-                    abort(400, description="user_id query parameter is required for GET request")
-                response = requests.get(f"{routes['user']}/{role}/{user_id}")
+                    response = requests.get(f"{routes['user']}/{role}/all")
+                else:
+                    response = requests.get(f"{routes['user']}/{role}/{user_id}")
 
             elif request.method == 'PUT':
                 if not user_id:
@@ -86,13 +91,15 @@ def user_role(role=None, user_id=None):
         print(response.json)
         return jsonify(response.json()), response.status_code
     except RequestException as e:
+        print(e)
         abort(502, description="Bad Gateway. Error connecting to UserService.")  # 502 Bad Gateway
     except Exception as e:
+        print(e)
         abort(500, description="An unexpected error occurred.")  # 500 Internal Server Error
 
 
 @app.route('/user', methods=['POST'])
-@app.route('/user/<int:user_id>', methods=['GET', 'DELETE', 'PUT'])
+@app.route('/user/<user_id>', methods=['GET', 'DELETE', 'PUT'])
 def user(user_id=None):
     try:
         if request.method == 'POST':

@@ -36,12 +36,13 @@ def create_order():
     if request.method == "POST":
         try:
             data = request.json
+            status = data.get("status", "").upper() if data.get("status") is not None else None
             order = Order(
                 chef_id=data['chef_id'],
                 customer_id=data['customer_id'],
                 quantity=data.get("quantity"),
                 price=data.get("price"),
-                status=data.get("status").upper()
+                status=status
             )
             db.session.add(order)
             db.session.commit()
@@ -77,7 +78,7 @@ def get_orders_by_chef(chef_id):
     orders_data = [{
         'order_id': order.order_id,
         'customer_id': order.customer_id,
-        'quantity': order.cost,
+        'quantity': order.quantity,
         'price': order.price,
         'status': order.status.value
     } for order in orders]

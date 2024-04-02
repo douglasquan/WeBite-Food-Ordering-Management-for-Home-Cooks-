@@ -1,110 +1,294 @@
-import React from 'react';
-import { useState, useEffect} from 'react';
+import React, { useState, useEffect } from "react";
 import Navbar from "../navbar/Navbar.jsx";
-import './customer.css'
-import backgroundImage from './hero.jpg';
-import { getReq, postReq } from "../view_control.js";
-import { Link } from "react-router-dom";
-
-var items = [];
-
-const handleAddItem = (item) => {
-  items.push(item)
-  console.log(item)
-  //return <Link to={{ pathname: "/addCartPage", state: { addedItems } }} />
-};
-var UserInfo = null;
-var chefID = null;
-
-
-
-// const products = [
-//   // Add your product details here
-//   { id: 1, name: "Show Me Your Love", price: 9.99, imageUrl: './food.jpg' },
-//   { id: 2, name: "Hong Kong Style Curry Beef Tendon Rice", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1610266834410-0232b52c2c4a?q=80&w=1972&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
-//   { id: 3, name: "Poke Bowl", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1609710219171-f86ae613c8d8?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
-//   { id: 4, name: "Siu Mai", price: 9.99, imageUrl: 'https://plus.unsplash.com/premium_photo-1674601033631-79eeffaac6f9?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGhvbmclMjBrb25nJTIwZm9vZHxlbnwwfHwwfHx8MA%3D%3D' },
-//   { id: 5, name: "Dim Sum", price: 9.99, imageUrl: 'https://plus.unsplash.com/premium_photo-1674601031608-1a38ca161523?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8aG9uZyUyMGtvbmclMjBmb29kfGVufDB8fDB8fHww' },
-//   { id: 6, name: "Hagao", price: 9.99, imageUrl: 'https://plus.unsplash.com/premium_photo-1674601033003-d028c1b148e6?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fGhvbmclMjBrb25nJTIwZm9vZHxlbnwwfHwwfHx8MA%3D%3D' },
-//   { id: 7, name: "Ramen", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1593906115209-6d0011a840e8?q=80&w=1972&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
-//   { id: 8, name: "Beef Brisket Noodle", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1529690678884-189e81f34ef6?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fGhvbmclMjBrb25nJTIwZm9vZHxlbnwwfHwwfHx8MA%3D%3D' },
-//   { id: 9, name: "Sweet and Sour Pork", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1623689048105-a17b1e1936b8?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Q2hpbmVzZSUyMGZvb2R8ZW58MHx8MHx8fDA%3D' },
-//   { id: 10, name: "Pad thai", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1637806930600-37fa8892069d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGFkJTIwdGhhaXxlbnwwfHwwfHx8MA%3D%3D' },
-//   // ... other products
-// ];
-
-const HeroSection = () => {
-  return (
-    <div className="relative text-white text-center py-36 px-12">
-      <div className="absolute inset-0 bg-cover bg-center opacity-50" style={{ backgroundImage: `url(${backgroundImage})`, backdropFilter: 'blur(0px)' }}></div>
-      {/* Content Overlay */}
-      <div className="relative z-10">
-        <h1 className="text-7xl font-bold mb-4" style={{ textShadow: '0px 4px 8px rgba(0, 0, 0, 0.5)' }}>Quan's Kitchen</h1>
-      </div>
-    </div>
-  );
-};
-
+import "./customer.css";
+import { getReq, getImage, postReq } from "../view_control.js";
 
 const Customer = () => {
-
-  const [products, setProducts] = useState([]);
+  const [chefs, setChefs] = useState([]);
+  const [selectedChefId, setSelectedChefId] = useState(null);
+  const [meals, setMeals] = useState([]);
+  const [cart, setCart] = useState({});
+  const [customerID, setCustomerID] = useState(null);
 
   useEffect(() => {
-    const fetchMenuData = async () => {
-      UserInfo = JSON.parse(localStorage.getItem('user'));
-      chefID = UserInfo?.chefid;
-      console.log(chefID);
-      if (chefID) {
-        const menuData = await getReq("meal/chef", chefID);
-        if (menuData !== null) {
-          console.log(menuData);
-          setProducts(menuData || []);
-        } else {
-          setProducts([]);
+    // If no chef is selected, fetch all chefs
+    if (!selectedChefId) {
+      setMeals([]);
+      const fetchChefs = async () => {
+        try {
+          const response = await getReq("/user/chef/all");
+          const fetchedChefs = response.data.chefs;
+          // Fetch usernames for each chef
+          const chefsWithUsernames = await Promise.all(
+            fetchedChefs.map(async (chef) => {
+              try {
+                const userResponse = await getReq(`/user/${chef.user_id}`);
+                return { ...chef, username: userResponse.data.username };
+              } catch (error) {
+                console.error(`Error fetching user data for user_id ${chef.user_id}:`, error);
+                return { ...chef, username: "Unknown" }; // Fallback username
+              }
+            })
+          );
+          setChefs(chefsWithUsernames);
+        } catch (error) {
+          console.error("Error fetching chefs:", error);
         }
-  
-      } else {
-        setProducts([]);
+      };
+      fetchChefs();
+    }
+    // Fetch customer ID
+    const fetchCustomerID = async () => {
+      try {
+        const response = await getReq("/user/customer/get-id");
+        setCustomerID(response.data.customer_id); // Assuming the response has a customer_id field
+      } catch (error) {
+        console.error("Error fetching customer ID:", error);
       }
-      // console.log(chefID);
     };
-  
-    fetchMenuData();
-  }, []);
+
+    fetchCustomerID();
+  }, [selectedChefId]); // Depend on selectedChefId
+
+  const fetchMeals = async (chefId) => {
+    try {
+      const response = await getReq(`meal/chef/${chefId}`);
+      const meals = response.data;
+      if (meals.length === 0) {
+        // If the chef has no meals, clear the meals state
+        setMeals([]);
+      } else {
+        // Fetch all images concurrently and add image URLs to meals
+        const mealsWithImages = await Promise.all(
+          meals.map(async (meal) => {
+            const imageUrl = await getImage(meal.meal_id); // Use the new fetchImage function
+            console.log(imageUrl);
+            return { ...meal, imageUrl }; // Add the imageUrl to the meal object
+          })
+        );
+        setMeals(mealsWithImages);
+      }
+    } catch (error) {
+      console.error("Failed to fetch meals:", error);
+      setMeals([]);
+    }
+  };
+
+  // When a chef is selected, fetch their meals
+  useEffect(() => {
+    if (selectedChefId) {
+      fetchMeals(selectedChefId);
+    }
+  }, [selectedChefId]);
+
+  // ---------------------Add/Update Cart---------------------
+  const addToCart = async (mealId) => {
+    if (cart[mealId]) {
+      // If meal already in cart, increase quantity
+      setCart({
+        ...cart,
+        [mealId]: {
+          ...cart[mealId],
+          quantity: cart[mealId].quantity + 1,
+        },
+      });
+    } else {
+      // Fetch meal details and add to cart
+      try {
+        const response = await getReq(`meal/${mealId}`);
+        const { name, cost } = response.data;
+        setCart({
+          ...cart,
+          [mealId]: {
+            name,
+            price: cost,
+            quantity: 1,
+          },
+        });
+      } catch (error) {
+        console.error("Failed to fetch meal details:", error);
+      }
+    }
+  };
+
+  const updateQuantity = (mealId, delta) => {
+    if (cart[mealId]) {
+      const newQuantity = cart[mealId].quantity + delta;
+      if (newQuantity > 0) {
+        setCart({
+          ...cart,
+          [mealId]: {
+            ...cart[mealId],
+            quantity: newQuantity,
+          },
+        });
+      } else {
+        // If quantity is 0, remove the item
+        const newCart = { ...cart };
+        delete newCart[mealId];
+        setCart(newCart);
+      }
+    }
+  };
+
+  const deleteItem = (mealId) => {
+    const newCart = { ...cart };
+    delete newCart[mealId];
+    setCart(newCart);
+  };
+
+  const calculateTotalPrice = () => {
+    return Object.values(cart)
+      .reduce((total, item) => total + item.price * item.quantity, 0)
+      .toFixed(2);
+  };
+
+  // ---------------------Place Order---------------------
+  const placeOrder = async () => {
+    if (!customerID) {
+      console.error("Customer ID is not set. Cannot place order.");
+      return;
+    }
+
+    try {
+      const orderPromises = Object.keys(cart).map(async (mealId) => {
+        const meal = cart[mealId];
+        const orderData = {
+          chef_id: selectedChefId, // Assuming chef_id is stored when a chef is selected
+          customer_id: customerID,
+          quantity: meal.quantity,
+          price: meal.price * meal.quantity, // Total price for this meal
+        };
+
+        await postReq("/order", orderData); // Assuming postReq is similar to getReq but for POST requests
+      });
+
+      await Promise.all(orderPromises);
+      console.log("All orders placed successfully!");
+      // Clear cart after placing orders or handle as needed
+      setCart({});
+    } catch (error) {
+      console.error("Failed to place order:", error);
+    }
+  };
 
   return (
-    <div className="bg-white">
+    <div className='p-5'>
       <Navbar />
-      <HeroSection />
-      <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
-        <div className="mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-          {products.map((product) => (
-            <div>
-            <div key={product.id} className="group relative">
-              <div className="w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none">
-                <img
-                  src={product.imageUrl}
-                  className="w-full h-full object-center object-cover lg:w-full lg:h-full"
-                />
-              </div>
-              <div className="mt-4 flex justify-between">
-                <div>
-                  <h3 className="text-sm text-gray-700">
-                    <span aria-hidden="true" className="absolute inset-0" />
-                    {product.name}
-                  </h3>
+      {!selectedChefId ? (
+        <>
+          <h1 className='text-2xl font-bold mb-5'>Our Chefs</h1>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+            {chefs.map((chef) => (
+              <div
+                key={chef.chef_id}
+                className='max-w-sm rounded overflow-hidden shadow-lg p-4 cursor-pointer transition-colors duration-300 hover:bg-gray-100'
+                onClick={() => setSelectedChefId(chef.chef_id)}
+              >
+                <div className='px-6 py-4'>
+                  <div className='font-bold text-xl mb-2'>{chef.username || "Chef"}</div>
+                  <p className='text-gray-700 text-base'>{chef.description}</p>
                 </div>
-                <p className="text-sm font-medium text-gray-900">${product.cost}</p>
+                <div className='px-6 pt-4 pb-2'>
+                  <span className='inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2'>
+                    {`Rating: ${chef.rating}`}
+                  </span>
+                </div>
               </div>
-            </div>
-              <Link to="/cart" onClick={() => handleAddItem(product)}>Add to Cart</Link>
-            </div>
-          ))}
+            ))}
+          </div>
+        </>
+      ) : (
+        // Order page
+        <>
+          <h1 className='text-2xl font-bold mb-5'>Meals</h1>
+          <button
+            onClick={() => setSelectedChefId(null)}
+            className='mb-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
+          >
+            Back to Chefs
+          </button>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+            {meals.map((meal) => (
+              <div
+                key={meal.meal_id}
+                className={`group relative rounded overflow-hidden shadow-lg p-4 ${
+                  meal.offer ? "border-4 border-green-500" : ""
+                }`}
+              >
+                {meal.offer && <p className='text-gray-700 text-base'> Today's Offer</p>}
+                <img src={meal.imageUrl} alt='Meal' className='w-full h-32 object-cover' />
+                <div className='px-6 py-4'>
+                  <div className='font-bold text-xl mb-2'>{meal.name}</div>
+                  <p className='text-gray-700 text-base'>{meal.cost}</p>
+                  {meal.offer && (
+                    <button
+                      className='mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
+                      onClick={() => addToCart(meal.meal_id)}
+                    >
+                      Add to Cart
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Shopping Cart */}
+      <div className='mt-8'>
+        <h2 className='text-2xl font-bold mb-4'>Shopping Cart</h2>
+        <table className='w-full text-left'>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Total Price</th>
+              <th colSpan='3'>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.keys(cart).map((mealId) => (
+              <tr key={mealId}>
+                <td>{cart[mealId].name}</td>
+                <td>${cart[mealId].price.toFixed(2)}</td>
+                <td>{cart[mealId].quantity}</td>
+                <td>${(cart[mealId].price * cart[mealId].quantity).toFixed(2)}</td>
+                <td>
+                  <button className='btn decrease' onClick={() => updateQuantity(mealId, -1)}>
+                    -
+                  </button>
+                </td>
+                <td>
+                  <button className='btn increase' onClick={() => updateQuantity(mealId, 1)}>
+                    +
+                  </button>
+                </td>
+                <td>
+                  <button className='btn delete' onClick={() => deleteItem(mealId)}>
+                    delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className='mt-4'>
+          <strong>Total Price: </strong>${calculateTotalPrice()}
         </div>
+      </div>
+      <div>
+        {/* Existing JSX */}
+        <button
+          onClick={placeOrder}
+          className='mt-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded'
+        >
+          Place Order
+        </button>
       </div>
     </div>
   );
 };
-export { items };
 export default Customer;

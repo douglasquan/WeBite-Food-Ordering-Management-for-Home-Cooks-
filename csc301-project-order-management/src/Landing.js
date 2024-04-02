@@ -64,14 +64,6 @@ function Landing() {
                         element={isChef ? <Chef /> : <Customer />}
                     />
                     <Route
-                        path="/chef"
-                        element={<Chef />}
-                    />
-                    <Route
-                        path="/customer"
-                        element={<Customer />}
-                    />
-                    <Route
                         path="/login"
                         element={<Login />}
                     />

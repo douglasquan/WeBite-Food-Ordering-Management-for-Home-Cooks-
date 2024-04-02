@@ -37,9 +37,9 @@ const Navbar = () => {
             </Link>
             <Link
               className='my-1 text-sm text-gray-700 leading-5 hover:text-blue-600 md:mx-4 md:my-0'
-              to='/chef'
+              to='/menu'
             >
-              Menu
+              Order
             </Link>
             <Link
               className='my-1 text-sm text-gray-700 leading-5 hover:text-blue-600 md:mx-4 md:my-0'
