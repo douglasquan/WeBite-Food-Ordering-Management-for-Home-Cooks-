@@ -172,19 +172,20 @@ def meal(meal_id=None, chef_id=None):
 
 @app.route('/order', methods=['POST'])
 @app.route('/order/chef/<int:chef_id>', methods=['GET'])
+@app.route('/order/customer/<int:customer_id>', methods=['GET'])
 @app.route('/order/<int:order_id>', methods=['GET', 'DELETE', 'PUT'])
-def order(order_id=None, chef_id=None):
+def order(order_id=None, chef_id=None, customer_id=None):
     try:
         if request.method == 'POST':
             response = requests.post(routes['order'], json=request.json)
         else:
             if request.method == 'GET':
-                if not order_id and not chef_id:
-                    abort(400, description="query parameter is required for GET request")
                 if order_id:
                     response = requests.get(f"{routes['order']}/{order_id}")
                 if chef_id:
                     response = requests.get(f"{routes['order']}/chef/{chef_id}")
+                if customer_id:
+                    response = requests.get(f"{routes['order']}/customer/{customer_id}")
             elif order_id is None:
                 abort(400, description="order_id is required for GET, PUT, DELETE requests")
 
