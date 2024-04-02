@@ -1,5 +1,7 @@
 import base64
-from flask import Flask, request, jsonify, Response, send_from_directory
+from os.path import exists
+
+from flask import Flask, request, jsonify, Response, send_from_directory, make_response
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
@@ -14,7 +16,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = os.path.join(BASE_DIR, 'uploaded_images')
 db = SQLAlchemy(app)
-allowed_extensions = {'png', 'jpg', 'jpeg', 'gif'}
+allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
 
 class MealImage(db.Model):
@@ -22,7 +24,7 @@ class MealImage(db.Model):
     image_filename = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     mimetype = db.Column(db.String(255), nullable=False)
-    meal_id = db.Column(db.Integer, unique=True, nullable=True)
+    meal_id = db.Column(db.Integer, nullable=True)
 
 
 with app.app_context():
@@ -37,6 +39,17 @@ def allowed_file(filename):
 
 @app.route('/image/', methods=['POST'])
 def upload_image():
+    # Check if meal_id is provided
+    meal_id = request.form.get('meal_id', None)
+    if not meal_id:
+        return jsonify({"error": "No meal_id provided"}), 400
+
+    # Validate the meal_id, for example, checking if it's an integer
+    try:
+        meal_id = int(meal_id)
+    except ValueError:
+        return jsonify({"error": "Invalid meal_id"}), 400
+
     if 'image' not in request.files:
         print(request.files)
         return jsonify({"error": "No image part"}), 400
@@ -45,26 +58,38 @@ def upload_image():
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
 
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        mimetype = file.mimetype
+    filename = secure_filename(file.filename)
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
-        # Save the file
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(filepath)
+    # Check if the file exists in the folder
+    file_exists = exists(filepath)
 
-        # Store the filename in the database
-        new_image = MealImage(image_filename=filename, name=filename, mimetype=mimetype)
+    try:
+        if not file_exists:
+            # Save the file if it does not exist
+            file.save(filepath)
+
+        # Check if an entry for this filename already exists in the database
+        # existing_image = MealImage.query.filter_by(image_filename=filename).first()
+
+
+        # Create a new database entry
+        new_image = MealImage(image_filename=filename, name=filename, mimetype=file.mimetype, meal_id=meal_id)
         db.session.add(new_image)
         db.session.commit()
+        return jsonify({'message': 'Image uploaded/record created', 'image_id': new_image.image_id}), 200
 
-        return jsonify({'message': 'Image uploaded', 'image_id': new_image.image_id}), 200
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify({"error": "A database error occurred, potentially due to a duplicate filename."}), 400
 
 
-@app.route('/image/<int:image_id>', methods=['GET'])
-def get_image(image_id):
-    image = MealImage.query.get_or_404(image_id)
-    return send_from_directory(app.config['UPLOAD_FOLDER'], image.image_filename)
+@app.route('/image/<int:meal_id>', methods=['GET'])
+def get_image(meal_id):
+    image = MealImage.query.filter_by(meal_id=meal_id).first_or_404()
+    response = make_response(send_from_directory(app.config['UPLOAD_FOLDER'], image.image_filename))
+    # response.headers['Cache-Control'] = 'public, max-age=31536000'  # Example: 1 year
+    return response
 
 
 if __name__ == "__main__":

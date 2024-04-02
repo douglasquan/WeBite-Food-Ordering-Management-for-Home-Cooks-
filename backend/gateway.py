@@ -46,12 +46,13 @@ def account():
                 # You may not want to forward all headers
                 # if key.lower() not in ['content-length', 'content-type', 'content-encoding']:
                     response.headers[key] = value
-
+        print(response.json)
         return response, response.status_code
 
-    # except RequestException as e:
-    #     abort(502, description="Bad Gateway. Error connecting to UserService.")  # 502 Bad Gateway
+    except RequestException as e:
+        abort(502, description="Bad Gateway. Error connecting to UserService.")  # 502 Bad Gateway
     except Exception as e:
+        print(e)
         abort(500, description="An unexpected error occurred.")  # 500 Internal Server Error
 
 
@@ -82,7 +83,7 @@ def user_role(role=None, user_id=None):
                 if not user_id:
                     abort(400, description="user_id query parameter is required for DELETE request")
                 response = requests.delete(f"{routes['user']}/{role}/{user_id}")
-
+        print(response.json)
         return jsonify(response.json()), response.status_code
     except RequestException as e:
         abort(502, description="Bad Gateway. Error connecting to UserService.")  # 502 Bad Gateway
@@ -128,6 +129,7 @@ def user(user_id=None):
 @app.route('/meal/<int:meal_id>', methods=['GET', 'DELETE', 'PUT'])
 def meal(meal_id=None, chef_id=None):
     try:
+        # print("meal request: ", request.json)
         if request.method == 'POST':
             response = requests.post(routes['meal'], json=request.json)
         else:
@@ -139,6 +141,8 @@ def meal(meal_id=None, chef_id=None):
                     response = requests.get(f"{routes['meal']}/{meal_id}")
                 if chef_id:
                     response = requests.get(f"{routes['meal']}/chef/{chef_id}")
+                    for meal in response.json():
+                        print(meal)
             elif meal_id is None:
                 abort(400, description="meal_id is required for GET, PUT, DELETE requests")
 
@@ -151,7 +155,7 @@ def meal(meal_id=None, chef_id=None):
                 if not meal_id:
                     abort(400, description="meal_id query parameter is required for DELETE request")
                 response = requests.delete(f"{routes['meal']}/{meal_id}")
-
+        print("meal response: ", response.json)
         return jsonify(response.json()), response.status_code
     except RequestException as e:
         abort(502, description="Bad Gateway. Error connecting to MealService.")  # 502 Bad Gateway
@@ -284,10 +288,27 @@ def food(path):
 def image(image_id=None):
     if request.method == 'GET':
         response = requests.get(f"{routes['image']}/{image_id}")
-        return response.json(), response.status_code
+        print(response)
+        # Stream the content directly without reading it into memory completely
+        # Flask will handle streaming the content to the client
+        def generate():
+            for chunk in response.iter_content(chunk_size=4096):
+                yield chunk
+        return Response(generate(),
+                         content_type=response.headers['Content-Type'],
+                         status=response.status_code)
     elif request.method == 'POST':
-        response = requests.post(f"{routes['image']}/")
-        return response.json(), response.status_code
+        # Capture incoming files and data.
+        incoming_files = request.files
+        incoming_data = request.form.to_dict()
+
+        # Prepare files in the correct format for 'requests' library.
+        files = [(key, (file.filename, file.stream, file.mimetype)) for key, file in incoming_files.items()]
+
+        # Forward the request to the image service including both files and form data.
+        response = requests.post(f"{routes['image']}", files=files, data=incoming_data)
+        print(response.json())
+        return jsonify(response.json()), response.status_code
     else:
         return "Bad Request", 400
 
