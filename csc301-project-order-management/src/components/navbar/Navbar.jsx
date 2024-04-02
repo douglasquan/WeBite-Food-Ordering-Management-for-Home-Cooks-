@@ -35,18 +35,28 @@ const Navbar = () => {
             >
               Home
             </Link>
+
             <Link
               className='my-1 text-sm text-gray-700 leading-5 hover:text-blue-600 md:mx-4 md:my-0'
               to='/menu'
             >
               Order
             </Link>
+
             <Link
               className='my-1 text-sm text-gray-700 leading-5 hover:text-blue-600 md:mx-4 md:my-0'
               to='/review'
             >
               Review
             </Link>
+
+            <Link
+              className='my-1 text-sm text-gray-700 leading-5 hover:text-blue-600 md:mx-4 md:my-0'
+              to='/summary'
+            >
+              Summary
+            </Link>
+
             <Link
               className='my-1 text-sm text-gray-700 leading-5 hover:text-blue-600 md:mx-4 md:my-0'
               to='/login'

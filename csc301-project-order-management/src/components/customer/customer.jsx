@@ -156,6 +156,7 @@ const Customer = () => {
         const orderData = {
           chef_id: selectedChefId, // Assuming chef_id is stored when a chef is selected
           customer_id: customerID,
+          meal_id: mealId,
           quantity: meal.quantity,
           price: meal.price * meal.quantity, // Total price for this meal
         };

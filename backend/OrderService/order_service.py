@@ -22,6 +22,7 @@ class Order(db.Model):
     order_id = db.Column(db.Integer, primary_key=True)
     chef_id = db.Column(db.Integer, nullable=False)
     customer_id = db.Column(db.Integer, nullable=False)
+    meal_id = db.Column(db.Integer, nullable=False)
     quantity = db.Column(db.Integer, nullable=False, default=0)
     price = db.Column(db.Float, nullable=False, default=0)
     status = db.Column(db.Enum(OrderStatus), nullable=False, default=OrderStatus.UNPAID)
@@ -40,6 +41,7 @@ def create_order():
             order = Order(
                 chef_id=data['chef_id'],
                 customer_id=data['customer_id'],
+                meal_id=data['meal_id'],
                 quantity=data.get("quantity"),
                 price=data.get("price"),
                 status=status
@@ -60,6 +62,7 @@ def get_order(order_id):
     return jsonify({
         'chef_id': order.chef_id,
         'customer_id': order.customer_id,
+        'meal_id': order.meal_id,
         'quantity': order.quantity,
         'price': order.price,
         'status': order.status.value
@@ -78,6 +81,7 @@ def get_orders_by_chef(chef_id):
     orders_data = [{
         'order_id': order.order_id,
         'customer_id': order.customer_id,
+        'meal_id': order.meal_id,
         'quantity': order.quantity,
         'price': order.price,
         'status': order.status.value
