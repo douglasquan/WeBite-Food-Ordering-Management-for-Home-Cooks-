@@ -51,7 +51,7 @@ def is_chef():
 
     chef = Chef.query.filter_by(user_id=user_id).first()
     if chef:
-        return jsonify({"is_chef": True})
+        return jsonify({"is_chef": True, "chef_id": chef.chef_id})
     else:
         return jsonify({"is_chef": False})
 
