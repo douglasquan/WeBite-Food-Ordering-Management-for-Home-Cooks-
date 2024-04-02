@@ -1,72 +1,98 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom"; // Add this line
 import logoImage from "./logo1.png";
+import { Collapse, Ripple, initTWE } from "tw-elements";
 
 const Navbar = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Initialize tw-elements functionalities
+  initTWE({ Collapse, Ripple });
+
   return (
-    <nav className='bg-white shadow' style={{ paddingLeft: "0px", height: "70px" }}>
-      <div className='container mx-auto py-1 md:flex md:justify-between md:items-center'>
-        <div className='flex justify-between items-center'>
-          <div>
+    <header>
+      <nav className='relative flex w-full items-center justify-between bg-white py-2 shadow-md lg:flex-wrap lg:justify-start lg:py-4'>
+        <div className='flex w-full flex-wrap items-center justify-between px-3'>
+          <div className='flex items-center'>
+            <button
+              className='border-0 bg-transparent px-2 text-xl leading-none hover:text-neutral-700 focus:text-neutral-700 lg:hidden'
+              type='button'
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-controls='navbarSupportedContentX'
+              aria-expanded={isMenuOpen}
+              aria-label='Toggle navigation'
+            >
+              <span className='[&>svg]:h-7 [&>svg]:w-7 [&>svg]:stroke-black/50'>
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  stroke-width='1.5'
+                  stroke='currentColor'
+                >
+                  <path
+                    stroke-linecap='round'
+                    stroke-linejoin='round'
+                    d='M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5'
+                  />
+                </svg>
+              </span>
+            </button>
             <Link to='/home' className='p-0'>
               <img src={logoImage} alt='Logo' className='h-10 w-auto sm:h-10' />
             </Link>
           </div>
-
-          <div className='flex md:hidden'>
-            <button
-              type='button'
-              className='text-gray-500 hover:text-gray-600 focus:outline-none focus:text-gray-600'
-              aria-label='toggle menu'
-            >
-              <svg viewBox='0 0 24 24' className='h-6 w-6 fill-current'>
-                <path fillRule='evenodd' d='M4 5h16v2H4V5zm0 6h16v2H4v-2zm0 6h16v2H4v-2z'></path>
-              </svg>
-            </button>
+          {/* Navigation Links */}
+          <div
+            className={`${isMenuOpen ? "block" : "hidden"} grow basis-full lg:flex lg:basis-auto`}
+            id='navbarSupportedContentX'
+          >
+            <ul className='me-auto flex flex-col items-center lg:flex-row lg:mx-6'>
+              <li className='mb-4 lg:mb-0 lg:mx-2'>
+                <Link
+                  className='block text-black/60 transition duration-200 hover:text-black/80 lg:px-2'
+                  to='/home'
+                >
+                  Home
+                </Link>
+              </li>
+              <li className='mb-4 lg:mb-0 lg:mx-2'>
+                <Link
+                  className='block text-black/60 transition duration-200 hover:text-black/80 lg:px-2'
+                  to='/menu'
+                >
+                  Order
+                </Link>
+              </li>
+              <li className='mb-4 lg:mb-0 lg:mx-2'>
+                <Link
+                  className='block text-black/60 transition duration-200 hover:text-black/80 lg:px-2'
+                  to='/review'
+                >
+                  Review
+                </Link>
+              </li>
+              <li className='mb-4 lg:mb-0 lg:mx-2'>
+                <Link
+                  className='block text-black/60 transition duration-200 hover:text-black/80 lg:px-2'
+                  to='/summary'
+                >
+                  Summary
+                </Link>
+              </li>
+              <li className='mb-4 lg:mb-0 lg:mx-2'>
+                <Link
+                  className='block text-black/60 transition duration-200 hover:text-black/80 lg:px-2'
+                  to='/login'
+                >
+                  Login
+                </Link>
+              </li>
+            </ul>
           </div>
         </div>
-
-        {/* Navigation Links */}
-        <div className='items-center md:flex'>
-          <div className='flex flex-col md:flex-row md:mx-6'>
-            <Link
-              className='my-1 text-sm text-gray-700 leading-5 hover:text-blue-600 md:mx-4 md:my-0'
-              to='/home'
-            >
-              Home
-            </Link>
-
-            <Link
-              className='my-1 text-sm text-gray-700 leading-5 hover:text-blue-600 md:mx-4 md:my-0'
-              to='/menu'
-            >
-              Order
-            </Link>
-
-            <Link
-              className='my-1 text-sm text-gray-700 leading-5 hover:text-blue-600 md:mx-4 md:my-0'
-              to='/review'
-            >
-              Review
-            </Link>
-
-            <Link
-              className='my-1 text-sm text-gray-700 leading-5 hover:text-blue-600 md:mx-4 md:my-0'
-              to='/summary'
-            >
-              Summary
-            </Link>
-
-            <Link
-              className='my-1 text-sm text-gray-700 leading-5 hover:text-blue-600 md:mx-4 md:my-0'
-              to='/login'
-            >
-              Login
-            </Link>
-          </div>
-        </div>
-      </div>
-    </nav>
+      </nav>
+    </header>
   );
 };
 

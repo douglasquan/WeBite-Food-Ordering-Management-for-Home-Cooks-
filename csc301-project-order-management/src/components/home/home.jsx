@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../navbar/Navbar.jsx";
-import logo from "./logo.png";
-import "./input.css";
-import backgroundImage from "./background.jpg";
+import logo from "./static/logo.png";
+import backgroundImage from "./static/home_page_hero.jpg";
+import home_page_hero from "./static/home_page_hero.jpg";
 import { getReq, postReq } from "../view_control";
 
 function Home() {
@@ -28,39 +28,61 @@ function Home() {
     })();
   }, []);
   return (
-    <div className='flex flex-col min-h-screen bg-gray-100'>
+    <div className='flex flex-col min-h-screen'>
       {user !== null && <Navbar />}
-      {/* Hero Section */}
-      {user ? (
-        <div>
-          <h1>Welcome, {user.email}!</h1>
-          <button onClick={logoutUser}>Logout</button>
-          {/* Main Content Section */}
-          <div className='relative text-white text-center py-36 px-12'>
-            <div
-              className='absolute inset-0 bg-cover bg-center opacity-25'
-              style={{ backgroundImage: `url(${backgroundImage})`, backdropFilter: "blur(0px)" }}
-            ></div>
-            <img src={logo} alt='Logo' className='mx-auto mb-4 w-48 h-auto' />
-            <h1 className='text-4xl font-bold'>Connecting Chefs and Customers Worldwide</h1>
+
+      <div
+        className='relative pt-6 pb-16 sm:pb-24'
+        style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: "cover" }}
+      >
+        <div className='absolute inset-0 bg-white opacity-50'></div>
+
+        {user ? (
+          <div className='relative px-4 pt-6 pb-16 sm:pb-24'>
+            <div className='text-center'>
+              <img src={logo} alt='Logo' className='mx-auto w-48 h-auto' />
+              <h1 className='mt-2 text-4xl font-extrabold leading-tight text-black'>
+                Welcome, {user.username}!
+              </h1>
+              <button
+                onClick={logoutUser}
+                className='mt-6 w-auto bg-red-600 text-white px-4 py-2 rounded-md text-lg font-medium hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
+              >
+                Logout
+              </button>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div>
-          <p>You are not logged in</p>
-          <div>
-            <a href='/login'>
-              <button>Login</button>
-            </a>
-            <a href='/register'>
-              <button>Register</button>
-            </a>
+        ) : (
+          <div className='relative px-4 pt-6 pb-16 sm:pb-24'>
+            <div className='text-center'>
+              <h2 className='text-2xl font-extrabold text-white tracking-tight sm:text-4xl'>
+                You are not logged in
+              </h2>
+              <div className='mt-10 max-w-md mx-auto'>
+                <div className='flex flex-wrap justify-center gap-4'>
+                  <Link
+                    to='/login'
+                    className='block w-full px-4 py-2 rounded bg-blue-600 text-white font-medium text-center hover:bg-blue-700'
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to='/register'
+                    className='block w-full px-4 py-2 rounded bg-green-600 text-white font-medium text-center hover:bg-green-700'
+                  >
+                    Register
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
-      {/* Footer */}
-      <footer className='bg-white'>
-        <p className='text-center text-sm text-gray-600 py-4'>Copyright © 2024 by WeBite.Inc.</p>
+        )}
+      </div>
+
+      <footer className='bg-gray-800'>
+        <p className='text-center text-sm text-gray-300 py-4'>
+          Copyright © 2024 by WeBite.Inc. All rights reserved.
+        </p>
       </footer>
     </div>
   );
