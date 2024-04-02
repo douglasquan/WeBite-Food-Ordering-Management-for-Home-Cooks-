@@ -1,6 +1,9 @@
-from flask import Flask, request, jsonify
+import redis
+from dotenv import load_dotenv
+from flask import Flask, request, jsonify, session
 import sqlite3
 
+from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -17,6 +20,17 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
+load_dotenv()
+app.config['SECRET_KEY'] = os.environ["SECRET_KEY"]
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SECURE'] = False  # True if using HTTPS
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # 'None' for cross-origin
+app.config['SESSION_TYPE'] = "redis"
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_USE_SIGNER"] = True
+app.config['SESSION_REDIS'] = redis.from_url('redis://127.0.0.1:6379')
+server_session = Session(app)
+
 
 class Customer(db.Model):
     customer_id = db.Column(db.Integer, primary_key=True)
@@ -26,6 +40,22 @@ class Customer(db.Model):
 
 with app.app_context():
     db.create_all()
+
+
+@app.route("/customer/get-id", methods=["GET"])
+def get_customer_id():
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    customer = Customer.query.filter_by(user_id=user_id).first()
+    if customer:
+        print(customer.customer_id)
+        return jsonify({"customer_id": customer.customer_id})
+    else:
+        print("not customer")
+        return jsonify({})
 
 
 @app.route("/customer", methods=["POST"])

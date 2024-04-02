@@ -28,8 +28,6 @@ const Chef = () => {
   useEffect(() => {
     const init = async () => {
       await checkIfChef();
-      // fetchMeals will now be called from within checkIfChef
-      // after setChefId has been successfully called if the user is a chef
     };
 
     init();
@@ -121,6 +119,46 @@ const Chef = () => {
     setPreview(URL.createObjectURL(file));
   };
 
+  const handleOfferConfirmation = (mealId) => {
+    const isConfirmed = window.confirm("Are you sure you want to set this meal as today’s offer?");
+    if (isConfirmed) {
+      updateMealOffer(mealId);
+    }
+  };
+
+  const updateMealOffer = async (mealId) => {
+    try {
+      const response = await putReq(`meal/${mealId}`, { offer: true });
+      if (response.status === 200) {
+        // Assuming fetchMeals also updates the local state to reflect the current offers
+        fetchMeals(chefId);
+      }
+    } catch (error) {
+      console.error("Failed to update meal offer status:", error);
+    }
+  };
+
+  const handleRemoveOfferConfirmation = (mealId) => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to remove this meal from today’s offer?"
+    );
+    if (isConfirmed) {
+      removeMealOffer(mealId);
+    }
+  };
+
+  const removeMealOffer = async (mealId) => {
+    try {
+      const response = await putReq(`meal/${mealId}`, { offer: false });
+      if (response.status === 200) {
+        // Refresh the meals to reflect the change
+        fetchMeals(chefId);
+      }
+    } catch (error) {
+      console.error("Failed to remove meal offer status:", error);
+    }
+  };
+
   return (
     <div className='bg-white'>
       <Navbar />
@@ -128,7 +166,24 @@ const Chef = () => {
         <h2 className='text-4xl font-extrabold tracking-tight text-gray-900'>Your Store</h2>
         <div className='mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8'>
           {meals.map((meal) => (
-            <div key={meal.meal_id} className='group relative'>
+            <div
+              key={meal.meal_id}
+              className={`group relative ${meal.offer ? "border-4 border-green-500" : ""}`}
+            >
+              <button
+                onClick={() => handleOfferConfirmation(meal.meal_id)}
+                className='text-xs text-white bg-green-500 hover:bg-green-400 px-2 py-1 rounded'
+              >
+                Set as Today's Offer
+              </button>
+              {meal.offer && (
+                <button
+                  onClick={() => handleRemoveOfferConfirmation(meal.meal_id)}
+                  className='text-xs text-white bg-red-500 hover:bg-red-400 px-2 py-1 rounded'
+                >
+                  Remove Offer
+                </button>
+              )}
               <div className='w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none'>
                 <img
                   src={meal.imageUrl}

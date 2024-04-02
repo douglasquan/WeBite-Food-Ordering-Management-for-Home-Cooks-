@@ -194,14 +194,12 @@ def create_account():
             return jsonify({"error": "Missing fields in the JSON data"}), 400
 
 
-@app.route('/user/<int:user_id>', methods=['GET'])
+@app.route('/user/<user_id>', methods=['GET'])
 def get_account(user_id):
     user = User.query.get_or_404(user_id)
     return jsonify({
-        'user_id': user.user_id,
         'username': user.username,
         'email': user.email,
-        'password': user.password,
         'created_at': user.created_at,
         'phone_number': user.phone_number
     }), 200
@@ -230,6 +228,7 @@ def delete_account(user_id):
 
 # ------------------------- Forward the request to the ChefService -------------------------
 @app.route('/user/chef', methods=['POST'])
+@app.route('/user/chef/all', methods=['GET'])
 @app.route('/user/chef/<int:chef_id>', methods=['GET', 'DELETE', 'PUT'])
 def chef(chef_id=None):
     try:
@@ -237,16 +236,11 @@ def chef(chef_id=None):
         if request.method == 'POST':
             response = requests.post(routes['chef'], json=request.json)
         else:
-            # For GET, DELETE, PUT, use the chef_id from the URL
-            if chef_id is None:
-                # This case should not happen due to the route definition
-                abort(400, description="chef_id is required for GET, PUT, DELETE requests")
-
             if request.method == 'GET':
-                print(chef_id)
                 if not chef_id:
-                    abort(400, description="chef_id query parameter is required for GET request")
-                response = requests.get(f"{routes['chef']}/{chef_id}")
+                    response = requests.get(f"{routes['chef']}/all")
+                else:
+                    response = requests.get(f"{routes['chef']}/{chef_id}")
 
             elif request.method == 'PUT':
                 if not chef_id:
@@ -271,6 +265,17 @@ def chef(chef_id=None):
 
 
 # ------------------------- Forward the request to the CustomerService -------------------------
+@app.route('/user/customer/get-id', methods=['GET'])
+def get_customer_id():
+    user_id = session.get("user_id")
+    print(user_id)
+    user_service_response = requests.get(f"{routes['customer']}/get-id", cookies=request.cookies)
+    print(user_service_response.json())
+    response = make_response(jsonify(user_service_response.json()), user_service_response.status_code)
+    for key, value in user_service_response.headers.items():
+        response.headers[key] = value
+    return response, response.status_code
+
 @app.route('/user/customer', methods=['POST'])
 @app.route('/user/customer/<int:customer_id>', methods=['GET', 'DELETE', 'PUT'])
 def customer(customer_id=None):
