@@ -73,11 +73,6 @@ def get_order(order_id):
 def get_orders_by_chef(chef_id):
     # return a list of orders prepared by the specified chef.
     orders = Order.query.filter_by(chef_id=chef_id).all()
-    if not orders:
-        # No orders found for the chef, return a 404 response
-        return jsonify({}), 200
-
-    # Convert the list of order objects into a list of dictionaries
     orders_data = [{
         'order_id': order.order_id,
         'customer_id': order.customer_id,

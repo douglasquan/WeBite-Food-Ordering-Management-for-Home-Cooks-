@@ -66,13 +66,7 @@ def get_meal(meal_id):
 
 @app.route('/meal/chef/<int:chef_id>', methods=['GET'])
 def get_meals_by_chef(chef_id):
-    # return a list of meals prepared by the specified chef.
     meals = Meal.query.filter_by(chef_id=chef_id).all()
-    if not meals:
-        # No meals found for the chef, return a 404 response
-        return jsonify({'error': 'No meals found for the given chef_id'}), 404
-
-    # Convert the list of Meal objects into a list of dictionaries
     meals_data = [{
         'meal_id': meal.meal_id,
         'chef_id': meal.chef_id,
@@ -81,7 +75,6 @@ def get_meals_by_chef(chef_id):
         "offer": meal.offer
     } for meal in meals]
 
-    # Return the list of meals as a JSON response
     return jsonify(meals_data), 200
 
 

@@ -13,8 +13,7 @@ function Home() {
     await postReq("user/logout");
     setUser(null); // Clear user state
     // Using reload to refresh the page and clear state
-    window.location.reload();
-    // window.location.href = "/";
+    window.location.href = "/";
   };
 
   useEffect(() => {
@@ -41,12 +40,6 @@ function Home() {
               <h1 className='text-4xl font-extrabold leading-tight text-black'>
                 Welcome, {user.username}!
               </h1>
-              <button
-                onClick={logoutUser}
-                className='mt-4 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none'
-              >
-                Logout
-              </button>
             </div>
           </div>
         </div>
@@ -80,8 +73,8 @@ function Home() {
           </div>
         </div>
       )}
-      <footer className='bg-gray-800  bottom-0 w-full'>
-        <p className='text-center text-sm text-gray-300 py-4'>
+      <footer className='bg-gray-800 w-full py-4 mt-12'>
+        <p className='text-center text-sm text-gray-300'>
           Copyright © 2024 by WeBite.Inc. All rights reserved.
         </p>
       </footer>

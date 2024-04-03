@@ -1,13 +1,33 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom"; // Add this line
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import logoImage from "./logo1.png";
 import { Collapse, Ripple, initTWE } from "tw-elements";
+import { getReq, postReq } from "../view_control";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState(null); // Track user login state
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const resp = await getReq("user/@me");
+        setUser(resp.data);
+      } catch (error) {
+        console.log("Not authenticated");
+        setUser(null); // Ensure user is set to null if not authenticated
+      }
+    })();
+  }, []);
 
   // Initialize tw-elements functionalities
   initTWE({ Collapse, Ripple });
+
+  const logoutUser = async () => {
+    await postReq("user/logout");
+    setUser(null); // Clear user state
+    window.location.href = "/";
+  };
 
   return (
     <nav class='container flex items-center py-2 mt-2 sm:mt-12'>
@@ -44,55 +64,81 @@ const Navbar = () => {
             </span>
           </button>
         </div>
+
         {/* Navigation Links */}
-        <div
-          className={`${isMenuOpen ? "block" : "hidden"} grow basis-full lg:flex lg:basis-auto`}
-          id='navbarSupportedContentX'
-          style={{ justifyContent: "flex-end" }}
-        >
-          <ul class='hidden sm:flex flex-1 justify-end items-center gap-12  uppercase text-s'>
-            <li className='mb-4 lg:mb-0 lg:mx-2'>
-              <Link
-                className='block text-black/60 transition duration-200 hover:text-black/80 lg:px-2'
-                to='/home'
-              >
-                Home
-              </Link>
-            </li>
-            <li className='mb-4 lg:mb-0 lg:mx-2'>
-              <Link
-                className='block text-black/60 transition duration-200 hover:text-black/80 lg:px-2'
-                to='/menu'
-              >
-                Order
-              </Link>
-            </li>
-            <li className='mb-4 lg:mb-0 lg:mx-2'>
-              <Link
-                className='block text-black/60 transition duration-200 hover:text-black/80 lg:px-2'
-                to='/review'
-              >
-                Review
-              </Link>
-            </li>
-            <li className='mb-4 lg:mb-0 lg:mx-2'>
-              <Link
-                className='block text-black/60 transition duration-200 hover:text-black/80 lg:px-2'
-                to='/summary'
-              >
-                Summary
-              </Link>
-            </li>
-            <li className='mb-4 lg:mb-0 lg:mx-2'>
-              <Link
-                className='block text-black/60 transition duration-200 hover:text-black/80 lg:px-2'
-                to='/login'
-              >
-                Login
-              </Link>
-            </li>
-          </ul>
-        </div>
+        {/* Conditionally render "Login" link only when user is not logged in */}
+        {!user ? (
+          <div className='flex justify-end' id='navbarSupportedContentX'>
+            <ul className='flex items-center gap-12 uppercase text-s'>
+              <li>
+                <Link
+                  to='/login'
+                  className='text-black/60 transition duration-200 hover:text-black/80'
+                >
+                  Login
+                </Link>
+              </li>
+            </ul>
+          </div>
+        ) : (
+          <div
+            className={`${isMenuOpen ? "block" : "hidden"} grow basis-full lg:flex lg:basis-auto`}
+            id='navbarSupportedContentX'
+            style={{ justifyContent: "flex-end" }}
+          >
+            <ul class='hidden sm:flex flex-1 justify-end items-center gap-12  uppercase text-s'>
+              <li className='mb-4 lg:mb-0 lg:mx-2'>
+                <Link
+                  className='block text-black/60 transition duration-200 hover:text-black/80 lg:px-2'
+                  to='/home'
+                >
+                  Home
+                </Link>
+              </li>
+              <li className='mb-4 lg:mb-0 lg:mx-2'>
+                <Link
+                  className='block text-black/60 transition duration-200 hover:text-black/80 lg:px-2'
+                  to='/menu'
+                >
+                  Order
+                </Link>
+              </li>
+              <li className='mb-4 lg:mb-0 lg:mx-2'>
+                <Link
+                  className='block text-black/60 transition duration-200 hover:text-black/80 lg:px-2'
+                  to='/review'
+                >
+                  Review
+                </Link>
+              </li>
+              <li className='mb-4 lg:mb-0 lg:mx-2'>
+                <Link
+                  className='block text-black/60 transition duration-200 hover:text-black/80 lg:px-2'
+                  to='/summary'
+                >
+                  Summary
+                </Link>
+              </li>
+              <li className='mb-4 lg:mb-0 lg:mx-2'>
+                {user ? (
+                  <button
+                    onClick={logoutUser}
+                    className='block text-black/60 transition duration-200 hover:text-black/80 lg:px-2 cursor-pointer'
+                  >
+                    Logout
+                  </button>
+                ) : (
+                  <Link
+                    className='block text-black/60 transition duration-200 hover:text-black/80 lg:px-2'
+                    to='/login'
+                  >
+                    Login
+                  </Link>
+                )}
+              </li>
+            </ul>
+          </div>
+        )}
       </div>
     </nav>
   );
