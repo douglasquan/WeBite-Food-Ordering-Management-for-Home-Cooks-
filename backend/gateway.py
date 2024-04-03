@@ -133,8 +133,9 @@ def user(user_id=None):
 
 @app.route('/meal', methods=['POST'])
 @app.route('/meal/chef/<int:chef_id>', methods=['GET'])
+@app.route('/meal/name/<meal_name>', methods=['GET'])
 @app.route('/meal/<int:meal_id>', methods=['GET', 'DELETE', 'PUT'])
-def meal(meal_id=None, chef_id=None):
+def meal(meal_id=None, chef_id=None, meal_name=None):
     try:
         # print("meal request: ", request.json)
         if request.method == 'POST':
@@ -142,14 +143,13 @@ def meal(meal_id=None, chef_id=None):
         else:
 
             if request.method == 'GET':
-                if not meal_id and not chef_id:
-                    abort(400, description="query parameter is required for GET request")
                 if meal_id:
                     response = requests.get(f"{routes['meal']}/{meal_id}")
                 if chef_id:
                     response = requests.get(f"{routes['meal']}/chef/{chef_id}")
-                    for meal in response.json():
-                        print(meal)
+                if meal_name:
+                    response = requests.get(f"{routes['meal']}/name/{meal_name}")
+
             elif meal_id is None:
                 abort(400, description="meal_id is required for GET, PUT, DELETE requests")
 
@@ -157,24 +157,32 @@ def meal(meal_id=None, chef_id=None):
                 if not meal_id:
                     abort(400, description="meal_id query parameter is required for PUT request")
                 response = requests.put(f"{routes['meal']}/{meal_id}", json=request.json)
-
             elif request.method == 'DELETE':
                 if not meal_id:
                     abort(400, description="meal_id query parameter is required for DELETE request")
-                response = requests.delete(f"{routes['meal']}/{meal_id}")
+                check_order = requests.get(f"{routes['order']}/meal/{meal_id}")
+                print(check_order.json)
+                if check_order.json():
+                    return jsonify({"error": "This Meal has been ordered. Delete is not allowed "}), 400
+                else:
+                    image_respone = requests.delete(f"{routes['image']}/{meal_id}")
+                    print(image_respone.json())
+                    response = requests.delete(f"{routes['meal']}/{meal_id}")
         print("meal response: ", response.json)
         return jsonify(response.json()), response.status_code
     except RequestException as e:
         abort(502, description="Bad Gateway. Error connecting to MealService.")  # 502 Bad Gateway
     except Exception as e:
+        print(e)
         abort(500, description="An unexpected error occurred.")  # 500 Internal Server Error
 
 
 @app.route('/order', methods=['POST'])
 @app.route('/order/chef/<int:chef_id>', methods=['GET'])
 @app.route('/order/customer/<int:customer_id>', methods=['GET'])
+@app.route('/order/meal/<int:meal_id>', methods=['GET'])
 @app.route('/order/<int:order_id>', methods=['GET', 'DELETE', 'PUT'])
-def order(order_id=None, chef_id=None, customer_id=None):
+def order(order_id=None, chef_id=None, customer_id=None, meal_id=None):
     try:
         if request.method == 'POST':
             response = requests.post(routes['order'], json=request.json)
@@ -186,6 +194,8 @@ def order(order_id=None, chef_id=None, customer_id=None):
                     response = requests.get(f"{routes['order']}/chef/{chef_id}")
                 if customer_id:
                     response = requests.get(f"{routes['order']}/customer/{customer_id}")
+                if meal_id:
+                    response = requests.get(f"{routes['order']}/meal/{meal_id}")
             elif order_id is None:
                 abort(400, description="order_id is required for GET, PUT, DELETE requests")
 
@@ -293,7 +303,8 @@ def food(path):
 
 @app.route('/image', methods=['POST'])
 @app.route('/image/<int:image_id>', methods=['GET'])
-def image(image_id=None):
+@app.route('/image/<int:meal_id>', methods=['DELETE'])
+def image(image_id=None, meal_id=None):
     if request.method == 'GET':
         response = requests.get(f"{routes['image']}/{image_id}")
         print(response)
@@ -316,6 +327,9 @@ def image(image_id=None):
         # Forward the request to the image service including both files and form data.
         response = requests.post(f"{routes['image']}", files=files, data=incoming_data)
         print(response.json())
+        return jsonify(response.json()), response.status_code
+    elif request.method == 'DELETE':
+        response = requests.delete(f"{routes['image']}/{meal_id}")
         return jsonify(response.json()), response.status_code
     else:
         return "Bad Request", 400

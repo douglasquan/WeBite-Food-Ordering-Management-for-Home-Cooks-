@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import TransitionWrapper from "./components/TransitionWrapper/TransitionWrapper.jsx";
 
 import Home from "./components/home/home.jsx";
 import Customer from "./components/customer/customer.jsx";
@@ -38,30 +39,37 @@ const useIsChef = () => {
 
   return { isChef, loading }; // Return both isChef and loading states
 };
-
-function Landing() {
-  const { isChef, loading } = useIsChef(); // Destructure both isChef and loading
-
-  if (loading) {
-    return <div>Loading...</div>; // Or any loading indicator you prefer
-  }
-
+function AppWrapper() {
   return (
-    <>
-      <Router>
-        <Routes>
-          <Route exact path='/' element={<Home />} />
-          <Route path='/menu' element={isChef ? <Chef /> : <Customer />} />
-          <Route path='/login' element={<Login />} />
-          <Route path='*' element={<Navigate to='/' />} />
-          <Route path='/create-account' element={<Create_Account />} />
-          <Route path='/forgot-password' element={<Forget_Password />} />
-          <Route path='/review' element={isChef ? <ChefReviewPage /> : <CustomerReviewPage />} />
-          <Route path='/summary' element={isChef ? <ChefSummaryPage /> : <CustomerSummaryPage />} />
-        </Routes>
-      </Router>
-    </>
+    <Router>
+      <App />
+    </Router>
   );
 }
 
-export default Landing;
+function App() {
+  const { isChef, loading } = useIsChef();
+  let location = useLocation(); // Use useLocation hook here
+
+  if (loading) {
+    return <div>Loading...</div>; // Handle loading state
+  }
+
+  return (
+    <TransitionWrapper locationKey={location.key}>
+      <Routes location={location}>
+        {/* Define routes here */}
+        <Route path='/' element={<Home />} />
+        <Route path='/menu' element={isChef ? <Chef /> : <Customer />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/create-account' element={<Create_Account />} />
+        <Route path='/forgot-password' element={<Forget_Password />} />
+        <Route path='/review' element={isChef ? <ChefReviewPage /> : <CustomerReviewPage />} />
+        <Route path='/summary' element={isChef ? <ChefSummaryPage /> : <CustomerSummaryPage />} />
+        <Route path='*' element={<Navigate to='/' />} />
+      </Routes>
+    </TransitionWrapper>
+  );
+}
+
+export default AppWrapper;

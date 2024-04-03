@@ -1,14 +1,13 @@
-import React from "react";
-import { useState, useEffect } from "react";
-import Button from "react-bootstrap/Button";
+import React, { useState, useEffect } from "react";
+// import Button from "react-bootstrap/Button";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
+import Modal from "react-bootstrap/Modal";
 
 import "./chef.css";
 import Navbar from "../navbar/Navbar.jsx";
-import OffcanvasBody from "react-bootstrap/esm/OffcanvasBody.js";
-import { getReq, postReq, putReq, postReqForm, getImage } from "../view_control.js"; // Adjust the path as necessary
+import { getReq, postReq, putReq, postReqForm, getImage, deleteReq } from "../view_control.js";
 
 const Chef = () => {
   // chef container stuff
@@ -25,6 +24,22 @@ const Chef = () => {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
+  // hide and unhide offer button
+  const [currentOfferId, setCurrentOfferId] = useState(null);
+
+  // Notification Modal
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+
+  // Confirmation Model
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [mealIdToConfirm, setMealIdToConfirm] = useState(null);
+
+  const [showOfferConfirmationModal, setShowOfferConfirmationModal] = useState(false);
+  const [mealIdForOffer, setMealIdForOffer] = useState(null);
+
+  const [successMessage, setSuccessMessage] = useState("");
+
   useEffect(() => {
     const init = async () => {
       await checkIfChef();
@@ -32,6 +47,11 @@ const Chef = () => {
 
     init();
   }, []); // Removed chefId dependency to prevent initial double call
+
+  const handleShowModal = (message) => {
+    setModalMessage(message);
+    setShowModal(true);
+  };
 
   const checkIfChef = async () => {
     try {
@@ -46,6 +66,7 @@ const Chef = () => {
       }
     } catch (error) {
       console.error("Failed to check chef status:", error);
+      handleShowModal("Failed to check chef status. Please try again later.");
     }
   };
 
@@ -57,18 +78,25 @@ const Chef = () => {
       const response = await getReq(`meal/chef/${currentChefId}`);
       const meals = response.data;
 
-      // Fetch all images concurrently and add image URLs to meals
+      if (meals.length === 0) {
+        // Handle the case where no meals are found
+        setMeals([]);
+        // Optionally, you can set a state to show a "no meals available" message
+        // For example: setNoMealsMessage('No meals are currently available.');
+        return;
+      }
+
       const mealsWithImages = await Promise.all(
         meals.map(async (meal) => {
-          const imageUrl = await getImage(meal.meal_id); // Use the new fetchImage function
-          console.log(imageUrl);
-          return { ...meal, imageUrl }; // Add the imageUrl to the meal object
+          const imageUrl = await getImage(meal.meal_id);
+          return { ...meal, imageUrl };
         })
       );
 
       setMeals(mealsWithImages);
     } catch (error) {
       console.error("Failed to fetch meals:", error);
+      handleShowModal("Failed to fetch meals. Please try again later.");
     }
   };
 
@@ -90,28 +118,57 @@ const Chef = () => {
         // Upload the image with the meal_id
         await postReqForm("image", formData, true);
       }
+      setSuccessMessage("Meal added successfully!"); // Update the success message
+      setTimeout(() => setSuccessMessage(""), 5000); // Clear the message after 5 seconds
       // If everything is successful, close the off-canvas and refresh the page
       handleClose();
-
-      // This will cause a full page reload
-      window.location.reload();
+      setMealFormData({ name: "", cost: "" }); // Reset form fields
+      setFile(null); // Clear the file state
+      setPreview(""); // Clear the image preview
+      fetchMeals(); // Refresh the meal list
     } catch (error) {
       console.error("Error adding meal:", error);
+      handleShowModal("Error adding meal. Please check the meal details and try again.");
     }
   };
 
-  const handleDelete = (event) => {
+  const handleDelete = async (event) => {
     event.preventDefault();
-  };
 
-  const handleUpdate = (event) => {
-    event.preventDefault();
-  };
+    if (!mealFormData.name) {
+      handleShowModal("Please enter a dish name.");
+      return;
+    }
 
-  // const reset = () => {
-  //   setName();
-  //   setPrice();
-  // };
+    try {
+      // Step 1: Send a GET request to retrieve the meal ID using the meal name
+      const getResponse = await getReq(`meal/name/${mealFormData.name}`);
+      if (!getResponse.data || !getResponse.data.meal_id) {
+        handleShowModal("Meal not found.");
+        return;
+      }
+
+      const mealId = getResponse.data.meal_id;
+
+      // Step 2: Send a DELETE request to delete the meal using the meal ID
+      const deleteResponse = await deleteReq(`meal/${mealId}`);
+      if (deleteResponse.status === 200) {
+        setSuccessMessage("Meal deleted successfully.");
+        setTimeout(() => setSuccessMessage(""), 5000);
+        // Optionally, refresh the meals list to reflect the deletion
+        fetchMeals(chefId);
+
+        // Reset form data
+        setMealFormData({ name: "", cost: "" });
+
+        // Close the form if it's open
+        handleClose();
+      }
+    } catch (error) {
+      console.error("Error deleting meal:", error);
+      handleShowModal("You cannot delete a meal that has been ordered.");
+    }
+  };
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -119,101 +176,133 @@ const Chef = () => {
     setPreview(URL.createObjectURL(file));
   };
 
+  // handle "today's offer"
   const handleOfferConfirmation = (mealId) => {
-    const isConfirmed = window.confirm("Are you sure you want to set this meal as today’s offer?");
-    if (isConfirmed) {
-      updateMealOffer(mealId);
-    }
+    setMealIdForOffer(mealId); // Store the meal ID for later use
+    setShowOfferConfirmationModal(true); // Show the confirmation modal
   };
 
-  const updateMealOffer = async (mealId) => {
-    try {
-      const response = await putReq(`meal/${mealId}`, { offer: true });
-      if (response.status === 200) {
-        // Assuming fetchMeals also updates the local state to reflect the current offers
-        fetchMeals(chefId);
-      }
-    } catch (error) {
-      console.error("Failed to update meal offer status:", error);
+  const confirmSetOffer = async () => {
+    if (mealIdForOffer !== null) {
+      await updateMealOffer(mealIdForOffer);
+      setMealIdForOffer(null); // Reset the meal ID for offer
     }
-  };
-
-  const handleRemoveOfferConfirmation = (mealId) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to remove this meal from today’s offer?"
-    );
-    if (isConfirmed) {
-      removeMealOffer(mealId);
-    }
+    setShowOfferConfirmationModal(false); // Hide the confirmation modal
   };
 
   const removeMealOffer = async (mealId) => {
     try {
       const response = await putReq(`meal/${mealId}`, { offer: false });
       if (response.status === 200) {
-        // Refresh the meals to reflect the change
         fetchMeals(chefId);
+        setCurrentOfferId(null); // Clear the current offer ID
       }
     } catch (error) {
-      console.error("Failed to remove meal offer status:", error);
+      console.error("Failed to update meal offer status:", error);
+      handleShowModal("An error occurred while updating the offer. Please try again.");
     }
+  };
+
+  const updateMealOffer = async (newOfferMealId) => {
+    try {
+      // If there's already a meal set as the offer, remove the offer status
+      if (currentOfferId) {
+        await putReq(`meal/${currentOfferId}`, { offer: false });
+      }
+
+      // Then, set the new meal as the offer
+      const response = await putReq(`meal/${newOfferMealId}`, { offer: true });
+      if (response.status === 200) {
+        setCurrentOfferId(newOfferMealId); // Update the state to reflect the new offer
+        fetchMeals(chefId); // Refresh meals list to reflect these changes
+      } else {
+        // Handle failure
+        console.error("Failed to update meal offer status:", response);
+        alert("Could not set the new offer. Please try again.");
+      }
+    } catch (error) {
+      console.error("Failed to update meal offer status:", error);
+      handleShowModal("An error occurred while updating the offer. Please try again.");
+    }
+  };
+
+  const handleRemoveOfferConfirmation = (mealId) => {
+    setMealIdToConfirm(mealId); // Store the meal ID for later use
+    setShowConfirmationModal(true); // Show the confirmation modal
+  };
+
+  const confirmRemoveOffer = () => {
+    if (mealIdToConfirm !== null) {
+      removeMealOffer(mealIdToConfirm);
+      setMealIdToConfirm(null); // Reset the meal ID to confirm
+    }
+    setShowConfirmationModal(false); // Hide the confirmation modal
   };
 
   return (
     <div className='bg-white'>
       <Navbar />
-      <div className='max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8'>
-        <h2 className='text-4xl font-extrabold tracking-tight text-gray-900'>Your Store</h2>
-        <div className='mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8'>
+      <div className='max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8'>
+        <h2 className='text-4xl font-extrabold tracking-tight text-gray-900 text-center'>
+          Your Store
+        </h2>
+        {successMessage && (
+          <div className='bg-green-100 border-l-4 border-green-500 text-green-700 p-6' role='alert'>
+            <p>{successMessage}</p>
+          </div>
+        )}
+        <button
+          variant='primary'
+          onClick={handleShow}
+          className='text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-base px-6 py-3 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700'
+        >
+          Edit your menu !!!
+        </button>
+
+        <div className='mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
           {meals.map((meal) => (
             <div
               key={meal.meal_id}
-              className={`group relative ${meal.offer ? "border-4 border-green-500" : ""}`}
+              className={`group relative border rounded-lg overflow-hidden shadow-lg ${
+                currentOfferId === meal.meal_id ? "bg-green-100" : "bg-white"
+              }`} // Change background color if it's the current offer
             >
-              <button
-                onClick={() => handleOfferConfirmation(meal.meal_id)}
-                className='text-xs text-white bg-green-500 hover:bg-green-400 px-2 py-1 rounded'
-              >
-                Set as Today's Offer
-              </button>
-              {meal.offer && (
-                <button
-                  onClick={() => handleRemoveOfferConfirmation(meal.meal_id)}
-                  className='text-xs text-white bg-red-500 hover:bg-red-400 px-2 py-1 rounded'
-                >
-                  Remove Offer
-                </button>
-              )}
-              <div className='w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none'>
+              <div className='aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-t-lg'>
                 <img
                   src={meal.imageUrl}
                   alt={meal.name}
-                  className='w-full h-full object-center object-cover lg:w-full lg:h-full'
+                  className='w-full h-full object-center object-cover group-hover:opacity-75'
                 />
               </div>
-              <div className='mt-4 flex justify-between'>
-                <div>
-                  <h3 className='text-sm text-gray-700'>{meal.name}</h3>
-                </div>
+              <div className='p-4 space-y-2'>
+                <h3 className='text-lg text-gray-700 font-semibold'>
+                  {meal.name.replace(/_/g, " ")}
+                </h3>
                 <p className='text-sm font-medium text-gray-900'>${meal.cost}</p>
+                <div className='flex space-x-2'>
+                  {meal.meal_id !== currentOfferId && (
+                    <button
+                      onClick={() => handleOfferConfirmation(meal.meal_id)}
+                      className='py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700'
+                    >
+                      Set Today's Offer
+                    </button>
+                  )}
+                  {meal.offer && (
+                    <button
+                      onClick={() => handleRemoveOfferConfirmation(meal.meal_id)}
+                      className='text-xs text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-full'
+                    >
+                      Remove Offer
+                    </button>
+                  )}
+                </div>
               </div>
-              {/* Edit button */}
-              {/* <button className="absolute top-0 right-0 mt-2 mr-2 text-xs text-white bg-blue-700 hover:bg-blue-600 px-2 py-1 rounded">
-                Edit
-              </button> */}
             </div>
           ))}
           {/* Add Product button */}
-          <div className='flex items-center justify-center w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none'>
-            {/* <button className="text-gray-700 bg-transparent hover:bg-gray-300 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
-              <svg className="h-6 w-6" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="5" viewBox="0 0 24 24" stroke="currentColor">
-                <path d="M12 4v16m8-8H4"/>
-              </svg>
-            </button> */}
-            <Button variant='primary' onClick={handleShow}>
-              Edit your menu !!!
-            </Button>
 
+          <div className='flex items-center justify-center'>
             <Offcanvas
               show={show}
               onHide={handleClose}
@@ -228,6 +317,7 @@ const Chef = () => {
 
               <Offcanvas.Body className='overflow-visible'>
                 <Tabs defaultActiveKey='profile' id='fill-tab-example' className='mb-3' fill>
+                  {/* Add Form */}
                   <Tab eventKey='Add' title='Add' className='offbody'>
                     <form method='post' onSubmit={handleAdd} className='flex flex-col space-y-5'>
                       {/* Meal inputs */}
@@ -278,9 +368,6 @@ const Chef = () => {
                       </div>
                       {/* Form submission buttons */}
                       <div className='form-actions'>
-                        {/* <button type='reset' onClick={reset}>
-                          Reset form
-                        </button> */}
                         <button
                           type='submit'
                           className='mt-4 py-2 px-4 bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg'
@@ -290,44 +377,33 @@ const Chef = () => {
                       </div>
                     </form>
                   </Tab>
+                  {/* Delete Form */}
                   <Tab eventKey='Delete' title='Delete' className='offbody'>
-                    <form method='post'>
+                    <form method='post' onSubmit={handleDelete} className='flex flex-col space-y-5'>
                       <div className='offInputs'>
                         <label>
-                          Dish Name: <input className='labelContainer' name='myInput' required />
-                        </label>
-                        <hr />
-                        <label>
-                          Dish Price: <input className='labelContainer' name='myInput' required />
-                        </label>
-                      </div>
-
-                      {/* <div className='offButtons'>
-                        <button type='reset' onClick={reset}>
-                          Reset form
-                        </button>
-                        <button type='submit'>Submit form</button>
-                      </div> */}
-                    </form>
-                  </Tab>
-                  <Tab eventKey='Update' title='Update' className='offbody'>
-                    <form method='post'>
-                      <div className='offInputs'>
-                        <label>
-                          Dish Name: <input className='labelContainer' name='myInput' required />
-                        </label>
-                        <hr />
-                        <label>
-                          Dish Price: <input className='labelContainer' name='myInput' required />
+                          Dish Name:{" "}
+                          <input
+                            className='meal-name-input mb-3 px-3 py-2 border rounded-lg w-full'
+                            type='text'
+                            name='name'
+                            required
+                            value={mealFormData.name}
+                            onChange={(e) =>
+                              setMealFormData({ ...mealFormData, name: e.target.value })
+                            }
+                          />
                         </label>
                       </div>
-
-                      {/* <div className='offButtons'>
-                        <button type='reset' onClick={reset}>
-                          Reset form
+                      {/* Form submission button */}
+                      <div className='form-actions'>
+                        <button
+                          type='submit'
+                          className='mt-4 py-2 px-4 bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg'
+                        >
+                          Remove Meal
                         </button>
-                        <button type='submit'>Submit form</button>
-                      </div> */}
+                      </div>
                     </form>
                   </Tab>
                 </Tabs>
@@ -336,6 +412,59 @@ const Chef = () => {
           </div>
         </div>
       </div>
+
+      <footer className='bg-gray-800 w-full py-4 mt-12'>
+        <p className='text-center text-sm text-gray-300'>
+          Copyright © 2024 by WeBite.Inc. All rights reserved.
+        </p>
+      </footer>
+
+      {/* Modal Component */}
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Notification</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{modalMessage}</Modal.Body>
+        <Modal.Footer>
+          <button variant='secondary' onClick={() => setShowModal(false)}>
+            Close
+          </button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showConfirmationModal} onHide={() => setShowConfirmationModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Action</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to remove this meal from today’s offer?</Modal.Body>
+        <Modal.Footer>
+          <button variant='secondary' onClick={() => setShowConfirmationModal(false)}>
+            Cancel
+          </button>
+          <button variant='danger' onClick={() => confirmRemoveOffer()}>
+            Confirm
+          </button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showOfferConfirmationModal} onHide={() => setShowOfferConfirmationModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Offer Change</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {currentOfferId
+            ? "Changing the offer. Are you sure?"
+            : "Are you sure you want to set this meal as today’s offer?"}
+        </Modal.Body>
+        <Modal.Footer>
+          <button variant='secondary' onClick={() => setShowOfferConfirmationModal(false)}>
+            Cancel
+          </button>
+          <button variant='primary' onClick={() => confirmSetOffer()}>
+            Confirm
+          </button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

@@ -91,6 +91,31 @@ def get_image(meal_id):
     return response
 
 
+@app.route('/image/<int:meal_id>', methods=['DELETE'])
+def delete_image(meal_id):
+    try:
+        image = MealImage.query.filter_by(meal_id=meal_id).all()[0]
+    except IndexError:
+        return jsonify({"error": "No such image"}), 404
+
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], image.image_filename)
+
+    try:
+        # Delete the file from the filesystem
+        if os.path.exists(filepath):
+            os.remove(filepath)
+
+        # Delete the entry from the database
+        db.session.delete(image)
+        db.session.commit()
+
+        return jsonify({'message': 'Image and record successfully deleted'}), 200
+    except Exception as e:
+        # Log the error or handle it as appropriate
+        db.session.rollback()
+        return jsonify({"error": "An error occurred while deleting the image"}), 500
+
+
 if __name__ == "__main__":
     current_dir = os.getcwd()
     config_path = os.path.abspath(
