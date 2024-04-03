@@ -74,14 +74,18 @@ export const getImage = async (mealId) => {
   }
 };
 
-// Function to create a put request
-export const putReq = async (endpoint, id, data) => {
+export const putReq = async (endpoint, data = {}) => {
+  const url = "/api/" + endpoint;
+  const config = {
+    headers: { "Content-Type": "application/json" },
+    withCredentials: true,
+  };
   try {
-    const url = "/api/" + endpoint + "?id=" + id;
-    const response = await axios.put(url, data);
-    return response.data;
+    const response = await axios.put(url, JSON.stringify(data), config);
+    console.log("postReq response " + response.data);
+    return response;
   } catch (error) {
-    console.error("Error fetching data:", error);
+    console.error("Error:", error);
     throw error;
   }
 };

@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify
 import json
 import os
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 app = Flask(__name__)
 
@@ -12,12 +13,15 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
+migrate = Migrate(app, db)
+
 
 class Meal(db.Model):
     meal_id = db.Column(db.Integer, primary_key=True)
     chef_id = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String(200), nullable=False, default="")
     cost = db.Column(db.Float, nullable=False, default=0)
+    offer = db.Column(db.Boolean, default=False, nullable=False)
 
     __table_args__ = (
         db.UniqueConstraint('chef_id', 'name', name='unique_chef_id_name'),
@@ -54,7 +58,8 @@ def get_meal(meal_id):
     return jsonify({
         'chef_id': meal.chef_id,
         'name': meal.name,
-        'cost': meal.cost
+        'cost': meal.cost,
+        "offer": meal.offer
     }), 200
 
 
@@ -62,7 +67,6 @@ def get_meal(meal_id):
 def get_meals_by_chef(chef_id):
     # return a list of meals prepared by the specified chef.
     meals = Meal.query.filter_by(chef_id=chef_id).all()
-    print(meals)
     if not meals:
         # No meals found for the chef, return a 404 response
         return jsonify({'error': 'No meals found for the given chef_id'}), 404
@@ -72,7 +76,8 @@ def get_meals_by_chef(chef_id):
         'meal_id': meal.meal_id,
         'chef_id': meal.chef_id,
         'name': meal.name,
-        'cost': meal.cost
+        'cost': meal.cost,
+        "offer": meal.offer
     } for meal in meals]
 
     # Return the list of meals as a JSON response
@@ -89,7 +94,10 @@ def update_meal(meal_id):
         meal.name = data['name']
     if 'cost' in data:
         meal.cost = data['cost']
+    if 'offer' in data:
+        meal.offer = data['offer']
 
+    print(meal.offer)
     db.session.commit()
     return jsonify({'message': 'meal updated successfully'}), 200
 

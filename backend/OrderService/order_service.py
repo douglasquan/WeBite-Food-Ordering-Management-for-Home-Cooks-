@@ -22,6 +22,7 @@ class Order(db.Model):
     order_id = db.Column(db.Integer, primary_key=True)
     chef_id = db.Column(db.Integer, nullable=False)
     customer_id = db.Column(db.Integer, nullable=False)
+    meal_id = db.Column(db.Integer, nullable=False)
     quantity = db.Column(db.Integer, nullable=False, default=0)
     price = db.Column(db.Float, nullable=False, default=0)
     status = db.Column(db.Enum(OrderStatus), nullable=False, default=OrderStatus.UNPAID)
@@ -36,12 +37,14 @@ def create_order():
     if request.method == "POST":
         try:
             data = request.json
+            status = data.get("status", "").upper() if data.get("status") is not None else None
             order = Order(
                 chef_id=data['chef_id'],
                 customer_id=data['customer_id'],
+                meal_id=data['meal_id'],
                 quantity=data.get("quantity"),
                 price=data.get("price"),
-                status=data.get("status").upper()
+                status=status
             )
             db.session.add(order)
             db.session.commit()
@@ -59,6 +62,7 @@ def get_order(order_id):
     return jsonify({
         'chef_id': order.chef_id,
         'customer_id': order.customer_id,
+        'meal_id': order.meal_id,
         'quantity': order.quantity,
         'price': order.price,
         'status': order.status.value
@@ -77,7 +81,30 @@ def get_orders_by_chef(chef_id):
     orders_data = [{
         'order_id': order.order_id,
         'customer_id': order.customer_id,
-        'quantity': order.cost,
+        'meal_id': order.meal_id,
+        'quantity': order.quantity,
+        'price': order.price,
+        'status': order.status.value
+    } for order in orders]
+
+    # Return the list of orders as a JSON response
+    return jsonify(orders_data), 200
+
+
+@app.route('/order/customer/<int:customer_id>', methods=['GET'])
+def get_orders_by_customer(customer_id):
+    # return a list of orders prepared by the specified chef.
+    orders = Order.query.filter_by(customer_id=customer_id).all()
+    if not orders:
+        # No orders found for the customer, return a 404 response
+        return jsonify({'error': 'No orders found for the given customer_id'}), 404
+
+    # Convert the list of order objects into a list of dictionaries
+    orders_data = [{
+        'order_id': order.order_id,
+        'chef_id': order.chef_id,
+        'meal_id': order.meal_id,
+        'quantity': order.quantity,
         'price': order.price,
         'status': order.status.value
     } for order in orders]

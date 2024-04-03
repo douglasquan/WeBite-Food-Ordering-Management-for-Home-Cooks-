@@ -45,14 +45,17 @@ with app.app_context():
 @app.route("/chef/is-chef", methods=["GET"])
 def is_chef():
     user_id = session.get("user_id")
-    print(user_id)
+
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     chef = Chef.query.filter_by(user_id=user_id).first()
     if chef:
+        print(chef.chef_id)
+        print("is chef")
         return jsonify({"is_chef": True, "chef_id": chef.chef_id})
     else:
+        print("not chef")
         return jsonify({"is_chef": False})
 
 
@@ -87,6 +90,22 @@ def get_chef(chef_id):
         'description': chef.description,
         'delivery_address_id': chef.delivery_address_id
     }), 200
+
+
+@app.route('/chef/all', methods=['GET'])
+def get_all_chefs():
+    chefs = Chef.query.all()
+    chef_list = []
+    for chef in chefs:
+        chef_data = {
+            'chef_id': chef.chef_id,
+            'user_id': chef.user_id,
+            'rating': chef.rating,
+            'description': chef.description,
+            'delivery_address_id': chef.delivery_address_id
+        }
+        chef_list.append(chef_data)
+    return jsonify({'chefs': chef_list}), 200
 
 
 @app.route('/chef/<int:chef_id>', methods=['PUT'])

@@ -29,7 +29,7 @@ function Home() {
   }, []);
   return (
     <div className='flex flex-col min-h-screen bg-gray-100'>
-      <Navbar />
+      {user !== null && <Navbar />}
       {/* Hero Section */}
       {user ? (
         <div>
@@ -43,80 +43,6 @@ function Home() {
             ></div>
             <img src={logo} alt='Logo' className='mx-auto mb-4 w-48 h-auto' />
             <h1 className='text-4xl font-bold'>Connecting Chefs and Customers Worldwide</h1>
-          </div>
-          <div className='flex-grow flex flex-wrap md:flex-nowrap justify-center md:justify-between items-start p-4'>
-            {/* Chef Container on the left */}
-            <div className='w-full md:w-1/2 p-4'>
-              <div className='bg-gray-400 text-white m-2 rounded-lg p-4'>
-                <h2 className='text-2xl font-bold mb-4'>CHEF CONTAINER</h2>
-                <div className='grid grid-cols-4 gap-4'>
-                  <Link
-                    to='/chef'
-                    className='bg-white rounded shadow p-4 block text-center'
-                    href='Chef'
-                  >
-                    Chef 1
-                  </Link>
-                  <Link
-                    to='/chef'
-                    className='bg-white rounded shadow p-4 block text-center'
-                    href='Chef'
-                  >
-                    Chef 2
-                  </Link>
-                  <Link
-                    to='/chef'
-                    className='bg-white rounded shadow p-4 block text-center'
-                    href='Chef'
-                  >
-                    Chef 3
-                  </Link>
-                  <Link
-                    to='/chef'
-                    className='bg-white rounded shadow p-4 block text-center'
-                    href='Chef'
-                  >
-                    Chef 4
-                  </Link>
-                </div>
-              </div>
-            </div>
-            {/* Customer Container on the right */}
-            <div className='w-full md:w-1/2 p-4'>
-              <div className='bg-gray-400 text-white m-2 rounded-lg p-4'>
-                <h2 className='text-2xl font-bold mb-4'>CUSTOMER CONTAINER</h2>
-                <div className='grid grid-cols-4 gap-4'>
-                  <Link
-                    to='/customer'
-                    className='bg-white rounded shadow p-4 block text-center'
-                    href='Customer'
-                  >
-                    Customer 1
-                  </Link>
-                  <Link
-                    to='/customer'
-                    className='bg-white rounded shadow p-4 block text-center'
-                    href='Customer'
-                  >
-                    Customer 2
-                  </Link>
-                  <Link
-                    to='/customer'
-                    className='bg-white rounded shadow p-4 block text-center'
-                    href='Customer'
-                  >
-                    Customer 3
-                  </Link>
-                  <Link
-                    to='/customer'
-                    className='bg-white rounded shadow p-4 block text-center'
-                    href='Customer'
-                  >
-                    Customer 4
-                  </Link>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       ) : (
