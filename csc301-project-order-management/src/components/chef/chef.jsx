@@ -8,7 +8,7 @@ import Tabs from "react-bootstrap/Tabs";
 import "./chef.css";
 import Navbar from "../navbar/Navbar.jsx";
 import OffcanvasBody from "react-bootstrap/esm/OffcanvasBody.js";
-import { getReq, postReq, putReq, postReqForm, getImage } from "../view_control.js"; // Adjust the path as necessary
+import { getReq, postReq, putReq, postReqForm, getImage, deleteReq } from "../view_control.js"; // Adjust the path as necessary
 
 const Chef = () => {
   // chef container stuff
@@ -56,7 +56,7 @@ const Chef = () => {
     try {
       const response = await getReq(`meal/chef/${currentChefId}`);
       const meals = response.data;
-
+      console.log(meals);
       // Fetch all images concurrently and add image URLs to meals
       const mealsWithImages = await Promise.all(
         meals.map(async (meal) => {
@@ -100,18 +100,46 @@ const Chef = () => {
     }
   };
 
-  const handleDelete = (event) => {
+  const handleDelete = async (event) => {
     event.preventDefault();
-  };
 
-  const handleUpdate = (event) => {
-    event.preventDefault();
-  };
+    if (!mealFormData.name) {
+      alert("Please enter a dish name.");
+      return;
+    }
 
-  // const reset = () => {
-  //   setName();
-  //   setPrice();
-  // };
+    try {
+      // Step 1: Send a GET request to retrieve the meal ID using the meal name
+      const getResponse = await getReq(`meal/name/${mealFormData.name}`);
+      if (!getResponse.data || !getResponse.data.meal_id) {
+        alert("Meal not found.");
+        return;
+      }
+
+      const mealId = getResponse.data.meal_id;
+
+      // Step 2: Send a DELETE request to delete the meal using the meal ID
+      const deleteResponse = await deleteReq(`meal/${mealId}`);
+      if (deleteResponse.status === 200) {
+        alert("Meal deleted successfully.");
+
+        // Optionally, refresh the meals list to reflect the deletion
+        fetchMeals(chefId);
+
+        // Reset form data
+        setMealFormData({ name: "", cost: "" });
+
+        // Close the form if it's open
+        handleClose();
+      } else {
+        // Handle failure (based on your API's response structure)
+        alert("Failed to delete the meal.");
+      }
+    } catch (error) {
+      console.error("Error deleting meal:", error);
+      alert("An error occurred while deleting the meal.");
+    }
+  };
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -193,7 +221,7 @@ const Chef = () => {
               </div>
               <div className='mt-4 flex justify-between'>
                 <div>
-                  <h3 className='text-sm text-gray-700'>{meal.name}</h3>
+                  <h3 className='text-sm text-gray-700'>{meal.name.replace(/_/g, " ")}</h3>
                 </div>
                 <p className='text-sm font-medium text-gray-900'>${meal.cost}</p>
               </div>
@@ -228,6 +256,7 @@ const Chef = () => {
 
               <Offcanvas.Body className='overflow-visible'>
                 <Tabs defaultActiveKey='profile' id='fill-tab-example' className='mb-3' fill>
+                  {/* Add Form */}
                   <Tab eventKey='Add' title='Add' className='offbody'>
                     <form method='post' onSubmit={handleAdd} className='flex flex-col space-y-5'>
                       {/* Meal inputs */}
@@ -278,9 +307,6 @@ const Chef = () => {
                       </div>
                       {/* Form submission buttons */}
                       <div className='form-actions'>
-                        {/* <button type='reset' onClick={reset}>
-                          Reset form
-                        </button> */}
                         <button
                           type='submit'
                           className='mt-4 py-2 px-4 bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg'
@@ -290,44 +316,33 @@ const Chef = () => {
                       </div>
                     </form>
                   </Tab>
+                  {/* Delete Form */}
                   <Tab eventKey='Delete' title='Delete' className='offbody'>
-                    <form method='post'>
+                    <form method='post' onSubmit={handleDelete} className='flex flex-col space-y-5'>
                       <div className='offInputs'>
                         <label>
-                          Dish Name: <input className='labelContainer' name='myInput' required />
-                        </label>
-                        <hr />
-                        <label>
-                          Dish Price: <input className='labelContainer' name='myInput' required />
-                        </label>
-                      </div>
-
-                      {/* <div className='offButtons'>
-                        <button type='reset' onClick={reset}>
-                          Reset form
-                        </button>
-                        <button type='submit'>Submit form</button>
-                      </div> */}
-                    </form>
-                  </Tab>
-                  <Tab eventKey='Update' title='Update' className='offbody'>
-                    <form method='post'>
-                      <div className='offInputs'>
-                        <label>
-                          Dish Name: <input className='labelContainer' name='myInput' required />
-                        </label>
-                        <hr />
-                        <label>
-                          Dish Price: <input className='labelContainer' name='myInput' required />
+                          Dish Name:{" "}
+                          <input
+                            className='meal-name-input mb-3 px-3 py-2 border rounded-lg w-full'
+                            type='text'
+                            name='name'
+                            required
+                            value={mealFormData.name}
+                            onChange={(e) =>
+                              setMealFormData({ ...mealFormData, name: e.target.value })
+                            }
+                          />
                         </label>
                       </div>
-
-                      {/* <div className='offButtons'>
-                        <button type='reset' onClick={reset}>
-                          Reset form
+                      {/* Form submission button */}
+                      <div className='form-actions'>
+                        <button
+                          type='submit'
+                          className='mt-4 py-2 px-4 bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg'
+                        >
+                          Remove Meal
                         </button>
-                        <button type='submit'>Submit form</button>
-                      </div> */}
+                      </div>
                     </form>
                   </Tab>
                 </Tabs>
@@ -336,6 +351,11 @@ const Chef = () => {
           </div>
         </div>
       </div>
+      <footer className='bg-gray-800  bottom-0 w-full'>
+        <p className='text-center text-sm text-gray-300 py-4'>
+          Copyright © 2024 by WeBite.Inc. All rights reserved.
+        </p>
+      </footer>
     </div>
   );
 };

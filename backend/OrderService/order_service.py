@@ -75,7 +75,7 @@ def get_orders_by_chef(chef_id):
     orders = Order.query.filter_by(chef_id=chef_id).all()
     if not orders:
         # No orders found for the chef, return a 404 response
-        return jsonify({'error': 'No orders found for the given chef_id'}), 404
+        return jsonify({}), 200
 
     # Convert the list of order objects into a list of dictionaries
     orders_data = [{
@@ -97,7 +97,7 @@ def get_orders_by_customer(customer_id):
     orders = Order.query.filter_by(customer_id=customer_id).all()
     if not orders:
         # No orders found for the customer, return a 404 response
-        return jsonify({'error': 'No orders found for the given customer_id'}), 404
+        return jsonify({}), 200
 
     # Convert the list of order objects into a list of dictionaries
     orders_data = [{
@@ -110,6 +110,24 @@ def get_orders_by_customer(customer_id):
     } for order in orders]
 
     # Return the list of orders as a JSON response
+    return jsonify(orders_data), 200
+
+@app.route('/order/meal/<int:meal_id>', methods=['GET'])
+def get_orders_by_meal(meal_id):
+    # return a list of orders with a specific meal.
+    orders = Order.query.filter_by(meal_id=meal_id).all()
+    if not orders:
+        return jsonify({}), 200
+
+    orders_data = [{
+        'order_id': order.order_id,
+        'chef_id': order.chef_id,
+        'customer_id': order.customer_id,
+        'quantity': order.quantity,
+        'price': order.price,
+        'status': order.status.value
+    } for order in orders]
+
     return jsonify(orders_data), 200
 
 

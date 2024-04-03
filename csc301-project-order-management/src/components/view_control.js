@@ -90,6 +90,20 @@ export const putReq = async (endpoint, data = {}) => {
   }
 };
 
+export const deleteReq = async (endpoint) => {
+  const config = {
+    headers: { "Content-Type": "application/json" },
+    withCredentials: true,
+  };
+  try {
+    const response = await axios.delete(`/api/${endpoint}`, config);
+    return response; 
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+};
+
 // Function to create a delete request
 // export const deleteReq = async (endpoint, id, data) => {
 //     try {
