@@ -25,6 +25,8 @@ const Chef = () => {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
 
   useEffect(() => {
     const init = async () => {
@@ -33,6 +35,12 @@ const Chef = () => {
 
     init();
   }, []); // Removed chefId dependency to prevent initial double call
+
+  const handleShowModal = (message) => {
+    setModalMessage(message);
+    setShowModal(true);
+  };
+  
 
   const checkIfChef = async () => {
     try {
@@ -76,28 +84,23 @@ const Chef = () => {
   const handleAdd = async (event) => {
     event.preventDefault();
     try {
-      // Submit the meal data
       const mealResponse = await postReq("meal", { ...mealFormData, chef_id: chefId });
       const mealData = mealResponse.data;
-
-      // Check if the meal was successfully created and the ID is returned
       if (mealData && mealData.meal_id && file) {
-        // Now you have the meal_id, you can upload the image with this ID
         const formData = new FormData();
-
         formData.append("image", file);
         formData.append("meal_id", mealData.meal_id);
-
-        // Upload the image with the meal_id
         await postReqForm("image", formData, true);
       }
-      // If everything is successful, close the off-canvas and refresh the page
+      handleShowModal('Meal added successfully!');
       handleClose();
-
-      // This will cause a full page reload
-      window.location.reload();
+      setMealFormData({ name: "", cost: "" }); // Reset form fields
+      setFile(null); // Clear the file state
+      setPreview(""); // Clear the image preview
+      fetchMeals(); // Refresh the meal list
     } catch (error) {
       console.error("Error adding meal:", error);
+      handleShowModal(`Error adding meal: Duplicate meal name`);
     }
   };
 
@@ -337,6 +340,18 @@ const Chef = () => {
           </div>
         </div>
       </div>
+      {/* Modal Component */}
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Notification</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{modalMessage}</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

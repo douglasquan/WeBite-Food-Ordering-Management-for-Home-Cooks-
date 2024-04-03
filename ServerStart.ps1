@@ -7,7 +7,6 @@ $scripts = @(
     ".\backend\OrderService\order_service.py",
     ".\backend\MealService\meal_service.py",
     ".\backend\ImageService\image_service.py",
-    ".\backend\FoodService\FoodService.py",
     ".\backend\AddressService\address_service.py",
     ".\backend\gateway.py"
 )

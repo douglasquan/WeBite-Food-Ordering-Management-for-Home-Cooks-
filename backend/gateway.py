@@ -24,6 +24,21 @@ def get_customer_id():
     for key, value in user_service_response.headers.items():
         response.headers[key] = value
     return response, response.status_code
+@app.route('/user/chef/get-id', methods=['GET'])
+def get_chef_id():
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+    chef_service_response = requests.get(
+        f"{routes['chef']}/chef/is-chef", 
+        cookies=request.cookies
+    )
+    if not chef_service_response.json().get('is_chef', False):
+        return jsonify({"error": "User is not a chef"}), 404
+
+    # Return the chef_id from the chef_service response
+    chef_id = chef_service_response.json().get('chef_id')
+    return jsonify({"chef_id": chef_id}), 200
 @app.route('/user/register', methods=['POST'])
 @app.route('/user/login', methods=['POST'])
 @app.route('/user/logout', methods=['POST'])
