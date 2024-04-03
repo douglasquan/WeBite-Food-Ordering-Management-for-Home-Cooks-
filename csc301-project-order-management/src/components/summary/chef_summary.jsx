@@ -29,7 +29,7 @@ const ChefSummaryPage = () => {
       if (chefId) {
         try {
           const ordersResponse = await getReq(`/order/chef/${chefId}`);
-          const ordersData = ordersResponse.data;
+          const ordersData = ordersResponse.data || []; // Default to empty array if data is falsy
           setOrders(ordersData);
 
           // Create a map of customer IDs to usernames
@@ -103,44 +103,48 @@ const ChefSummaryPage = () => {
     <div>
       <Navbar />
       <h2 className='text-2xl font-bold my-5 text-center'>Orders Summary</h2>
-      <div className='overflow-auto'>
-        <table className='min-w-full divide-y divide-gray-200'>
-          <thead>
-            <tr>
-              <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                Meal / Customer
-              </th>
-              {Object.values(customers).map((username) => (
-                <th
-                  key={username}
-                  className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
-                >
-                  {username}
+      {orders.length > 0 ? (
+        <div className='overflow-auto'>
+          <table className='min-w-full divide-y divide-gray-200'>
+            <thead>
+              <tr>
+                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                  Meal / Customer
                 </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className='bg-white divide-y divide-gray-200'>
-            {Object.entries(orderTable).map(([mealName, customerOrders]) => (
-              <tr key={mealName}>
-                <td className='px-6 py-4 whitespace-nowrap'>{mealName}</td>
-                {Object.values(customers).map((username, index) => (
-                  <td
-                    key={index}
-                    className={`px-6 py-4 whitespace-nowrap ${
-                      customerOrders[username]?.includes("UNPAID")
-                        ? "text-red-600"
-                        : "text-green-600"
-                    }`}
+                {Object.values(customers).map((username) => (
+                  <th
+                    key={username}
+                    className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
                   >
-                    {customerOrders[username] || "N/A"}
-                  </td>
+                    {username}
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className='bg-white divide-y divide-gray-200'>
+              {Object.entries(orderTable).map(([mealName, customerOrders]) => (
+                <tr key={mealName}>
+                  <td className='px-6 py-4 whitespace-nowrap'>{mealName}</td>
+                  {Object.values(customers).map((username, index) => (
+                    <td
+                      key={index}
+                      className={`px-6 py-4 whitespace-nowrap ${
+                        customerOrders[username]?.includes("UNPAID")
+                          ? "text-red-600"
+                          : "text-green-600"
+                      }`}
+                    >
+                      {customerOrders[username] || "N/A"}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className='text-center my-5'>No orders currently.</div>
+      )}
     </div>
   );
 };

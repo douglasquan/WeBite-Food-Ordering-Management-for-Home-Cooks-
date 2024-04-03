@@ -90,22 +90,18 @@ export const putReq = async (endpoint, data = {}) => {
   }
 };
 
-export const uploadImage = async (file) => {
-    const formData = new FormData();
-    formData.append('image', file);
-
-    try {
-        const response = await axios.post('/api/image', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-            withCredentials: true,
-        });
-        return response;
-    } catch (error) {
-        console.error('Error uploading image:', error);
-        throw error;
-    }
+export const deleteReq = async (endpoint) => {
+  const config = {
+    headers: { "Content-Type": "application/json" },
+    withCredentials: true,
+  };
+  try {
+    const response = await axios.delete(`/api/${endpoint}`, config);
+    return response; 
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
 };
 
 // Function to create a delete request
