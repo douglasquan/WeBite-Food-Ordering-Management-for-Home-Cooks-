@@ -4,6 +4,7 @@ import Button from "react-bootstrap/Button";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
+import Modal from 'react-bootstrap/Modal';
 
 import "./chef.css";
 import Navbar from "../navbar/Navbar.jsx";
