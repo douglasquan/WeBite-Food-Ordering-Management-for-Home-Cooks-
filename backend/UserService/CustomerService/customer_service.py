@@ -52,7 +52,8 @@ def get_customer_id():
     customer = Customer.query.filter_by(user_id=user_id).first()
     if customer:
         print(customer.customer_id)
-        return jsonify({"customer_id": customer.customer_id})
+        return jsonify({"customer_id": customer.customer_id,
+                       "user_id": user_id})
     else:
         print("not customer")
         return jsonify({})

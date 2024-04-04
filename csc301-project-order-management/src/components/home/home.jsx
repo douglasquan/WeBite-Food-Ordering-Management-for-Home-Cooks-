@@ -8,11 +8,11 @@ import { getReq, postReq } from "../view_control";
 
 function Home() {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const logoutUser = async () => {
     await postReq("user/logout");
-    setUser(null); // Clear user state
-    // Using reload to refresh the page and clear state
+    setUser(null);
     window.location.href = "/";
   };
 
@@ -23,9 +23,16 @@ function Home() {
         setUser(resp.data);
       } catch (error) {
         console.log("Not authenticated");
+      } finally {
+        setLoading(false); // Set loading to false after the request is complete
       }
     })();
   }, []);
+
+  if (loading) {
+    return <div>Loading...</div>; // Render a loading indicator while checking auth status
+  }
+
   return (
     <div className='flex flex-col min-h-screen bg-gray-100'>
       {user && <Navbar />}
