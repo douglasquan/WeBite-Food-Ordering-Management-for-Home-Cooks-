@@ -37,7 +37,7 @@ def allowed_file(filename):
         filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
 
-@app.route('/image', methods=['POST'])
+@app.route('/image/', methods=['POST'])
 def upload_image():
     # Check if meal_id is provided
     meal_id = request.form.get('meal_id', None)
@@ -51,6 +51,7 @@ def upload_image():
         return jsonify({"error": "Invalid meal_id"}), 400
 
     if 'image' not in request.files:
+        print(request.files)
         return jsonify({"error": "No image part"}), 400
 
     file = request.files['image']
@@ -118,8 +119,7 @@ def delete_image(meal_id):
 
 if __name__ == "__main__":
     current_dir = os.getcwd()
-    config_path = os.path.abspath(
-        os.path.join(current_dir, "config.json"))
+    config_path = os.path.abspath(os.path.join(current_dir, 'config.json'))
     with open(config_path, 'r') as config_file:
         config_data = json.load(config_file)
     try:

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../navbar/Navbar.jsx";
-import "./customer.css";
 import { getReq, getImage, postReq } from "../view_control.js";
 
 const Customer = () => {
@@ -9,6 +8,7 @@ const Customer = () => {
   const [meals, setMeals] = useState([]);
   const [cart, setCart] = useState({});
   const [customerID, setCustomerID] = useState(null);
+  const [cartVisible, setCartVisible] = useState(false); // New state for cart visibility
 
   useEffect(() => {
     // If no chef is selected, fetch all chefs
@@ -109,6 +109,7 @@ const Customer = () => {
         console.error("Failed to fetch meal details:", error);
       }
     }
+    setCartVisible(true);
   };
 
   const updateQuantity = (mealId, delta) => {
@@ -135,6 +136,7 @@ const Customer = () => {
     const newCart = { ...cart };
     delete newCart[mealId];
     setCart(newCart);
+    setCartVisible(Object.keys(cart).length > 0);
   };
 
   const calculateTotalPrice = () => {
@@ -174,129 +176,104 @@ const Customer = () => {
   };
 
   return (
-    <div className='bg-white'>
+    <div class="flex flex-col items-center h-screen">
       <Navbar />
-      <div className='max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8'>
-        {!selectedChefId ? (
-          <>
-            <h1 className='text-2xl font-bold mb-5'>Our Chefs</h1>
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-              {chefs.map((chef) => (
-                <div
-                  key={chef.chef_id}
-                  className='max-w-sm rounded overflow-hidden shadow-lg p-4 cursor-pointer transition-colors duration-300 hover:bg-gray-100'
-                  onClick={() => setSelectedChefId(chef.chef_id)}
-                >
-                  <div className='px-6 py-4'>
-                    <div className='font-bold text-xl mb-2'>{chef.username || "Chef"}</div>
-                    <p className='text-gray-700 text-base'>{chef.description}</p>
+      <main className="flex justify-center items-start">
+        <div className={`px-4 ${cartVisible ? 'md:mr-80' : ''}`}>
+          <div className='max-w-5xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8'>
+          {!selectedChefId ? (
+            <>
+              <h1 className='text-2xl font-bold mb-5 text-center'>Our Chefs</h1>
+              <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4'>
+                {chefs.map((chef) => (
+                  <div
+                    key={chef.chef_id}
+                    className='max-w-sm rounded overflow-hidden shadow-lg p-4 cursor-pointer transition-colors duration-300 hover:bg-gray-100'
+                    onClick={() => setSelectedChefId(chef.chef_id)}
+                  >
+                    <div className='px-6 py-4'>
+                      <div className='font-bold text-xl mb-2 text-center'>{chef.username || "Chef"}</div>
+                      <p className='text-gray-700 text-base text-center'>{chef.description}</p>
+                    </div>
+                    <div className='flex flex-col items-center px-6 pt-4 pb-2'>
+                      <span className='inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2'>
+                        {`Rating: ${chef.rating}`}
+                      </span>
+                      <button className="w-full bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm mt-4">View Menu</button>
+                    </div>
                   </div>
-                  <div className='px-6 pt-4 pb-2'>
-                    <span className='inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2'>
-                      {`Rating: ${chef.rating}`}
-                    </span>
-                  </div>
+                ))}
+              </div>
+            </>
+            ) : (
+              <div className="container mx-auto pt-4">
+                <h2 className="text-xl font-bold text-center mt-2 mb-8">Menu</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {meals.map((meal) => (
+                    <div key={meal.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                      <img src={meal.imageUrl} alt={meal.name} className="w-full h-32 sm:h-48 object-cover" />
+                      <div className="p-4">
+                        <h3 className="font-bold text-lg mb-2">{meal.name}</h3>
+                        <p className="text-gray-700 text-sm">{meal.description}</p>
+                        <div className="mt-3 flex justify-between items-center">
+                          <span className="text-lg font-semibold">{`$${meal.cost}`}</span>
+                          <button onClick={() => addToCart(meal.meal_id)} className="bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm">Add to Cart</button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </>
-        ) : (
-          // Order page
-          <>
-            <h1 className='text-2xl font-bold mb-5'>Meals</h1>
-            <button
-              onClick={() => setSelectedChefId(null)}
-              className='mb-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
-            >
-              Back to Chefs
-            </button>
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-              {meals.map((meal) => (
-                <div
-                  key={meal.meal_id}
-                  className={`group relative rounded overflow-hidden shadow-lg p-4 ${
-                    meal.offer ? "border-4 border-green-500" : ""
-                  }`}
-                >
-                  {meal.offer && <p className='text-gray-700 text-base'> Today's Offer</p>}
-                  <img src={meal.imageUrl} alt='Meal' className='w-full h-32 object-cover' />
-                  <div className='px-6 py-4'>
-                    <div className='font-bold text-xl mb-2'>{meal.name}</div>
-                    <p className='text-gray-700 text-base'>{meal.cost}</p>
-                    {meal.offer && (
-                      <button
-                        className='mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
-                        onClick={() => addToCart(meal.meal_id)}
-                      >
-                        Add to Cart
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-
-        {/* Shopping Cart */}
-        <div className='mt-8'>
-          <h2 className='text-2xl font-bold mb-4'>Shopping Cart</h2>
-          <table className='w-full text-left'>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Total Price</th>
-                <th colSpan='3'>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.keys(cart).map((mealId) => (
-                <tr key={mealId}>
-                  <td>{cart[mealId].name}</td>
-                  <td>${cart[mealId].price.toFixed(2)}</td>
-                  <td>{cart[mealId].quantity}</td>
-                  <td>${(cart[mealId].price * cart[mealId].quantity).toFixed(2)}</td>
-                  <td>
-                    <button className='btn decrease' onClick={() => updateQuantity(mealId, -1)}>
-                      -
-                    </button>
-                  </td>
-                  <td>
-                    <button className='btn increase' onClick={() => updateQuantity(mealId, 1)}>
-                      +
-                    </button>
-                  </td>
-                  <td>
-                    <button className='btn delete' onClick={() => deleteItem(mealId)}>
-                      delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className='mt-4'>
-            <strong>Total Price: </strong>${calculateTotalPrice()}
+                <button onClick={() => setSelectedChefId(null)} className="text-blue-600 hover:text-blue-800 transition-colors duration-300">
+                  Back to Chefs
+                </button>
+              </div>
+            )}
           </div>
+
+          {cartVisible && (
+            <aside className="fixed inset-y-0 right-0 w-80 bg-white shadow-xl p-4 overflow-y-auto z-10">
+              <button onClick={() => setCartVisible(false)} className="text-black">
+                Close
+              </button>
+              <h2 className="text-xl font-bold border-b pb-4">Shopping Cart</h2>
+              <ul>
+                {Object.keys(cart).map(mealId => (
+                  <li key={mealId} className="flex items-center p-2 border-b">
+                    <span>{cart[mealId].name}</span>
+                    <div className="flex items-center ml-auto">
+                      <button onClick={() => updateQuantity(mealId, -1)} className="text-black mx-2">
+                        -
+                      </button>
+                      <span>{cart[mealId].quantity}</span>
+                      <button onClick={() => updateQuantity(mealId, 1)} className="text-black mx-2">
+                        +
+                      </button>
+                    </div>
+                    <span>${(cart[mealId].price * cart[mealId].quantity).toFixed(2)}</span>
+                    <button onClick={() => deleteItem(mealId)} className="text-red-500 ml-4">
+                      Remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <div className="border-t pt-4">
+                <strong>Total:</strong> ${calculateTotalPrice()}
+                <button
+                  onClick={placeOrder}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded mt-4"
+                >
+                  Place Order
+                </button>
+              </div>
+            </aside>
+          )}  
         </div>
-        <div>
-          {/* Existing JSX */}
-          <button
-            onClick={placeOrder}
-            className='mt-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded'
-          >
-            Place Order
-          </button>
-        </div>
-      </div>
-      <footer className='bg-gray-800 fixed bottom-0 w-full'>
-        <p className='text-center text-sm text-gray-300 py-4'>
-          Copyright © 2024 by WeBite.Inc. All rights reserved.
-        </p>
+      </main>
+      <footer className="bg-gray-800 text-white text-center py-4 w-full">
+        Copyright © 2024 by WeBite.Inc. All rights reserved.
       </footer>
     </div>
   );
 };
+
 export default Customer;

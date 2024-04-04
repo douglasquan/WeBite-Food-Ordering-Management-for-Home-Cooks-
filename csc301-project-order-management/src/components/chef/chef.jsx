@@ -103,19 +103,12 @@ const Chef = () => {
   const handleAdd = async (event) => {
     event.preventDefault();
     try {
-      // Submit the meal data
       const mealResponse = await postReq("meal", { ...mealFormData, chef_id: chefId });
       const mealData = mealResponse.data;
-
-      // Check if the meal was successfully created and the ID is returned
       if (mealData && mealData.meal_id && file) {
-        // Now you have the meal_id, you can upload the image with this ID
         const formData = new FormData();
-
         formData.append("image", file);
         formData.append("meal_id", mealData.meal_id);
-
-        // Upload the image with the meal_id
         await postReqForm("image", formData, true);
       }
       setSuccessMessage("Meal added successfully!"); // Update the success message
