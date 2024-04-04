@@ -15,8 +15,8 @@ function Login() {
     try {
         const resp = await login_postReq("user/login", { email, password }, { credentials: 'include' });
       if (resp && resp.status === 200) {
-              console.log(email);
-        // window.location.href = "user/login";
+            console.log(email);
+            window.location.href = "user/login";
       } else {
         // Handle non-200 responses if needed
         alert("Login failed");
