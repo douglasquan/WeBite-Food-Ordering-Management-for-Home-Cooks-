@@ -161,7 +161,7 @@ const Customer = () => {
           price: meal.price * meal.quantity, // Total price for this meal
         };
 
-        await postReq("/order", orderData); // Assuming postReq is similar to getReq but for POST requests
+        await postReq("order", orderData); // Assuming postReq is similar to getReq but for POST requests
       });
 
       await Promise.all(orderPromises);

@@ -47,9 +47,26 @@ function AppWrapper() {
   );
 }
 
+const ProtectedRoute = ({ children, user }) => {
+  return user ? children : <Navigate to='/' />;
+};
+
 function App() {
   const { isChef, loading } = useIsChef();
   let location = useLocation(); // Use useLocation hook here
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const resp = await getReq("user/@me");
+        setUser(resp.data);
+      } catch (error) {
+        console.log("Not authenticated");
+        setUser(null);
+      }
+    })();
+  }, []);
 
   if (loading) {
     return <div>Loading...</div>; // Handle loading state
@@ -58,14 +75,30 @@ function App() {
   return (
     <TransitionWrapper locationKey={location.key}>
       <Routes location={location}>
-        {/* Define routes here */}
         <Route path='/' element={<Home />} />
-        <Route path='/menu' element={isChef ? <Chef /> : <Customer />} />
+        <Route
+          path='/menu'
+          element={<ProtectedRoute user={user}>{isChef ? <Chef /> : <Customer />}</ProtectedRoute>}
+        />
         <Route path='/login' element={<Login />} />
         <Route path='/create-account' element={<Create_Account />} />
         <Route path='/forgot-password' element={<Forget_Password />} />
-        <Route path='/review' element={isChef ? <ChefReviewPage /> : <CustomerReviewPage />} />
-        <Route path='/summary' element={isChef ? <ChefSummaryPage /> : <CustomerSummaryPage />} />
+        <Route
+          path='/review'
+          element={
+            <ProtectedRoute user={user}>
+              {isChef ? <ChefReviewPage /> : <CustomerReviewPage />}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/summary'
+          element={
+            <ProtectedRoute user={user}>
+              {isChef ? <ChefSummaryPage /> : <CustomerSummaryPage />}
+            </ProtectedRoute>
+          }
+        />
         <Route path='*' element={<Navigate to='/' />} />
       </Routes>
     </TransitionWrapper>
