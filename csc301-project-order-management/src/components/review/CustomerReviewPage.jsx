@@ -12,11 +12,13 @@ const CustomerReviewPage = () => {
   const [mealNames, setMealNames] = useState({});
   const [customerID, setCustomerID] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [rating, setRating] = useState(null);
   const [hover, setHover] = useState(null);
 
   // Fetch customer_id on component mount
   useEffect(() => {
+    setErrorMessage("");
     // Replace 'your-method-here' with the actual method to fetch the customer ID
     const fetchCustomerId = async () => {
       try {
@@ -61,11 +63,22 @@ const CustomerReviewPage = () => {
     fetchCustomerOrders();
   }, [customerID]);
 
+  const handleSelectChange = (event) => {
+    setErrorMessage("");
+    const orderID = parseInt(event.target.value);
+    const order = customerOrders.find((o) => o.order_id === orderID);
+    setSelectedOrder(order || null); // Set the entire order object or null if not found
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (!selectedOrder) return; // Add a check to make sure an order is selected
+
     try {
+      console.log(selectedOrder.meal_id); // Now we have the correct meal_id
+      console.log(customerID);
       await postReq("review", {
-        meal_id: selectedOrder,
+        meal_id: selectedOrder.meal_id, // Use the meal_id from the selected order
         customer_id: customerID,
         review_description: review,
         rating: rating,
@@ -75,7 +88,13 @@ const CustomerReviewPage = () => {
       setReview("");
       setRating(null); // Reset the rating
     } catch (error) {
-      console.error("Error submitting review:", error);
+      if (error.response && error.response.status === 409) {
+        // Duplicate entry error
+        setErrorMessage("You have already submitted a review for this order.");
+      } else {
+        // Other errors
+        setErrorMessage("Failed to submit review. Please try again later.");
+      }
     }
   };
 
@@ -92,6 +111,11 @@ const CustomerReviewPage = () => {
               <p>{successMessage}</p>
             </div>
           )}
+          {errorMessage && (
+            <div className='bg-red-100 border-l-4 border-red-500 text-red-700 p-4' role='alert'>
+              <p>{errorMessage}</p>
+            </div>
+          )}
           {customerOrders.length > 0 ? (
             <form onSubmit={handleSubmit}>
               {/* Order selection dropdown */}
@@ -101,8 +125,8 @@ const CustomerReviewPage = () => {
               <select
                 id='orderSelect'
                 className='mb-4 shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
-                value={selectedOrder}
-                onChange={(e) => setSelectedOrder(e.target.value)}
+                value={selectedOrder ? selectedOrder.order_id : ""}
+                onChange={handleSelectChange}
                 required
               >
                 <option value=''>Select an order</option>
