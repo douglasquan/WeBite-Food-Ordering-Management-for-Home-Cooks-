@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy.exc import IntegrityError
 from flask import *
 import os
@@ -26,7 +28,7 @@ class Order(db.Model):
     quantity = db.Column(db.Integer, nullable=False, default=0)
     price = db.Column(db.Float, nullable=False, default=0)
     status = db.Column(db.Enum(OrderStatus), nullable=False, default=OrderStatus.UNPAID)
-
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
 with app.app_context():
     db.create_all()
@@ -65,7 +67,8 @@ def get_order(order_id):
         'meal_id': order.meal_id,
         'quantity': order.quantity,
         'price': order.price,
-        'status': order.status.value
+        'status': order.status.value,
+        'date': order.date
     }), 200
 
 
@@ -79,7 +82,8 @@ def get_orders_by_chef(chef_id):
         'meal_id': order.meal_id,
         'quantity': order.quantity,
         'price': order.price,
-        'status': order.status.value
+        'status': order.status.value,
+        'date': order.date
     } for order in orders]
 
     # Return the list of orders as a JSON response
@@ -101,7 +105,8 @@ def get_orders_by_customer(customer_id):
         'meal_id': order.meal_id,
         'quantity': order.quantity,
         'price': order.price,
-        'status': order.status.value
+        'status': order.status.value,
+        'date': order.date
     } for order in orders]
 
     # Return the list of orders as a JSON response
@@ -120,7 +125,8 @@ def get_orders_by_meal(meal_id):
         'customer_id': order.customer_id,
         'quantity': order.quantity,
         'price': order.price,
-        'status': order.status.value
+        'status': order.status.value,
+        'date': order.date
     } for order in orders]
 
     return jsonify(orders_data), 200
