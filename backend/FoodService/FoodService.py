@@ -37,8 +37,7 @@ def place_bulk_orders():
 
 if __name__ == '__main__':
     current_dir = os.getcwd()
-    config_path = os.path.abspath(
-        os.path.join(os.path.join(os.path.join(current_dir, os.pardir), os.pardir), "config.json"))
+    config_path = os.path.abspath(os.path.join(current_dir, 'config.json'))
     with open(config_path, 'r') as config_file:
         config_data = json.load(config_file)
     # getting ip for everything
@@ -55,6 +54,7 @@ if __name__ == '__main__':
     order_url = f"http://{order_ip}:{order_port}/order"
     meal_url = f"http://{meal_ip}:{meal_port}/meal"
     app.run(host=food_ip, port=food_port, debug=True)
+
 
 
 

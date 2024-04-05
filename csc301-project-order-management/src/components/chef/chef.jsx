@@ -1,246 +1,463 @@
-import React from "react"
-import { useState, useEffect} from 'react';
-import Button from 'react-bootstrap/Button';
-import Offcanvas from 'react-bootstrap/Offcanvas';
-import Tab from 'react-bootstrap/Tab';
-import Tabs from 'react-bootstrap/Tabs';
+import React, { useState, useEffect } from "react";
+// import Button from "react-bootstrap/Button";
+import Offcanvas from "react-bootstrap/Offcanvas";
+import Tab from "react-bootstrap/Tab";
+import Tabs from "react-bootstrap/Tabs";
+import Modal from "react-bootstrap/Modal";
 
-import './chef.css';
-import Navbar from "../navbar/Navbar.jsx"
-import { getReq, postReq } from "../view_control.js";
-import OffcanvasBody from "react-bootstrap/esm/OffcanvasBody.js";
+import "./chef.css";
+import Navbar from "../navbar/Navbar.jsx";
+import { getReq, postReq, putReq, postReqForm, getImage, deleteReq } from "../view_control.js";
 
-// const getMenuData = async () => {
-//   const chefID = "1";
-//   const data = await getReq("meal/chef", chefID)
-//   // console.log(data);
-//   return data; 
-// };
-
-// var products = [];
-
-// const UserInfo = JSON.parse(localStorage.getItem('user'));
-// const chefID = UserInfo.chefID;
-
-// if (chefID === null) {
-//   products = [];
-// } else {
-//   const menuData = await getMenuData(); 
-//   console.log(menuData);
-// }
-
-// console.log(UserInfo)
-var UserInfo = null;
-var chefID = null;
 const Chef = () => {
+  // chef container stuff
+  const [meals, setMeals] = useState([]);
+  const [mealFormData, setMealFormData] = useState({ name: "", cost: "" });
+  const [chefId, setChefId] = useState(null);
 
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
-  const [products, setProducts] = useState([]);
+  //image upload stuff
+  const [preview, setPreview] = useState("");
+  const [file, setFile] = useState(null);
 
-  useEffect(() => {
-    const fetchMenuData = async () => {
-      UserInfo = JSON.parse(localStorage.getItem('user'));
-      chefID = UserInfo?.chefid;
-      console.log(chefID);
-      if (chefID) {
-        const menuData = await getReq("meal/chef", chefID);
-        if (menuData !== null) {
-          console.log(menuData);
-          setProducts(menuData || []);
-        } else {
-          setProducts([]);
-        }
-
-      } else {
-        setProducts([]);
-      }
-      // console.log(chefID);
-    };
-
-    fetchMenuData();
-  }, []);
-  
-  // const products = [
-  //   // Add your product details here
-  //   { id: 1, name: "Show Me Your Love", price: 9.99, imageUrl: './food.jpg' },
-  //   { id: 2, name: "Hong Kong Style Curry Beef Tendon Rice", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1610266834410-0232b52c2c4a?q=80&w=1972&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
-  //   { id: 3, name: "Poke Bowl", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1609710219171-f86ae613c8d8?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
-  //   { id: 4, name: "Siu Mai", price: 9.99, imageUrl: 'https://plus.unsplash.com/premium_photo-1674601033631-79eeffaac6f9?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGhvbmclMjBrb25nJTIwZm9vZHxlbnwwfHwwfHx8MA%3D%3D' },
-  //   { id: 5, name: "Dim Sum", price: 9.99, imageUrl: 'https://plus.unsplash.com/premium_photo-1674601031608-1a38ca161523?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8aG9uZyUyMGtvbmclMjBmb29kfGVufDB8fDB8fHww' },
-  //   { id: 6, name: "Hagao", price: 9.99, imageUrl: 'https://plus.unsplash.com/premium_photo-1674601033003-d028c1b148e6?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fGhvbmclMjBrb25nJTIwZm9vZHxlbnwwfHwwfHx8MA%3D%3D' },
-  //   { id: 7, name: "Ramen", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1593906115209-6d0011a840e8?q=80&w=1972&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
-  //   { id: 8, name: "Beef Brisket Noodle", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1529690678884-189e81f34ef6?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fGhvbmclMjBrb25nJTIwZm9vZHxlbnwwfHwwfHx8MA%3D%3D' },
-  //   { id: 9, name: "Sweet and Sour Pork", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1623689048105-a17b1e1936b8?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Q2hpbmVzZSUyMGZvb2R8ZW58MHx8MHx8fDA%3D' },
-  //   { id: 10, name: "Pad thai", price: 9.99, imageUrl: 'https://images.unsplash.com/photo-1637806930600-37fa8892069d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGFkJTIwdGhhaXxlbnwwfHwwfHx8MA%3D%3D' },
-  //   // ... other products
-  // ];
-
-  // products = [];
-
-
+  // hide and unhide edit form
   const [show, setShow] = useState(false);
-
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
+  // hide and unhide offer button
+  const [currentOfferId, setCurrentOfferId] = useState(null);
+
+  // Notification Modal
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+
+  // Confirmation Model
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [mealIdToConfirm, setMealIdToConfirm] = useState(null);
+
+  const [showOfferConfirmationModal, setShowOfferConfirmationModal] = useState(false);
+  const [mealIdForOffer, setMealIdForOffer] = useState(null);
+
+  const [successMessage, setSuccessMessage] = useState("");
+
+  useEffect(() => {
+    const init = async () => {
+      await checkIfChef();
+    };
+
+    init();
+  }, []); // Removed chefId dependency to prevent initial double call
+
+  const handleShowModal = (message) => {
+    setModalMessage(message);
+    setShowModal(true);
+  };
+
+  const checkIfChef = async () => {
+    try {
+      const response = await getReq("user/chef/is-chef");
+      if (response.data.is_chef) {
+        console.log("Chef ID:", response.data.chef_id);
+        setChefId(response.data.chef_id);
+        // Call fetchMeals here after the state is set
+        fetchMeals(response.data.chef_id); // Pass chefId directly to ensure it's used immediately
+      } else {
+        console.log("User is not a chef.");
+      }
+    } catch (error) {
+      console.error("Failed to check chef status:", error);
+      handleShowModal("Failed to check chef status. Please try again later.");
+    }
+  };
+
+  const fetchMeals = async (chefIdParam) => {
+    const currentChefId = chefIdParam || chefId;
+    if (currentChefId === null) return; // Guard clause
+
+    try {
+      const response = await getReq(`meal/chef/${currentChefId}`);
+      const meals = response.data;
+
+      if (meals.length === 0) {
+        // Handle the case where no meals are found
+        setMeals([]);
+        // Optionally, you can set a state to show a "no meals available" message
+        // For example: setNoMealsMessage('No meals are currently available.');
+        return;
+      }
+
+      const mealsWithImages = await Promise.all(
+        meals.map(async (meal) => {
+          const imageUrl = await getImage(meal.meal_id);
+          return { ...meal, imageUrl };
+        })
+      );
+
+      setMeals(mealsWithImages);
+    } catch (error) {
+      console.error("Failed to fetch meals:", error);
+      handleShowModal("Failed to fetch meals. Please try again later.");
+    }
+  };
+
   const handleAdd = async (event) => {
-    // Prevent the browser from reloading the page
     event.preventDefault();
-
-    // console.log(name);
-    // console.log(price);
-
-    const data = {"chef_id": chefID, "name": name, "cost": price};
-    // console.log(data);
-    const response = await postReq("meal/None", data);
-    // const response = await getReq("meal", "1");
-    // console.log(response);
+    try {
+      const mealResponse = await postReq("meal", { ...mealFormData, chef_id: chefId });
+      const mealData = mealResponse.data;
+      if (mealData && mealData.meal_id && file) {
+        const formData = new FormData();
+        formData.append("image", file);
+        formData.append("meal_id", mealData.meal_id);
+        await postReqForm("image", formData, true);
+      }
+      setSuccessMessage("Meal added successfully!"); // Update the success message
+      setTimeout(() => setSuccessMessage(""), 5000); // Clear the message after 5 seconds
+      // If everything is successful, close the off-canvas and refresh the page
+      handleClose();
+      setMealFormData({ name: "", cost: "" }); // Reset form fields
+      setFile(null); // Clear the file state
+      setPreview(""); // Clear the image preview
+      fetchMeals(); // Refresh the meal list
+    } catch (error) {
+      console.error("Error adding meal:", error);
+      handleShowModal("Error adding meal. Please check the meal details and try again.");
+    }
   };
 
-  const handleDelete = (event) => {
-    // Prevent the browser from reloading the page
+  const handleDelete = async (event) => {
     event.preventDefault();
 
-    console.log(name);
-    console.log(price);
+    if (!mealFormData.name) {
+      handleShowModal("Please enter a dish name.");
+      return;
+    }
 
-    const data = {"name": name, "cost": price};
-    // postReq("chef", data);
+    try {
+      // Step 1: Send a GET request to retrieve the meal ID using the meal name
+      const getResponse = await getReq(`meal/name/${mealFormData.name}`);
+      if (!getResponse.data || !getResponse.data.meal_id) {
+        handleShowModal("Meal not found.");
+        return;
+      }
+
+      const mealId = getResponse.data.meal_id;
+
+      // Step 2: Send a DELETE request to delete the meal using the meal ID
+      const deleteResponse = await deleteReq(`meal/${mealId}`);
+      if (deleteResponse.status === 200) {
+        setSuccessMessage("Meal deleted successfully.");
+        setTimeout(() => setSuccessMessage(""), 5000);
+        // Optionally, refresh the meals list to reflect the deletion
+        fetchMeals(chefId);
+
+        // Reset form data
+        setMealFormData({ name: "", cost: "" });
+
+        // Close the form if it's open
+        handleClose();
+      }
+    } catch (error) {
+      console.error("Error deleting meal:", error);
+      handleShowModal("You cannot delete a meal that has been ordered.");
+    }
   };
 
-  const handleUpdate = (event) => {
-    // Prevent the browser from reloading the page
-    event.preventDefault();
-
-    console.log(name);
-    console.log(price);
-
-    const data = {"name": name, "cost": price};
-    // postReq("chef", data);
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    setFile(file);
+    setPreview(URL.createObjectURL(file));
   };
 
-  const reset = () => { 
-    setName();
-    setPrice();
-  }
+  // handle "today's offer"
+  const handleOfferConfirmation = (mealId) => {
+    setMealIdForOffer(mealId); // Store the meal ID for later use
+    setShowOfferConfirmationModal(true); // Show the confirmation modal
+  };
 
+  const confirmSetOffer = async () => {
+    if (mealIdForOffer !== null) {
+      await updateMealOffer(mealIdForOffer);
+      setMealIdForOffer(null); // Reset the meal ID for offer
+    }
+    setShowOfferConfirmationModal(false); // Hide the confirmation modal
+  };
+
+  const removeMealOffer = async (mealId) => {
+    try {
+      const response = await putReq(`meal/${mealId}`, { offer: false });
+      if (response.status === 200) {
+        fetchMeals(chefId);
+        setCurrentOfferId(null); // Clear the current offer ID
+      }
+    } catch (error) {
+      console.error("Failed to update meal offer status:", error);
+      handleShowModal("An error occurred while updating the offer. Please try again.");
+    }
+  };
+
+  const updateMealOffer = async (newOfferMealId) => {
+    try {
+      // If there's already a meal set as the offer, remove the offer status
+      if (currentOfferId) {
+        await putReq(`meal/${currentOfferId}`, { offer: false });
+      }
+
+      // Then, set the new meal as the offer
+      const response = await putReq(`meal/${newOfferMealId}`, { offer: true });
+      if (response.status === 200) {
+        setCurrentOfferId(newOfferMealId); // Update the state to reflect the new offer
+        fetchMeals(chefId); // Refresh meals list to reflect these changes
+      } else {
+        // Handle failure
+        console.error("Failed to update meal offer status:", response);
+        alert("Could not set the new offer. Please try again.");
+      }
+    } catch (error) {
+      console.error("Failed to update meal offer status:", error);
+      handleShowModal("An error occurred while updating the offer. Please try again.");
+    }
+  };
+
+  const handleRemoveOfferConfirmation = (mealId) => {
+    setMealIdToConfirm(mealId); // Store the meal ID for later use
+    setShowConfirmationModal(true); // Show the confirmation modal
+  };
+
+  const confirmRemoveOffer = () => {
+    if (mealIdToConfirm !== null) {
+      removeMealOffer(mealIdToConfirm);
+      setMealIdToConfirm(null); // Reset the meal ID to confirm
+    }
+    setShowConfirmationModal(false); // Hide the confirmation modal
+  };
 
   return (
-    <div className="bg-white">
+    <div className='bg-white'>
       <Navbar />
-      <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
-        <h2 className="text-4xl font-extrabold tracking-tight text-gray-900">Your Store</h2>
-        <div className="mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-          {products.map((product) => (
-            <div key={product.id} className="group relative">
-              <div className="w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none">
+      <div className='max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8'>
+        <h2 className='text-4xl font-extrabold tracking-tight text-gray-900 text-center'>
+          Your Store
+        </h2>
+        {successMessage && (
+          <div className='bg-green-100 border-l-4 border-green-500 text-green-700 p-6' role='alert'>
+            <p>{successMessage}</p>
+          </div>
+        )}
+        <button
+          variant='primary'
+          onClick={handleShow}
+          className='text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-base px-6 py-3 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700'
+        >
+          Edit your menu !!!
+        </button>
+
+        <div className='mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+          {meals.map((meal) => (
+            <div
+              key={meal.meal_id}
+              className={`group relative border rounded-lg overflow-hidden shadow-lg ${
+                currentOfferId === meal.meal_id ? "bg-green-100" : "bg-white"
+              }`} // Change background color if it's the current offer
+            >
+              <div className='aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-t-lg'>
                 <img
-                  src={product.imageUrl}
-                  alt={product.name}
-                  className="w-full h-full object-center object-cover lg:w-full lg:h-full"
+                  src={meal.imageUrl}
+                  alt={meal.name}
+                  className='w-full h-full object-center object-cover group-hover:opacity-75'
                 />
               </div>
-              <div className="mt-4 flex justify-between">
-                <div>
-                  <h3 className="text-sm text-gray-700">
-                    {product.name}
-                  </h3>
+              <div className='p-4 space-y-2'>
+                <h3 className='text-lg text-gray-700 font-semibold'>
+                  {meal.name.replace(/_/g, " ")}
+                </h3>
+                <p className='text-sm font-medium text-gray-900'>${meal.cost}</p>
+                <div className='flex space-x-2'>
+                  {meal.meal_id !== currentOfferId && (
+                    <button
+                      onClick={() => handleOfferConfirmation(meal.meal_id)}
+                      className='py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700'
+                    >
+                      Set Today's Offer
+                    </button>
+                  )}
+                  {meal.offer && (
+                    <button
+                      onClick={() => handleRemoveOfferConfirmation(meal.meal_id)}
+                      className='text-xs text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-full'
+                    >
+                      Remove Offer
+                    </button>
+                  )}
                 </div>
-                <p className="text-sm font-medium text-gray-900">${product.cost}</p>
               </div>
-              {/* Edit button */}
-              {/* <button className="absolute top-0 right-0 mt-2 mr-2 text-xs text-white bg-blue-700 hover:bg-blue-600 px-2 py-1 rounded">
-                Edit
-              </button> */}
             </div>
           ))}
           {/* Add Product button */}
-          <div className="flex items-center justify-center w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none">
-            {/* <button className="text-gray-700 bg-transparent hover:bg-gray-300 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
-              <svg className="h-6 w-6" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="5" viewBox="0 0 24 24" stroke="currentColor">
-                <path d="M12 4v16m8-8H4"/>
-              </svg>
-            </button> */}
-            <Button variant="primary" onClick={handleShow}>
-              Edit your menu !!!
-            </Button>
 
-            <Offcanvas show={show} onHide={handleClose} placement="bottom" backdrop="static" scroll = {true}>
-              <Offcanvas.Header className="offHeader" closeButton>
+          <div className='flex items-center justify-center'>
+            <Offcanvas
+              show={show}
+              onHide={handleClose}
+              placement='bottom'
+              backdrop='static'
+              scroll={true}
+              className='h-auto'
+            >
+              <Offcanvas.Header className='offHeader' closeButton>
                 MENU EDITS!!!
               </Offcanvas.Header>
 
-    
-              <Offcanvas.Body >
-                <Tabs
-                  defaultActiveKey="profile"
-                  id="fill-tab-example"
-                  className="mb-3"
-                  fill
-                >
-                <Tab eventKey="Add" title="Add" className = "offbody">
-                  <form method="post" onSubmit={handleAdd}>
-                      <div className = 'offInputs'>
+              <Offcanvas.Body className='overflow-visible'>
+                <Tabs defaultActiveKey='profile' id='fill-tab-example' className='mb-3' fill>
+                  {/* Add Form */}
+                  <Tab eventKey='Add' title='Add' className='offbody'>
+                    <form method='post' onSubmit={handleAdd} className='flex flex-col space-y-5'>
+                      {/* Meal inputs */}
+                      <div className='offInputs'>
                         <label>
-                          Dish Name: <input className = 'labelContainer' name="myInput" required onChange={(e) => setName(e.target.value)}/>
+                          Dish Name:{" "}
+                          <input
+                            className='meal-name-input mb-3 px-3 py-2 border rounded-lg w-full'
+                            type='text'
+                            name='name'
+                            required
+                            value={mealFormData.name}
+                            onChange={(e) =>
+                              setMealFormData({ ...mealFormData, name: e.target.value })
+                            }
+                          />
                         </label>
                         <hr />
                         <label>
-                          Dish Price: <input className = 'labelContainer' name="myInput" required onChange={(e) => setPrice(e.target.value)}/>
+                          Dish Price:{" "}
+                          <input
+                            className='meal-cost-input mb-3 px-3 py-2 border rounded-lg w-full'
+                            type='number'
+                            name='cost'
+                            required
+                            value={mealFormData.cost}
+                            onChange={(e) =>
+                              setMealFormData({ ...mealFormData, cost: e.target.value })
+                            }
+                          />
                         </label>
                       </div>
-
-                    <div className = "offButtons">
-                      <button type="reset" onClick={reset} >Reset form</button>
-                      <button type="submit">Submit form</button>
-                    </div>
-                  </form>
-                </Tab>
-                <Tab eventKey="Delete" title="Delete" className = "offbody">
-                  <form method="post" onSubmit={handleDelete}>
-                      <div className = 'offInputs'>
-                        <label >
-                          Dish Name: <input className = 'labelContainer' name="myInput" required onChange={(e) => setName(e.target.value)}/>
-                        </label>
-                        <hr />
-                        <label >
-                          Dish Price: <input className = 'labelContainer' name="myInput" required onChange={(e) => setPrice(e.target.value)}/>
-                        </label>
+                      {/* Image upload */}
+                      <div className='image-upload-container mx-auto mt-10'>
+                        <div className='max-w-md mx-auto bg-white p-5 border rounded-md'>
+                          {/* Preview image if available */}
+                          {preview && (
+                            <img src={preview} alt='Preview' className='w-full h-auto bg-cover' />
+                          )}
+                          {/* Image file input */}
+                          <input
+                            type='file'
+                            name='image'
+                            onChange={handleImageChange}
+                            className='file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100'
+                          />
+                        </div>
                       </div>
-
-                    <div className = "offButtons">
-                      <button type="reset" onClick={reset} >Reset form</button>
-                      <button type="submit">Submit form</button>
-                    </div>
-                  </form>
-                </Tab>
-                <Tab eventKey="Update" title="Update" className = "offbody">
-                  <form method="post" onSubmit={handleUpdate}>
-                      <div className = 'offInputs'>
+                      {/* Form submission buttons */}
+                      <div className='form-actions'>
+                        <button
+                          type='submit'
+                          className='mt-4 py-2 px-4 bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg'
+                        >
+                          Add Meal and Upload Image
+                        </button>
+                      </div>
+                    </form>
+                  </Tab>
+                  {/* Delete Form */}
+                  <Tab eventKey='Delete' title='Delete' className='offbody'>
+                    <form method='post' onSubmit={handleDelete} className='flex flex-col space-y-5'>
+                      <div className='offInputs'>
                         <label>
-                          Dish Name: <input className = 'labelContainer' name="myInput" required onChange={(e) => setName(e.target.value)}/>
-                        </label>
-                        <hr />
-                        <label>
-                          Dish Price: <input className = 'labelContainer' name="myInput" required onChange={(e) => setPrice(e.target.value)}/>
+                          Dish Name:{" "}
+                          <input
+                            className='meal-name-input mb-3 px-3 py-2 border rounded-lg w-full'
+                            type='text'
+                            name='name'
+                            required
+                            value={mealFormData.name}
+                            onChange={(e) =>
+                              setMealFormData({ ...mealFormData, name: e.target.value })
+                            }
+                          />
                         </label>
                       </div>
-
-                    <div className = "offButtons">
-                      <button type="reset" onClick={reset} >Reset form</button>
-                      <button type="submit">Submit form</button>
-                    </div>
-                  </form>
-                </Tab>
-              </Tabs>
-
-
+                      {/* Form submission button */}
+                      <div className='form-actions'>
+                        <button
+                          type='submit'
+                          className='mt-4 py-2 px-4 bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg'
+                        >
+                          Remove Meal
+                        </button>
+                      </div>
+                    </form>
+                  </Tab>
+                </Tabs>
               </Offcanvas.Body>
             </Offcanvas>
           </div>
         </div>
       </div>
+
+      <footer className='bg-gray-800 w-full py-4 mt-12'>
+        <p className='text-center text-sm text-gray-300'>
+          Copyright © 2024 by WeBite.Inc. All rights reserved.
+        </p>
+      </footer>
+
+      {/* Modal Component */}
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Notification</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{modalMessage}</Modal.Body>
+        <Modal.Footer>
+          <button variant='secondary' onClick={() => setShowModal(false)}>
+            Close
+          </button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showConfirmationModal} onHide={() => setShowConfirmationModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Action</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to remove this meal from today’s offer?</Modal.Body>
+        <Modal.Footer>
+          <button variant='secondary' onClick={() => setShowConfirmationModal(false)}>
+            Cancel
+          </button>
+          <button variant='danger' onClick={() => confirmRemoveOffer()}>
+            Confirm
+          </button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showOfferConfirmationModal} onHide={() => setShowOfferConfirmationModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Offer Change</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {currentOfferId
+            ? "Changing the offer. Are you sure?"
+            : "Are you sure you want to set this meal as today’s offer?"}
+        </Modal.Body>
+        <Modal.Footer>
+          <button variant='secondary' onClick={() => setShowOfferConfirmationModal(false)}>
+            Cancel
+          </button>
+          <button variant='primary' onClick={() => confirmSetOffer()}>
+            Confirm
+          </button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

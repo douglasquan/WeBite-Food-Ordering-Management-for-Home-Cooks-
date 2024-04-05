@@ -1,56 +1,88 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../navbar/Navbar.jsx";
-import logo from './logo.png';
-import './input.css';
-import backgroundImage from './background.jpg';
-
-const UserInfo = JSON.parse(localStorage.getItem('user'));
+import logo from "./static/logo.png";
+import delivery from "./static/food_delivery.jpg";
+import home_page_hero from "./static/background1.jpg";
+import { getReq, postReq } from "../view_control";
 
 function Home() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const logoutUser = async () => {
+    await postReq("user/logout");
+    setUser(null);
+    window.location.href = "/";
+  };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const resp = await getReq("user/@me");
+        setUser(resp.data);
+      } catch (error) {
+        console.log("Not authenticated");
+      } finally {
+        setLoading(false); // Set loading to false after the request is complete
+      }
+    })();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>; // Render a loading indicator while checking auth status
+  }
+
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      <Navbar />
-      <h1>Welcome {UserInfo !== null? UserInfo.email : 'Guest'}</h1>
-      {/* Hero Section */}
-      <div className="relative text-white text-center py-36 px-12">
-        <div className="absolute inset-0 bg-cover bg-center opacity-25" style={{ backgroundImage: `url(${backgroundImage})`, backdropFilter: 'blur(0px)' }}></div>
-        {/* Content Overlay */}
-        {/* Logo Image */}
-        <img src={logo} alt="Logo" className="mx-auto mb-4 w-48 h-auto" /> {/* Adjust the w-48 (width) and h-auto (height) classes as needed */}
-        <h1 className="text-4xl font-bold">Connecting Chefs and Customers Worldwide</h1>
-      </div>
-      {/* Main Content Section */}
-      <div className="flex-grow flex flex-wrap md:flex-nowrap justify-center md:justify-between items-start p-4">
-        {/* Chef Container on the left */}
-        <div className="w-full md:w-1/2 p-4">
-          <div className="bg-gray-400 text-white m-2 rounded-lg p-4">
-            <h2 className="text-2xl font-bold mb-4">CHEF CONTAINER</h2>
-            <div className="grid grid-cols-4 gap-4">
-              <Link to="/chef" className="bg-white rounded shadow p-4 block text-center" href="Chef">Chef 1</Link>
-              <Link to="/chef" className="bg-white rounded shadow p-4 block text-center" href="Chef">Chef 2</Link>
-              <Link to="/chef" className="bg-white rounded shadow p-4 block text-center" href="Chef">Chef 3</Link>
-              <Link to="/chef" className="bg-white rounded shadow p-4 block text-center" href="Chef">Chef 4</Link>
+    <div className='flex flex-col min-h-screen bg-gray-100'>
+      {user && <Navbar />}
+      {user ? (
+        <div
+          className='relative h-[500px] bg-no-repeat bg-center bg-cover'
+          style={{ backgroundImage: `url(${home_page_hero})` }}
+        >
+          <div className='text-center py-36'>
+            <img src={logo} alt='Logo' className='mx-auto w-48 h-auto' />
+            <div>
+              <h1 className='text-4xl font-extrabold leading-tight text-black'>
+                Welcome, {user.username}!
+              </h1>
             </div>
           </div>
         </div>
-        {/* Customer Container on the right */}
-        <div className="w-full md:w-1/2 p-4">
-          <div className="bg-gray-400 text-white m-2 rounded-lg p-4">
-            <h2 className="text-2xl font-bold mb-4">CUSTOMER CONTAINER</h2>
-            <div className="grid grid-cols-4 gap-4">
-              <Link to="/customer" className="bg-white rounded shadow p-4 block text-center" href="Customer">Customer 1</Link>
-              <Link to="/customer" className="bg-white rounded shadow p-4 block text-center" href="Customer">Customer 2</Link>
-              <Link to="/customer" className="bg-white rounded shadow p-4 block text-center" href="Customer">Customer 3</Link>
-              <Link to="/customer" className="bg-white rounded shadow p-4 block text-center" href="Customer">Customer 4</Link>
+      ) : (
+        <div className='relative px-4 pt-6 pb-16 sm:pb-24'>
+          <div class='bg-neutral-50 px-6 py-12 text-center dark:bg-neutral-900 md:px-12 lg:text-left'>
+            <div class='w-100 mx-auto sm:max-w-2xl md:max-w-3xl lg:max-w-5xl xl:max-w-7xl'>
+              <div class='grid items-center gap-12 lg:grid-cols-2'>
+                <div class='mt-12 lg:mt-0'>
+                  <img src={logo} alt='Logo' className='mx-auto w-48 h-auto' />
+                  <h1 class='mt-2 mb-16 text-5xl font-bold tracking-tight md:text-6xl xl:text-7xl'>
+                    Taste like <br />
+                    <span class='text-[#0284c7]'>Home</span>
+                  </h1>
+                  <Link
+                    to='/login'
+                    class='bg-[#0284c7] hover:bg-[#0284c7] text-white font-bold py-2 px-4 rounded-full'
+                  >
+                    Get started
+                  </Link>
+                </div>
+                <div class='mb-12 lg:mb-0'>
+                  <img
+                    src={delivery}
+                    class='w-full rounded-lg shadow-lg dark:shadow-black/20'
+                    alt=''
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      {/* Footer */}
-      <footer className="bg-white">
-        <p className="text-center text-sm text-gray-600 py-4">
-          Copyright © 2024 by WeBite.Inc.
+      )}
+      <footer className='bg-gray-800 w-full py-4 mt-12'>
+        <p className='text-center text-sm text-gray-300'>
+          Copyright © 2024 by WeBite.Inc. All rights reserved.
         </p>
       </footer>
     </div>
