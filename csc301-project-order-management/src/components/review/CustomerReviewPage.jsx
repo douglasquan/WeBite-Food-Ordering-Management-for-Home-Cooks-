@@ -99,7 +99,7 @@ const CustomerReviewPage = () => {
   };
 
   return (
-    <div>
+    <div className='bg-custom-grey min-h-screen flex flex-col'>
       <Navbar />
       <div className='flex justify-center items-center mt-10'>
         <div className='w-full max-w-xl bg-white rounded-lg shadow-md p-6'>
@@ -189,6 +189,14 @@ const CustomerReviewPage = () => {
           )}
         </div>
       </div>
+      <div className='flex-grow'></div>
+
+      {/* Footer */}
+      <footer className='bg-gray-800 w-full py-4'>
+        <p className='text-center text-sm text-gray-300'>
+          Copyright © 2024 by WeBite.Inc. All rights reserved.
+        </p>
+      </footer>
     </div>
   );
 };

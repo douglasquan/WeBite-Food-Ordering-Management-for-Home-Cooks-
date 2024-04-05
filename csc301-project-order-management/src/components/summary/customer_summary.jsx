@@ -63,7 +63,7 @@ const CustomerSummaryPage = () => {
   }, [customerId]);
 
   return (
-    <div>
+    <div className='bg-custom-grey min-h-screen flex flex-col'>
       <Navbar />
       <h2 className='text-2xl font-bold my-5 text-center'>Order History</h2>
       {orders.length > 0 ? (
@@ -71,22 +71,32 @@ const CustomerSummaryPage = () => {
           <table className='min-w-full divide-y divide-gray-200'>
             <thead>
               <tr>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                <th className='px-6 py-3 text-left text-s font-medium text-gray-500 uppercase tracking-wider'>
                   Meal Name
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                <th className='px-6 py-3 text-left text-s font-medium text-gray-500 uppercase tracking-wider'>
                   Status
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                <th className='px-6 py-3 text-left text-s font-medium text-gray-500 uppercase tracking-wider'>
                   Date Ordered
                 </th>
               </tr>
             </thead>
-            <tbody className='bg-white divide-y divide-gray-200'>
+            <tbody className='bg-custom-light-orange divide-y divide-gray-200'>
               {orders.map((order) => (
                 <tr key={order.id}>
-                  <td className='px-6 py-4 whitespace-nowrap'>{order.mealName}</td>
-                  <td className='px-6 py-4 whitespace-nowrap'>{`${order.status} - $${order.price}`}</td>
+                  <td className='px-6 py-4 whitespace-nowrap'>
+                    {order.mealName.replace(/_/g, " ")}
+                  </td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap ${
+                      order.status === "PAID"
+                        ? "text-green-500"
+                        : order.status === "UNPAID"
+                        ? "text-red-500"
+                        : ""
+                    }`}
+                  >{`${order.status} - $${order.price}`}</td>
                   <td className='px-6 py-4 whitespace-nowrap'>{order.dateCreated}</td>
                 </tr>
               ))}
@@ -96,6 +106,14 @@ const CustomerSummaryPage = () => {
       ) : (
         <div className='text-center my-5'>No orders currently.</div>
       )}
+      <div className='flex-grow'></div>
+
+      {/* Footer */}
+      <footer className='bg-gray-800 w-full py-4'>
+        <p className='text-center text-sm text-gray-300'>
+          Copyright © 2024 by WeBite.Inc. All rights reserved.
+        </p>
+      </footer>
     </div>
   );
 };
