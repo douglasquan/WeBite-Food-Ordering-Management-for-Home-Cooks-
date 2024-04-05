@@ -5,7 +5,7 @@ import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 import Modal from "react-bootstrap/Modal";
 
-import "./chef.css";
+// import "./chef.css";
 import Navbar from "../navbar/Navbar.jsx";
 import { getReq, postReq, putReq, postReqForm, getImage, deleteReq } from "../view_control.js";
 
@@ -39,6 +39,8 @@ const Chef = () => {
   const [mealIdForOffer, setMealIdForOffer] = useState(null);
 
   const [successMessage, setSuccessMessage] = useState("");
+
+  const [fontSize, setFontSize] = useState("base"); // 'base', 'lg', 'xl', etc.
 
   useEffect(() => {
     const init = async () => {
@@ -232,59 +234,98 @@ const Chef = () => {
     setShowConfirmationModal(false); // Hide the confirmation modal
   };
 
+  const handleIncreaseFontSize = () => {
+    setFontSize((currentSize) => {
+      // Map the current size to the next larger size
+      const sizeMap = {
+        base: "sm", // base -> sm
+        sm: "md", // sm -> md
+        md: "lg", // md -> lg
+        lg: "xl", // lg -> xl
+        xl: "2xl", // xl -> 2xl
+        "2xl": "3xl", // 2xl -> 3xl
+        "3xl": "4xl", // 3xl -> 4xl
+        "4xl": "5xl", // 4xl -> 5xl
+        "5xl": "6xl", // 5xl -> 6xl
+      };
+      return sizeMap[currentSize] || "2xl"; // Default to '2xl' if currentSize is not in sizeMap
+    });
+  };
+
+  const getFontSizeClass = (size) => {
+    const sizeClasses = {
+      base: "text-base",
+      lg: "text-lg",
+      xl: "text-xl",
+      "2xl": "text-2xl",
+      // ...add more sizes if needed
+    };
+    return sizeClasses[size] || sizeClasses.base; // Default to 'text-base' if size is not in sizeClasses
+  };
+
   return (
-    <div className='bg-white'>
+    <div className='bg-custom-grey min-h-screen flex flex-col'>
       <Navbar />
       <div className='max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8'>
         <h2 className='text-4xl font-extrabold tracking-tight text-gray-900 text-center'>
           Your Store
         </h2>
         {successMessage && (
-          <div className='bg-green-100 border-l-4 border-green-500 text-green-700 p-6' role='alert'>
+          <div className='bg-green-100 border-l-4 border-green-500 text-green-700 p-4' role='alert'>
             <p>{successMessage}</p>
           </div>
         )}
-        <button
-          variant='primary'
-          onClick={handleShow}
-          className='text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-base px-6 py-3 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700'
-        >
-          Edit your menu !!!
-        </button>
 
-        <div className='mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+        {/* Buttons */}
+        <div className='flex justify-center gap-4 my-4'>
+          <button
+            onClick={handleShow}
+            className='text-white bg-gray-800 hover:bg-gray-900 focus:ring-4 focus:ring-gray-300 font-medium rounded-full px-6 py-3 transition duration-300 ease-in-out'
+          >
+            Edit your menu !!!
+          </button>
+          <button
+            onClick={handleIncreaseFontSize}
+            className='text-white bg-gray-800 hover:bg-gray-900 focus:ring-4 focus:ring-gray-300 font-medium rounded-full px-6 py-3 transition duration-300 ease-in-out'
+          >
+            Increase Font Size
+          </button>
+        </div>
+
+        {/* Meals Grid */}
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
           {meals.map((meal) => (
             <div
               key={meal.meal_id}
               className={`group relative border rounded-lg overflow-hidden shadow-lg ${
                 currentOfferId === meal.meal_id ? "bg-green-100" : "bg-white"
-              }`} // Change background color if it's the current offer
+              }`}
             >
-              <div className='aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-t-lg'>
-                <img
-                  src={meal.imageUrl}
-                  alt={meal.name}
-                  className='w-full h-full object-center object-cover group-hover:opacity-75'
-                />
-              </div>
+              <img
+                src={meal.imageUrl}
+                alt={meal.name}
+                className='w-full h-48 sm:h-64 object-cover'
+              />
               <div className='p-4 space-y-2'>
-                <h3 className='text-lg text-gray-700 font-semibold'>
+                <h3 className='text-lg font-semibold text-gray-700'>
                   {meal.name.replace(/_/g, " ")}
                 </h3>
                 <p className='text-sm font-medium text-gray-900'>${meal.cost}</p>
-                <div className='flex space-x-2'>
-                  {meal.meal_id !== currentOfferId && (
+                {/* Buttons */}
+                <div className='flex gap-2'>
+                  {/* Conditionally render buttons based on offer status */}
+                  {!meal.offer && (
                     <button
                       onClick={() => handleOfferConfirmation(meal.meal_id)}
-                      className='py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700'
+                      className='py-2 px-4 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 transition duration-300 ease-in-out'
                     >
-                      Set Today's Offer
+                      Set as Today's Offer
                     </button>
                   )}
                   {meal.offer && (
                     <button
                       onClick={() => handleRemoveOfferConfirmation(meal.meal_id)}
-                      className='text-xs text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-full'
+                      className='text-xs text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-full transition duration-300 ease-in-out'
                     >
                       Remove Offer
                     </button>
@@ -293,8 +334,8 @@ const Chef = () => {
               </div>
             </div>
           ))}
-          {/* Add Product button */}
 
+          {/* Add and Delete Form */}
           <div className='flex items-center justify-center'>
             <Offcanvas
               show={show}
@@ -316,7 +357,7 @@ const Chef = () => {
                       {/* Meal inputs */}
                       <div className='offInputs'>
                         <label>
-                          Dish Name:{" "}
+                          Dish Name:
                           <input
                             className='meal-name-input mb-3 px-3 py-2 border rounded-lg w-full'
                             type='text'
@@ -406,7 +447,10 @@ const Chef = () => {
         </div>
       </div>
 
-      <footer className='bg-gray-800 w-full py-4 mt-12'>
+      <div className='flex-grow'></div>
+
+      {/* Footer */}
+      <footer className='bg-gray-800 w-full py-4'>
         <p className='text-center text-sm text-gray-300'>
           Copyright © 2024 by WeBite.Inc. All rights reserved.
         </p>

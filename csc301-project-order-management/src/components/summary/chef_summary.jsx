@@ -100,7 +100,7 @@ const ChefSummaryPage = () => {
   }, [orders, customers, mealNames]);
 
   return (
-    <div>
+    <div className='bg-custom-grey min-h-screen flex flex-col'>
       <Navbar />
       <h2 className='text-2xl font-bold my-5 text-center'>Orders Summary</h2>
       {orders.length > 0 ? (
@@ -108,23 +108,23 @@ const ChefSummaryPage = () => {
           <table className='min-w-full divide-y divide-gray-200'>
             <thead>
               <tr>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                <th className='px-6 py-3 text-left text-s font-medium text-gray-500 uppercase tracking-wider'>
                   Meal / Customer
                 </th>
                 {Object.values(customers).map((username) => (
                   <th
                     key={username}
-                    className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
+                    className='px-6 py-3 text-left text-s font-medium text-gray-500 uppercase tracking-wider'
                   >
                     {username}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className='bg-white divide-y divide-gray-200'>
+            <tbody className='bg-custom-light-orange divide-y divide-gray-200'>
               {Object.entries(orderTable).map(([mealName, customerOrders]) => (
                 <tr key={mealName}>
-                  <td className='px-6 py-4 whitespace-nowrap'>{mealName}</td>
+                  <td className='px-6 py-4 whitespace-nowrap'>{mealName.replace(/_/g, " ")}</td>
                   {Object.values(customers).map((username, index) => (
                     <td
                       key={index}
@@ -145,6 +145,14 @@ const ChefSummaryPage = () => {
       ) : (
         <div className='text-center my-5'>No orders currently.</div>
       )}
+      <div className='flex-grow'></div>
+
+      {/* Footer */}
+      <footer className='bg-gray-800 w-full py-4'>
+        <p className='text-center text-sm text-gray-300'>
+          Copyright © 2024 by WeBite.Inc. All rights reserved.
+        </p>
+      </footer>
     </div>
   );
 };

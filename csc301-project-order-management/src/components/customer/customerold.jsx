@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../navbar/Navbar.jsx";
-import "./customer.css";
+// import "./customer.css";
 import { getReq, getImage, postReq } from "../view_control.js";
 
 const Customer = () => {
@@ -176,7 +176,7 @@ const Customer = () => {
   return (
     <div className='bg-white'>
       <Navbar />
-      <div className='max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8'>
+      <div className='max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8'>
         {!selectedChefId ? (
           <>
             <h1 className='text-2xl font-bold mb-5'>Our Chefs</h1>
@@ -210,17 +210,28 @@ const Customer = () => {
             >
               Back to Chefs
             </button>
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+            {/* Meals Display */}
+            <div className='mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
               {meals.map((meal) => (
                 <div
                   key={meal.meal_id}
-                  className={`group relative rounded overflow-hidden shadow-lg p-4 ${
-                    meal.offer ? "border-4 border-green-500" : ""
+                  className={`group relative border rounded-lg overflow-hidden shadow-lg ${
+                    meal.offer ? "bg-green-100" : "bg-white"
                   }`}
                 >
                   {meal.offer && <p className='text-gray-700 text-base'> Today's Offer</p>}
-                  <img src={meal.imageUrl} alt='Meal' className='w-full h-32 object-cover' />
-                  <div className='px-6 py-4'>
+                  
+                  {/* meal image */}
+                  <div className='aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-t-lg'>
+                    <img
+                      src={meal.imageUrl}
+                      alt='Meal'
+                      className='w-full h-full sm:h-64 object-cover group-hover:opacity-75'
+                    />
+                  </div>
+
+                  {/* meal name and cost */}
+                  <div className='p-4 space-y-2'>
                     <div className='font-bold text-xl mb-2'>{meal.name}</div>
                     <p className='text-gray-700 text-base'>{meal.cost}</p>
                     {meal.offer && (

@@ -176,100 +176,132 @@ const Customer = () => {
   };
 
   return (
-    <div class="flex flex-col items-center h-screen">
+    <div className='bg-custom-grey min-h-screen flex flex-col'>
       <Navbar />
-      <main className="flex justify-center items-start">
-        <div className={`px-4 ${cartVisible ? 'md:mr-80' : ''}`}>
-          <div className='max-w-5xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8'>
-          {!selectedChefId ? (
-            <>
-              <h1 className='text-2xl font-bold mb-5 text-center'>Our Chefs</h1>
-              <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4'>
-                {chefs.map((chef) => (
-                  <div
-                    key={chef.chef_id}
-                    className='max-w-sm rounded overflow-hidden shadow-lg p-4 cursor-pointer transition-colors duration-300 hover:bg-gray-100'
-                    onClick={() => setSelectedChefId(chef.chef_id)}
-                  >
-                    <div className='px-6 py-4'>
-                      <div className='font-bold text-xl mb-2 text-center'>{chef.username || "Chef"}</div>
-                      <p className='text-gray-700 text-base text-center'>{chef.description}</p>
-                    </div>
-                    <div className='flex flex-col items-center px-6 pt-4 pb-2'>
-                      <span className='inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2'>
+      <main className='flex flex-col justify-center items-center md:items-start'>
+        <div className={`px-4 ${cartVisible ? "md:mr-80" : ""} w-full`}>
+          <div className='max-w-5xl mx-auto py-16 sm:py-24'>
+            {!selectedChefId ? (
+              <>
+                <h1 className='text-2xl font-bold mb-5 text-center'>Our Chefs</h1>
+                <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4'>
+                  {chefs.map((chef) => (
+                    <div
+                      key={chef.chef_id}
+                      className='max-w-sm rounded overflow-hidden shadow-lg p-4 cursor-pointer transition-colors duration-300 hover:bg-gray-100'
+                      onClick={() => setSelectedChefId(chef.chef_id)}
+                    >
+                      <div className='px-6 py-4'>
+                        <div className='font-bold text-xl mb-2 text-center'>
+                          {chef.username || "Chef"}
+                        </div>
+                        <p className='text-gray-700 text-base text-center'>{chef.description}</p>
+                      </div>
+                      <div className='flex flex-col items-center px-6 pt-4 pb-2'>
+                        {/* <span className='inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2'>
                         {`Rating: ${chef.rating}`}
-                      </span>
-                      <button className="w-full bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm mt-4">View Menu</button>
+                      </span> */}
+                        <button className='w-full bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm mt-4'>
+                          View Menu
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </>
+                  ))}
+                </div>
+              </>
             ) : (
-              <div className="container mx-auto pt-4">
-                <h2 className="text-xl font-bold text-center mt-2 mb-8">Menu</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              /* Meals Display */
+              <div className='container mx-auto pt-4'>
+                <h2 className='text-2xl font-bold text-center mb-10'>Menu</h2>
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10'>
                   {meals.map((meal) => (
-                    <div key={meal.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                      <img src={meal.imageUrl} alt={meal.name} className="w-full h-32 sm:h-48 object-cover" />
-                      <div className="p-4">
-                        <h3 className="font-bold text-lg mb-2">{meal.name}</h3>
-                        <p className="text-gray-700 text-sm">{meal.description}</p>
-                        <div className="mt-3 flex justify-between items-center">
-                          <span className="text-lg font-semibold">{`$${meal.cost}`}</span>
-                          <button onClick={() => addToCart(meal.meal_id)} className="bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm">Add to Cart</button>
+                    <div
+                      key={meal.meal_id}
+                      className={`border rounded-lg overflow-hidden shadow-lg ${
+                        meal.offer ? "bg-green-100" : "bg-white"
+                      }`}
+                    >
+                      <img
+                        src={meal.imageUrl}
+                        alt={meal.name}
+                        className='w-full h-64 object-cover group-hover:opacity-75'
+                      />
+                      <div className='p-4 space-y-2'>
+                        {meal.offer && <p className='text-sm text-green-800'>Today's Offer</p>}
+                        <h3 className='text-lg font-semibold break-words'>
+                          {meal.name.replace(/_/g, " ")}
+                        </h3>
+                        <p className='text-sm text-gray-700'>{meal.description}</p>
+                        <div className='flex justify-between items-center'>
+                          <span className='text-lg font-semibold'>{`$${meal.cost}`}</span>
+                          {meal.offer && (
+                            <button
+                              onClick={() => addToCart(meal.meal_id)}
+                              className='py-2 px-4 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 transition duration-300'
+                            >
+                              Add to Cart
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
-                <button onClick={() => setSelectedChefId(null)} className="text-blue-600 hover:text-blue-800 transition-colors duration-300">
-                  Back to Chefs
-                </button>
+                <div className='text-center mt-10'>
+                  <button
+                    onClick={() => setSelectedChefId(null)}
+                    className='text-lg text-blue-600 hover:text-blue-800 transition-colors duration-300'
+                  >
+                    Back to Chefs
+                  </button>
+                </div>
               </div>
             )}
           </div>
 
           {cartVisible && (
-            <aside className="fixed inset-y-0 right-0 w-80 bg-white shadow-xl p-4 overflow-y-auto z-10">
-              <button onClick={() => setCartVisible(false)} className="text-black">
+            <aside className='fixed inset-y-0 right-0 w-90 bg-white shadow-xl p-4 overflow-y-auto z-10'>
+              <button onClick={() => setCartVisible(false)} className='text-black'>
                 Close
               </button>
-              <h2 className="text-xl font-bold border-b pb-4">Shopping Cart</h2>
+              <h2 className='text-xl font-bold border-b pb-4'>Shopping Cart</h2>
               <ul>
-                {Object.keys(cart).map(mealId => (
-                  <li key={mealId} className="flex items-center p-2 border-b">
+                {Object.keys(cart).map((mealId) => (
+                  <li key={mealId} className='flex items-center p-2 border-b'>
                     <span>{cart[mealId].name}</span>
-                    <div className="flex items-center ml-auto">
-                      <button onClick={() => updateQuantity(mealId, -1)} className="text-black mx-2">
+                    <div className='flex items-center ml-auto'>
+                      <button
+                        onClick={() => updateQuantity(mealId, -1)}
+                        className='text-black mx-2'
+                      >
                         -
                       </button>
                       <span>{cart[mealId].quantity}</span>
-                      <button onClick={() => updateQuantity(mealId, 1)} className="text-black mx-2">
+                      <button onClick={() => updateQuantity(mealId, 1)} className='text-black mx-2'>
                         +
                       </button>
                     </div>
                     <span>${(cart[mealId].price * cart[mealId].quantity).toFixed(2)}</span>
-                    <button onClick={() => deleteItem(mealId)} className="text-red-500 ml-4">
+                    <button onClick={() => deleteItem(mealId)} className='text-red-500 ml-4'>
                       Remove
                     </button>
                   </li>
                 ))}
               </ul>
-              <div className="border-t pt-4">
+              <div className='border-t pt-4'>
                 <strong>Total:</strong> ${calculateTotalPrice()}
                 <button
                   onClick={placeOrder}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded mt-4"
+                  className='w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded mt-4'
                 >
                   Place Order
                 </button>
               </div>
             </aside>
-          )}  
+          )}
         </div>
       </main>
-      <footer className="bg-gray-800 text-white text-center py-4 w-full">
+      <footer className='bg-gray-800 text-white text-center py-4 w-full'>
         Copyright © 2024 by WeBite.Inc. All rights reserved.
       </footer>
     </div>

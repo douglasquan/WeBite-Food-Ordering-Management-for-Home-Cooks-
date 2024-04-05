@@ -26,11 +26,10 @@ const Navbar = () => {
   const logoutUser = async () => {
     await postReq("user/logout");
     setUser(null); // Clear user state
-    window.location.href = "/";
   };
 
   return (
-    <nav class='container flex items-center py-2 mt-2 sm:mt-12'>
+    <nav class='container flex items-center py-2 mt-2 sm:mt-12 '>
       <div class='py-1'>
         <Link to='/home' className='p-0'>
           <img src={logoImage} alt='Logo' className='h-20 w-auto sm:h-20' />
