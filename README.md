@@ -1,70 +1,27 @@
-# Getting Started with Create React App
+# Why We built this App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+WeBite is a food ordering app designed to bridge the gap between home cooks and friends.The app was developed to streamline order management and enhance the user experience, transcending the limitations of traditional communication and management methods. 
 
-## Available Scripts
+Webite revolutionizes this process by offering a centralized platform where chefs can manage menus, take orders, and process payments seamlessly. Its tailored interface is designed specifically for culinary commerce, enabling better organization, real-time updates, and a more engaging user experience compared to the ad-hoc systems previously used.
 
-In the project directory, you can run:
+The introduction of Webite has significantly improved the operational efficiency and satisfaction of both the cook and the customers, proving to be a substantial upgrade over the combination of Excel and WhatsApp.
 
-### `npm start`
+# Main Features
+## Microservices Architecture -- Integrated Gateway
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Utilizes a central gateway for managing communications between microservices, enhancing application scalability by simplifying interactions.
+## User Authentication System -- Secure and Reliable Authentication
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Incorporates server-side sessions with Redis to ensure fast session management and robust security measures to protect user data.
+## Chef's Management Interface -- Enhanced Meal Management
 
-### `npm test`
+Features an interface for chefs to manage meal details, which includes a image uploading feature, ensuring visually appealing meal presentations. It also allows chefs to highlight daily specials to attract customers by setting "today's offer" .
+## Anonymous Review and Rating System -- Engaging User Experience
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Includes an anonymous review and rating system that allows customers to provide honest feedback on food and service quality, enhancing overall customer engagement and satisfaction.
+## Order Payment Tracking System -- Comprehensive financial management:
 
-### `npm run build`
+Implements an order summary system that keeps tracks of all orders and payments, enabling chefs to organize and monitor which customers have paid, enhancing operational efficiency and financial management.
+## Optimized Development and Project Management
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Adopts Agile methodologies for flexible and efficient development processes, and employs Jira and GitHub for task management. This facilitates project coordination and progress tracking among team members, ensuring streamlined operations and effective team collaboration.
